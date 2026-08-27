@@ -362,31 +362,42 @@ const schemaData = type === 'article' ? {
           searchModal.querySelector('#searchCard')?.classList.add('-translate-y-4');
         }
 
-        searchTrigger?.addEventListener('click', openSearch);
-        closeSearchBtn?.addEventListener('click', closeSearch);
-        searchModal?.addEventListener('click', (e) => {
-          if (e.target === searchModal) closeSearch();
-        });
+        if (searchTrigger) searchTrigger.onclick = openSearch;
+        if (closeSearchBtn) closeSearchBtn.onclick = closeSearch;
+        if (searchModal) {
+          searchModal.onclick = (e) => {
+            if (e.target === searchModal) closeSearch();
+          };
+        }
 
-        document.addEventListener('keydown', (e) => {
+        const handleSearchKeydown = (e: KeyboardEvent) => {
           if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
             e.preventDefault();
             searchModal?.classList.contains('opacity-0') ? openSearch() : closeSearch();
           }
-          if (e.key === 'Escape') closeSearch();
-        });
+          if (e.key === 'Escape' && searchModal && !searchModal.classList.contains('opacity-0')) {
+            closeSearch();
+          }
+        };
+
+        document.removeEventListener('keydown', (document as any)._searchKeyHandler);
+        (document as any)._searchKeyHandler = handleSearchKeydown;
+        document.addEventListener('keydown', handleSearchKeydown);
 
         // 3. Back to Top
         const backToTop = document.getElementById('backToTopBtn');
-        backToTop?.addEventListener('click', () => {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
+        if (backToTop) {
+          backToTop.onclick = (e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          };
+        }
 
         // 4. Code Block Copy Buttons
         document.querySelectorAll('.prose-custom pre').forEach((pre) => {
           if (pre.querySelector('.code-copy-btn')) return;
           const btn = document.createElement('button');
-          btn.className = 'code-copy-btn absolute top-2.5 right-2.5 px-2.5 py-1 text-[11px] font-bold rounded-md bg-white/10 text-white hover:bg-white/20 transition-all';
+          btn.className = 'code-copy-btn absolute top-2.5 right-2.5 px-2.5 py-1 text-[11px] font-bold rounded-md bg-white/10 text-white hover:bg-white/20 transition-all cursor-pointer';
           btn.textContent = 'Copy';
           btn.onclick = () => {
             const code = pre.querySelector('code')?.innerText || (pre as HTMLElement).innerText;
@@ -404,11 +415,13 @@ const schemaData = type === 'article' ? {
 
         // 5. Copy Share Link
         const shareCopyBtn = document.getElementById('copyShareLinkBtn');
-        shareCopyBtn?.addEventListener('click', () => {
-          navigator.clipboard.writeText(window.location.href).then(() => {
-            showToast('Article link copied to clipboard! 📋');
-          });
-        });
+        if (shareCopyBtn) {
+          shareCopyBtn.onclick = () => {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+              showToast('Article link copied to clipboard! 📋');
+            });
+          };
+        }
       }
 
       function showToast(msg: string) {
@@ -422,7 +435,6 @@ const schemaData = type === 'article' ? {
       }
 
       document.addEventListener('astro:page-load', setupClientFeatures);
-      setupClientFeatures();
     </script>
   </body>
 </html>
