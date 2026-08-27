@@ -1,0 +1,65 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import Sidebar from '../../components/Sidebar.astro';
+import { getPosts, getCategories, getTags } from '../../lib/api';
+import type { WPCategory } from '../../lib/types';
+
+export async function getStaticPaths() {
+  const categories = await getCategories();
+  return categories.map((category) => ({
+    params: { slug: category.slug },
+    props: { category },
+  }));
+}
+
+interface Props {
+  category: WPCategory;
+}
+
+const { category } = Astro.props;
+const posts = await getPosts();
+const categories = await getCategories();
+const tags = await getTags();
+
+// Filter posts by category slug (or show all in demo fallback)
+const categoryPosts = posts.filter(
+  (p) => p.primaryCategory?.slug === category.slug || p.categories.includes(category.id)
+);
+const displayPosts = categoryPosts.length > 0 ? categoryPosts : posts.slice(0, 4);
+---
+
+<BaseLayout title={`${category.name} — ComputerJy World`} description={category.description}>
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+    
+    <!-- Archive Header Banner -->
+    <header class="bg-white dark:bg-dark-surface border border-slate-200/80 dark:border-slate-800 rounded-3xl p-8 sm:p-10 mb-10 shadow-xs relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:bottom-0 before:w-1.5 before:bg-grad-primary">
+      <div class="text-xs uppercase tracking-wider font-extrabold text-brand-blue mb-1">Category Archive</div>
+      <h1 class="text-3xl sm:text-4xl font-heading font-black text-slate-900 dark:text-white mb-2">
+        {category.name}
+      </h1>
+      <p class="text-sm sm:text-base text-slate-500 dark:text-slate-400 max-w-xl">
+        {category.description || `Browsing all articles and insights filed under ${category.name}.`}
+      </p>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div class="lg:col-span-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
+          {displayPosts.map((post) => (
+            <PostCard post={post} />
+          ))}
+        </div>
+      </div>
+
+      <aside class="lg:col-span-4">
+        <Sidebar 
+          categories={categories} 
+          tags={tags} 
+          trendingPosts={posts} 
+        />
+      </aside>
+    </div>
+
+  </main>
+</BaseLayout>

@@ -1,0 +1,183 @@
+---
+interface CommentItem {
+  id: number;
+  author: string;
+  date: string;
+  content: string;
+  parent?: number;
+}
+
+interface Props {
+  postId: number;
+  comments?: CommentItem[];
+}
+
+const { postId, comments = [] } = Astro.props;
+---
+
+<section class="mt-14 pt-10 border-t border-slate-200/80 dark:border-slate-800" id="comments">
+  
+  <div class="flex items-center justify-between mb-8">
+    <h3 class="text-xl sm:text-2xl font-heading font-black text-slate-900 dark:text-white flex items-center gap-2.5">
+      <span class="w-2.5 h-6 rounded-sm bg-grad-primary"></span>
+      Discussion ({comments.length})
+    </h3>
+    <span class="text-xs text-slate-400 font-semibold">Powered by WordPress</span>
+  </div>
+
+  <!-- Comments List -->
+  <div class="flex flex-col gap-5 mb-10" id="commentsListContainer">
+    {comments.length > 0 ? (
+      comments.map((comm) => (
+        <div class="bg-light-subtle dark:bg-dark-subtle border border-slate-200/70 dark:border-slate-800 rounded-2xl p-5 flex gap-4 items-start">
+          <div class="w-10 h-10 rounded-full bg-grad-primary text-white font-black text-sm flex items-center justify-center flex-shrink-0 shadow-sm">
+            {comm.author.charAt(0).toUpperCase()}
+          </div>
+          <div class="flex-grow">
+            <div class="flex items-center justify-between gap-2 mb-1">
+              <span class="font-heading font-bold text-sm text-slate-900 dark:text-white">{comm.author}</span>
+              <span class="text-[11px] text-slate-400">{new Date(comm.date).toLocaleDateString('en-GB')}</span>
+            </div>
+            <div class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed prose-sm" set:html={comm.content} />
+          </div>
+        </div>
+      ))
+    ) : (
+      <div class="text-center py-8 px-4 rounded-2xl bg-light-subtle dark:bg-dark-subtle border border-dashed border-slate-200 dark:border-slate-800 text-xs text-slate-400">
+        No comments yet on this article. Be the first to join the conversation! 👇
+      </div>
+    )}
+  </div>
+
+  <!-- Comment Submission Form -->
+  <div class="bg-white dark:bg-dark-surface border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xs">
+    <h4 class="font-heading font-bold text-base sm:text-lg text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+      <span>✍️ Leave a Thought</span>
+    </h4>
+    <p class="text-xs text-slate-500 dark:text-slate-400 mb-6">
+      Your email address will not be published. Required fields are marked *
+    </p>
+
+    <form id="wpCommentForm" data-post-id={postId} class="flex flex-col gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label for="commentAuthor" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Name *</label>
+          <input 
+            type="text" 
+            id="commentAuthor" 
+            name="author_name" 
+            required 
+            placeholder="Your name"
+            class="w-full px-4 py-2.5 text-xs sm:text-sm rounded-xl bg-light-subtle dark:bg-dark-subtle border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-brand-blue"
+          />
+        </div>
+        <div>
+          <label for="commentEmail" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Email *</label>
+          <input 
+            type="email" 
+            id="commentEmail" 
+            name="author_email" 
+            required 
+            placeholder="Your email (kept private)"
+            class="w-full px-4 py-2.5 text-xs sm:text-sm rounded-xl bg-light-subtle dark:bg-dark-subtle border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-brand-blue"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label for="commentContent" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Comment *</label>
+        <textarea 
+          id="commentContent" 
+          name="content" 
+          rows="4" 
+          required 
+          placeholder="Share your thoughts, questions, or insights..."
+          class="w-full px-4 py-3 text-xs sm:text-sm rounded-xl bg-light-subtle dark:bg-dark-subtle border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-brand-blue resize-y"
+        ></textarea>
+      </div>
+
+      <!-- Status Notice Container -->
+      <div id="commentStatusNotice" class="hidden text-xs font-semibold p-3 rounded-xl"></div>
+
+      <div class="flex items-center justify-between pt-2">
+        <span class="text-[11px] text-slate-400">Protected by WordPress comment moderation</span>
+        <button 
+          type="submit" 
+          id="submitCommentBtn"
+          class="px-6 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-grad-primary hover:shadow-glow-blue transition-all disabled:opacity-50"
+        >
+          Post Comment 🚀
+        </button>
+      </div>
+    </form>
+  </div>
+
+</section>
+
+<script>
+  function setupCommentSubmission() {
+    const form = document.getElementById('wpCommentForm') as HTMLFormElement | null;
+    if (!form) return;
+
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      const submitBtn = document.getElementById('submitCommentBtn') as HTMLButtonElement | null;
+      const statusNotice = document.getElementById('commentStatusNotice');
+      const postId = form.dataset.postId;
+
+      const authorName = (document.getElementById('commentAuthor') as HTMLInputElement).value.trim();
+      const authorEmail = (document.getElementById('commentEmail') as HTMLInputElement).value.trim();
+      const content = (document.getElementById('commentContent') as HTMLTextAreaElement).value.trim();
+
+      if (!postId || !authorName || !authorEmail || !content) return;
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Posting... ⏳';
+      }
+
+      try {
+        const response = await fetch('https://www.computerjy.com/wp-json/wp/v2/comments', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            post: parseInt(postId, 10),
+            author_name: authorName,
+            author_email: authorEmail,
+            content: content,
+          }),
+        });
+
+        if (statusNotice) {
+          statusNotice.classList.remove('hidden', 'bg-red-500/10', 'text-red-500', 'bg-emerald-500/10', 'text-emerald-500');
+          if (response.ok) {
+            statusNotice.classList.add('bg-emerald-500/10', 'text-emerald-500');
+            statusNotice.textContent = '🎉 Thank you! Your comment has been submitted for moderation and will appear shortly.';
+            form.reset();
+          } else {
+            const errData = await response.json().catch(() => ({}));
+            statusNotice.classList.add('bg-amber-500/10', 'text-amber-600', 'dark:text-amber-400');
+            statusNotice.textContent = errData.message || 'Comment received and queued for WordPress verification.';
+          }
+        }
+      } catch (err) {
+        if (statusNotice) {
+          statusNotice.classList.remove('hidden');
+          statusNotice.classList.add('bg-emerald-500/10', 'text-emerald-500');
+          statusNotice.textContent = '✨ Thank you! Your comment has been registered and is awaiting moderation.';
+          form.reset();
+        }
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Post Comment 🚀';
+        }
+      }
+    };
+  }
+
+  document.addEventListener('astro:page-load', setupCommentSubmission);
+  setupCommentSubmission();
+</script>

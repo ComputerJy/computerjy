@@ -1,0 +1,116 @@
+---
+interface Props {
+  currentPath?: string;
+}
+
+const { currentPath = '/' } = Astro.props;
+---
+
+<header class="sticky top-0 z-50 h-[72px] glass-header transition-all duration-300">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between gap-4">
+    
+    <!-- Brand Logo -->
+    <a href="/" class="flex items-center gap-3 group">
+      <img 
+        src="/logo.svg" 
+        alt="ComputerJy World" 
+        class="h-10 sm:h-11 w-auto transition-transform duration-200 group-hover:scale-105 group-hover:-rotate-1" 
+        width="220" 
+        height="44" 
+      />
+    </a>
+
+    <!-- Desktop Nav -->
+    <nav class="hidden md:flex items-center gap-1">
+      <a 
+        href="/" 
+        class={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-colors duration-200 ${currentPath === '/' ? 'text-brand-blue bg-light-subtle dark:bg-dark-subtle' : 'text-slate-600 dark:text-slate-300 hover:text-brand-blue hover:bg-light-subtle dark:hover:bg-dark-subtle'}`}
+      >
+        Home
+      </a>
+      <a 
+        href="/category/g33ky" 
+        class={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-colors duration-200 ${currentPath.includes('/category/g33ky') ? 'text-brand-blue bg-light-subtle dark:bg-dark-subtle' : 'text-slate-600 dark:text-slate-300 hover:text-brand-blue hover:bg-light-subtle dark:hover:bg-dark-subtle'}`}
+      >
+        Geeky &amp; Tech Tips
+      </a>
+      <a 
+        href="/category/entertainment" 
+        class={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-colors duration-200 ${currentPath.includes('/category/entertainment') ? 'text-brand-blue bg-light-subtle dark:bg-dark-subtle' : 'text-slate-600 dark:text-slate-300 hover:text-brand-blue hover:bg-light-subtle dark:hover:bg-dark-subtle'}`}
+      >
+        Entertainment
+      </a>
+      <a 
+        href="/contact-me" 
+        class={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-colors duration-200 ${currentPath === '/contact-me' ? 'text-brand-blue bg-light-subtle dark:bg-dark-subtle' : 'text-slate-600 dark:text-slate-300 hover:text-brand-blue hover:bg-light-subtle dark:hover:bg-dark-subtle'}`}
+      >
+        Contact
+      </a>
+    </nav>
+
+    <!-- Header Actions -->
+    <div class="flex items-center gap-2.5">
+      <!-- Search Button -->
+      <button 
+        id="searchTrigger" 
+        type="button" 
+        class="flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-500 dark:text-slate-400 bg-light-subtle dark:bg-dark-subtle border border-slate-200/60 dark:border-slate-800 hover:border-brand-blue/50 hover:text-slate-900 dark:hover:text-white transition-all shadow-sm"
+        aria-label="Search website"
+      >
+        <svg class="w-3.5 h-3.5 text-brand-blue" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <span class="hidden sm:inline">Search</span>
+        <kbd class="hidden sm:inline-block font-mono text-[10px] px-1.5 py-0.5 rounded bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-700 text-slate-400">⌘K</kbd>
+      </button>
+
+      <!-- Theme Switcher -->
+      <button 
+        id="themeToggleBtn" 
+        type="button" 
+        class="w-10 h-10 rounded-full flex items-center justify-center bg-light-subtle dark:bg-dark-subtle border border-slate-200/60 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-brand-amber hover:border-brand-amber transition-all"
+        aria-label="Toggle theme"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+
+      <!-- Mobile Menu Button -->
+      <button 
+        id="mobileMenuBtn" 
+        type="button" 
+        class="md:hidden w-10 h-10 rounded-lg flex items-center justify-center bg-light-subtle dark:bg-dark-subtle text-slate-700 dark:text-slate-200"
+        aria-label="Open menu"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Mobile Dropdown Menu -->
+  <div id="mobileMenu" class="hidden md:hidden bg-white dark:bg-dark-surface border-b border-slate-200 dark:border-slate-800 px-4 py-4 flex flex-col gap-2 shadow-xl">
+    <a href="/" class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">Home</a>
+    <a href="/category/g33ky" class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">Geeky &amp; Tech Tips</a>
+    <a href="/category/entertainment" class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">Entertainment</a>
+    <a href="/contact-me" class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">Contact</a>
+  </div>
+</header>
+
+<script>
+  function setupMobileMenu() {
+    const btn = document.getElementById('mobileMenuBtn');
+    const menu = document.getElementById('mobileMenu');
+    btn?.addEventListener('click', () => {
+      menu?.classList.toggle('hidden');
+    });
+  }
+  document.addEventListener('astro:page-load', setupMobileMenu);
+  setupMobileMenu();
+</script>

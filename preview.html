@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ComputerJy World — Modern Theme Preview</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Theme CSS -->
+    <link rel="stylesheet" href="assets/css/theme.css">
+    <link rel="icon" type="image/svg+xml" href="assets/images/logo-icon.svg">
+
+    <!-- Zero-FOUC Theme Script -->
+    <script>
+        (function() {
+            try {
+                var theme = localStorage.getItem('computerjy_theme_pref');
+                var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                var activeTheme = theme || (prefersDark ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-theme', activeTheme);
+            } catch (e) {}
+        })();
+    </script>
+</head>
+<body>
+
+    <a class="skip-link" href="#primary-content">Skip to content</a>
+
+    <!-- Sticky Header -->
+    <header class="site-header" id="masthead">
+        <div class="container header-inner">
+            <a href="preview.html" class="site-brand">
+                <img src="assets/images/logo.svg" alt="ComputerJy World" class="site-logo-img" width="220" height="44">
+            </a>
+
+            <nav class="site-nav" aria-label="Primary Navigation">
+                <ul class="nav-list">
+                    <li><a href="preview.html" class="nav-link active">Home</a></li>
+                    <li><a href="#computers" class="nav-link">Computers &amp; Tech</a></li>
+                    <li><a href="#entertainment" class="nav-link">Entertainment</a></li>
+                    <li><a href="#software" class="nav-link">Software Reviews</a></li>
+                    <li><a href="preview-single.html" class="nav-link">Single Article View</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-actions">
+                <button class="search-trigger-btn" type="button" aria-label="Search website">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <span>Search</span>
+                    <kbd class="search-kbd-shortcut">⌘K</kbd>
+                </button>
+
+                <button class="theme-toggle-btn" type="button" aria-label="Toggle Theme Mode">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+
+                <button class="mobile-menu-btn" type="button" aria-label="Open Navigation Menu">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Drawer -->
+    <div class="mobile-drawer-backdrop" aria-hidden="true">
+        <aside class="mobile-drawer" aria-label="Mobile Menu">
+            <div class="mobile-drawer-header">
+                <div class="brand-text-name">
+                    <span>Computer</span><span class="brand-text-accent">Jy</span>
+                </div>
+                <button class="mobile-drawer-close-btn search-close-btn" type="button" aria-label="Close menu">✕</button>
+            </div>
+            <nav class="mobile-nav">
+                <ul class="mobile-nav-list">
+                    <li><a href="preview.html" class="mobile-nav-link">Home</a></li>
+                    <li><a href="#computers" class="mobile-nav-link">Computers &amp; Tech</a></li>
+                    <li><a href="#entertainment" class="mobile-nav-link">Entertainment</a></li>
+                    <li><a href="#software" class="mobile-nav-link">Software Reviews</a></li>
+                    <li><a href="preview-single.html" class="mobile-nav-link">Single Article View</a></li>
+                </ul>
+            </nav>
+        </aside>
+    </div>
+
+    <!-- Search Modal -->
+    <div class="search-modal-backdrop" aria-hidden="true">
+        <div class="search-modal-card" role="dialog" aria-modal="true">
+            <div class="search-modal-header">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="search" class="search-modal-input" placeholder="Type keywords and search ComputerJy..." autocomplete="off" />
+                <button class="search-close-btn" type="button">ESC</button>
+            </div>
+            <div class="search-results-list">
+                <div style="padding: 10px 14px; font-size: 0.82rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">
+                    Popular Articles
+                </div>
+                <a href="preview-single.html" class="search-result-item">
+                    <div class="search-result-title">Clickbait Headlines &amp; Internet Psychology</div>
+                    <div class="search-result-snippet">Computers, Internet, News, SEO</div>
+                </a>
+                <a href="preview-single.html" class="search-result-item">
+                    <div class="search-result-title">Photo Dump: Motivational Posters &amp; Fun</div>
+                    <div class="search-result-snippet">Entertainment, Humor, Images</div>
+                </a>
+                <a href="preview-single.html" class="search-result-item">
+                    <div class="search-result-title">The Philosophy of Money &amp; Digital Economics</div>
+                    <div class="search-result-snippet">Education, Economy, Science</div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <main id="primary-content" class="main-layout" role="main">
+        <div class="container">
+
+            <!-- Hero Section -->
+            <section class="hero-section">
+                <div class="hero-banner">
+                    <div class="hero-banner-content">
+                        <div class="hero-tag">
+                            <span class="badge-glow">
+                                <span class="hero-sparkle">✦</span> Welcome to ComputerJy World
+                            </span>
+                        </div>
+                        <h1 class="hero-title">
+                            Entertainment, Tech Tips &amp; <span class="text-gradient">Occasional Software Reviews</span>
+                        </h1>
+                        <p class="hero-description">
+                            Welcome to the newly revamped home for technology insights, witty observations, software recommendations, and digital curiosities since 2007.
+                        </p>
+                        <div class="hero-stats">
+                            <div class="hero-stat-item">
+                                <span class="hero-stat-number">500+</span>
+                                <span class="hero-stat-label">Articles Published</span>
+                            </div>
+                            <div class="hero-stat-item">
+                                <span class="hero-stat-number" style="color: var(--brand-pink);">18+</span>
+                                <span class="hero-stat-label">Years Online</span>
+                            </div>
+                            <div class="hero-stat-item">
+                                <span class="hero-stat-number" style="color: var(--brand-amber);">100%</span>
+                                <span class="hero-stat-label">Independent</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Featured Bento Grid -->
+            <section class="featured-bento-grid">
+                <!-- Main Featured Post -->
+                <article class="featured-main-card">
+                    <a href="preview-single.html" class="card-media-wrapper">
+                        <span class="category-badge badge-tech">Computers &bull; SEO</span>
+                        <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1200&q=80" alt="Clickbait Headlines" class="card-media-img">
+                    </a>
+                    <div class="card-body">
+                        <div class="card-meta">
+                            <span class="card-meta-item">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                27/07/2015
+                            </span>
+                            <span class="meta-dot"></span>
+                            <span class="card-meta-item">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                4 min read
+                            </span>
+                            <span class="meta-dot"></span>
+                            <span class="card-meta-item">⭐ Featured</span>
+                        </div>
+                        <h2 class="card-title" style="font-size: 1.65rem;">
+                            <a href="preview-single.html">Clickbait Headlines: How Infuriating Teasers Peaked the Web</a>
+                        </h2>
+                        <p class="card-excerpt">
+                            I’m happy to report that the tidal wave of clickbait headlines — infuriating, manipulative teaser headlines whose writers will do anything to make you click — seems to have peaked and triggered a counter-culture of authentic journalism.
+                        </p>
+                        <div class="card-footer">
+                            <div class="author-pill">
+                                <img src="assets/images/logo-icon.svg" alt="Eyad Salah" class="author-avatar-img">
+                                <span>Eyad Salah</span>
+                            </div>
+                            <a href="preview-single.html" class="read-more-link">Read Full Story &rarr;</a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Secondary Featured Stack -->
+                <div class="featured-side-stack">
+                    <article class="side-featured-item">
+                        <div class="side-thumb">
+                            <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=400&q=80" alt="Photo Dump">
+                        </div>
+                        <div class="side-content">
+                            <span class="tag-badge" style="color: var(--brand-pink); margin-bottom: 4px; display: inline-block;">Entertainment</span>
+                            <h4><a href="preview-single.html">Photo Dump: Humorous Tech &amp; Motivational Posters</a></h4>
+                            <div class="card-meta" style="font-size: 0.78rem; margin: 0;">31/08/2014 &bull; 2 min read</div>
+                        </div>
+                    </article>
+
+                    <article class="side-featured-item">
+                        <div class="side-thumb">
+                            <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=400&q=80" alt="Money & Monetary Policy">
+                        </div>
+                        <div class="side-content">
+                            <span class="tag-badge" style="color: var(--brand-amber); margin-bottom: 4px; display: inline-block;">Education</span>
+                            <h4><a href="preview-single.html">Money: What Exactly Is Value in Modern Systems?</a></h4>
+                            <div class="card-meta" style="font-size: 0.78rem; margin: 0;">24/08/2014 &bull; 5 min read</div>
+                        </div>
+                    </article>
+
+                    <article class="side-featured-item">
+                        <div class="side-thumb">
+                            <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=400&q=80" alt="Wisdom">
+                        </div>
+                        <div class="side-content">
+                            <span class="tag-badge" style="color: var(--brand-blue); margin-bottom: 4px; display: inline-block;">Humor</span>
+                            <h4><a href="preview-single.html">Words of Wisdom &amp; Paradoxes by Steven Wright</a></h4>
+                            <div class="card-meta" style="font-size: 0.78rem; margin: 0;">26/09/2013 &bull; 3 min read</div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- 2-Column Content Layout -->
+            <div class="layout-grid">
+                <!-- Post Feed -->
+                <div class="content-area">
+                    <div class="section-header-bar">
+                        <h2 class="section-heading">
+                            <span class="section-icon"></span>
+                            Latest Posts &amp; Software Notes
+                        </h2>
+                        <span class="badge-glow" style="font-size: 0.72rem;">Feed</span>
+                    </div>
+
+                    <div class="posts-grid">
+                        <!-- Post 1 -->
+                        <article class="post-card">
+                            <a href="preview-single.html" class="card-media-wrapper">
+                                <span class="category-badge badge-tech">Tech &bull; Web</span>
+                                <img src="https://images.unsplash.com/photo-1504639725590-34d0984388bd?auto=format&fit=crop&w=700&q=80" alt="Language" class="card-media-img">
+                            </a>
+                            <div class="card-body">
+                                <div class="card-meta">
+                                    <span class="card-meta-item">21/08/2014</span>
+                                    <span class="meta-dot"></span>
+                                    <span class="card-meta-item">3 min read</span>
+                                </div>
+                                <h3 class="card-title">
+                                    <a href="preview-single.html">The Structure of Language: How Code and Speech Align</a>
+                                </h3>
+                                <p class="card-excerpt">
+                                    Language is defined as a set of spoken, written, or signed symbols combined to communicate meaning. How computing and programming languages mirror linguistic roots.
+                                </p>
+                                <div class="card-tags">
+                                    <span class="tag-badge">#science</span>
+                                    <span class="tag-badge">#language</span>
+                                    <span class="tag-badge">#tech</span>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="author-pill">
+                                        <img src="assets/images/logo-icon.svg" alt="Eyad Salah" class="author-avatar-img">
+                                        <span>Eyad Salah</span>
+                                    </div>
+                                    <a href="preview-single.html" class="read-more-link">Read &rarr;</a>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Post 2 -->
+                        <article class="post-card">
+                            <a href="preview-single.html" class="card-media-wrapper">
+                                <span class="category-badge badge-entertainment">Fun</span>
+                                <img src="https://images.unsplash.com/photo-1534972195531-a756b1126f24?auto=format&fit=crop&w=700&q=80" alt="Brain Teasers" class="card-media-img">
+                            </a>
+                            <div class="card-body">
+                                <div class="card-meta">
+                                    <span class="card-meta-item">15/05/2013</span>
+                                    <span class="meta-dot"></span>
+                                    <span class="card-meta-item">4 min read</span>
+                                </div>
+                                <h3 class="card-title">
+                                    <a href="preview-single.html">Curated Brain Teasers and Geek Puzzles for Developers</a>
+                                </h3>
+                                <p class="card-excerpt">
+                                    A collection of mind-bending logic puzzles, algorithm riddles, and funny thought experiments to test your cognitive sharpness.
+                                </p>
+                                <div class="card-tags">
+                                    <span class="tag-badge">#brainteaser</span>
+                                    <span class="tag-badge">#humor</span>
+                                    <span class="tag-badge">#puzzles</span>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="author-pill">
+                                        <img src="assets/images/logo-icon.svg" alt="Eyad Salah" class="author-avatar-img">
+                                        <span>Eyad Salah</span>
+                                    </div>
+                                    <a href="preview-single.html" class="read-more-link">Read &rarr;</a>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Post 3 -->
+                        <article class="post-card">
+                            <a href="preview-single.html" class="card-media-wrapper">
+                                <span class="category-badge badge-tech">Software</span>
+                                <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=700&q=80" alt="Freeware Tools" class="card-media-img">
+                            </a>
+                            <div class="card-body">
+                                <div class="card-meta">
+                                    <span class="card-meta-item">08/11/2012</span>
+                                    <span class="meta-dot"></span>
+                                    <span class="card-meta-item">6 min read</span>
+                                </div>
+                                <h3 class="card-title">
+                                    <a href="preview-single.html">Essential Freeware Tools That Still Outperform Commercial Software</a>
+                                </h3>
+                                <p class="card-excerpt">
+                                    Reviewing hidden gem open-source utilities and lightweight freeware for Windows, Linux, and web developers that punch far above their weight.
+                                </p>
+                                <div class="card-tags">
+                                    <span class="tag-badge">#freeware</span>
+                                    <span class="tag-badge">#open-source</span>
+                                    <span class="tag-badge">#tools</span>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="author-pill">
+                                        <img src="assets/images/logo-icon.svg" alt="Eyad Salah" class="author-avatar-img">
+                                        <span>Eyad Salah</span>
+                                    </div>
+                                    <a href="preview-single.html" class="read-more-link">Read &rarr;</a>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Post 4 -->
+                        <article class="post-card">
+                            <a href="preview-single.html" class="card-media-wrapper">
+                                <span class="category-badge badge-education">Science</span>
+                                <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=700&q=80" alt="Internet Infrastructure" class="card-media-img">
+                            </a>
+                            <div class="card-body">
+                                <div class="card-meta">
+                                    <span class="card-meta-item">14/08/2011</span>
+                                    <span class="meta-dot"></span>
+                                    <span class="card-meta-item">5 min read</span>
+                                </div>
+                                <h3 class="card-title">
+                                    <a href="preview-single.html">Undersea Cables and the Hidden Architecture of the Global Internet</a>
+                                </h3>
+                                <p class="card-excerpt">
+                                    How gigabits of internet traffic flow across the oceans through fiber optic cables and the resilience mechanisms behind worldwide connectivity.
+                                </p>
+                                <div class="card-tags">
+                                    <span class="tag-badge">#internet</span>
+                                    <span class="tag-badge">#hardware</span>
+                                    <span class="tag-badge">#networking</span>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="author-pill">
+                                        <img src="assets/images/logo-icon.svg" alt="Eyad Salah" class="author-avatar-img">
+                                        <span>Eyad Salah</span>
+                                    </div>
+                                    <a href="preview-single.html" class="read-more-link">Read &rarr;</a>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination-wrapper">
+                        <a href="#" class="page-numbers current">1</a>
+                        <a href="#" class="page-numbers">2</a>
+                        <a href="#" class="page-numbers">3</a>
+                        <span class="page-numbers" style="border:none; background:none;">&hellip;</span>
+                        <a href="#" class="page-numbers">83</a>
+                        <a href="#" class="page-numbers">Next &rarr;</a>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <aside class="sidebar-column">
+                    <div class="sidebar-wrapper">
+                        
+                        <!-- Author Card -->
+                        <section class="sidebar-widget widget-author-card">
+                            <div class="author-banner-bg"></div>
+                            <img src="assets/images/logo-icon.svg" alt="Eyad Salah" class="author-avatar-large">
+                            <h3 class="author-name">Eyad Salah</h3>
+                            <div class="author-title-sub">ComputerJy World &bull; Since 2007</div>
+                            <p class="author-bio">
+                                Technologist, software enthusiast, and creator sharing independent tech reviews, fun digital curiosities, and practical tutorials.
+                            </p>
+                            <div class="social-icons-list">
+                                <a href="https://x.com/ComputerJy" target="_blank" rel="noopener noreferrer" class="social-icon-btn" aria-label="X / Twitter">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                                </a>
+                                <a href="https://www.facebook.com/computerjy" target="_blank" rel="noopener noreferrer" class="social-icon-btn" aria-label="Facebook">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                                </a>
+                                <a href="https://www.linkedin.com/in/computerjy" target="_blank" rel="noopener noreferrer" class="social-icon-btn" aria-label="LinkedIn">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76a1.45 1.45 0 0 0 1.45-1.45 1.45 1.45 0 0 0-1.45-1.45 1.45 1.45 0 0 0 1.45 1.45m1.37 9.74v-8.37H5.09v8.37h2.74z"/></svg>
+                                </a>
+                                <a href="https://www.instagram.com/computerjy/" target="_blank" rel="noopener noreferrer" class="social-icon-btn" aria-label="Instagram">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                                </a>
+                            </div>
+                        </section>
+
+                        <!-- Trending Widget -->
+                        <section class="sidebar-widget">
+                            <h3 class="widget-title">
+                                <span>🔥 Trending Articles</span>
+                            </h3>
+                            <div class="trending-list">
+                                <article class="trending-item">
+                                    <span class="trending-rank">01</span>
+                                    <div class="trending-content">
+                                        <h4><a href="preview-single.html">Clickbait Headlines &amp; Internet Psychology</a></h4>
+                                        <div class="trending-date">27/07/2015</div>
+                                    </div>
+                                </article>
+                                <article class="trending-item">
+                                    <span class="trending-rank">02</span>
+                                    <div class="trending-content">
+                                        <h4><a href="preview-single.html">Photo Dump &amp; Motivational Fun</a></h4>
+                                        <div class="trending-date">31/08/2014</div>
+                                    </div>
+                                </article>
+                                <article class="trending-item">
+                                    <span class="trending-rank">03</span>
+                                    <div class="trending-content">
+                                        <h4><a href="preview-single.html">What Is Money? Modern Economic Realities</a></h4>
+                                        <div class="trending-date">24/08/2014</div>
+                                    </div>
+                                </article>
+                                <article class="trending-item">
+                                    <span class="trending-rank">04</span>
+                                    <div class="trending-content">
+                                        <h4><a href="preview-single.html">Words of Wisdom by Steven Wright</a></h4>
+                                        <div class="trending-date">26/09/2013</div>
+                                    </div>
+                                </article>
+                            </div>
+                        </section>
+
+                        <!-- Categories Widget -->
+                        <section class="sidebar-widget">
+                            <h3 class="widget-title">
+                                <span>📂 Categories</span>
+                            </h3>
+                            <div class="categories-widget-list">
+                                <a href="#computers" class="category-row-link">
+                                    <span>Computers &amp; Tech</span>
+                                    <span class="category-count">128</span>
+                                </a>
+                                <a href="#entertainment" class="category-row-link">
+                                    <span>Entertainment &amp; Fun</span>
+                                    <span class="category-count">94</span>
+                                </a>
+                                <a href="#software" class="category-row-link">
+                                    <span>Freeware &amp; Software</span>
+                                    <span class="category-count">72</span>
+                                </a>
+                                <a href="#internet" class="category-row-link">
+                                    <span>Internet &amp; Web</span>
+                                    <span class="category-count">65</span>
+                                </a>
+                                <a href="#education" class="category-row-link">
+                                    <span>Education &amp; Science</span>
+                                    <span class="category-count">48</span>
+                                </a>
+                            </div>
+                        </section>
+
+                        <!-- Tags Cloud -->
+                        <section class="sidebar-widget">
+                            <h3 class="widget-title">
+                                <span>🏷️ Popular Tags</span>
+                            </h3>
+                            <div class="tags-cloud-flex">
+                                <a href="#" class="tag-badge">#computers</a>
+                                <a href="#" class="tag-badge">#facebook</a>
+                                <a href="#" class="tag-badge">#internet</a>
+                                <a href="#" class="tag-badge">#news</a>
+                                <a href="#" class="tag-badge">#seo</a>
+                                <a href="#" class="tag-badge">#freeware</a>
+                                <a href="#" class="tag-badge">#humor</a>
+                                <a href="#" class="tag-badge">#images</a>
+                                <a href="#" class="tag-badge">#linux</a>
+                                <a href="#" class="tag-badge">#mac</a>
+                                <a href="#" class="tag-badge">#windows</a>
+                                <a href="#" class="tag-badge">#programming</a>
+                                <a href="#" class="tag-badge">#quotes</a>
+                                <a href="#" class="tag-badge">#science</a>
+                            </div>
+                        </section>
+
+                        <!-- Newsletter -->
+                        <section class="sidebar-widget">
+                            <div class="newsletter-box">
+                                <span class="hero-sparkle" style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem;">✨</span>
+                                <h4>Stay Connected</h4>
+                                <p>Get tech tips, reviews &amp; curiosities delivered weekly.</p>
+                                <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Thank you for subscribing to ComputerJy World!');">
+                                    <input type="email" class="newsletter-input" placeholder="Your email address" required />
+                                    <button type="submit" class="btn-primary">Join Free 🚀</button>
+                                </form>
+                            </div>
+                        </section>
+
+                    </div>
+                </aside>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Site Footer -->
+    <footer class="site-footer" id="colophon">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand-info">
+                    <a href="preview.html" class="site-brand">
+                        <img src="assets/images/logo.svg" alt="ComputerJy World" style="height: 38px; width: auto;">
+                    </a>
+                    <p>
+                        Entertainment, Tech tips &amp; Occasional software reviews. Exploring the digital frontier with energy and curiosity since 2007.
+                    </p>
+                    <div class="social-icons-list" style="justify-content: flex-start;">
+                        <a href="https://x.com/ComputerJy" target="_blank" class="social-icon-btn" aria-label="X / Twitter">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                        </a>
+                        <a href="https://www.facebook.com/computerjy" target="_blank" class="social-icon-btn" aria-label="Facebook">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        </a>
+                        <a href="https://www.linkedin.com/in/computerjy" target="_blank" class="social-icon-btn" aria-label="LinkedIn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76a1.45 1.45 0 0 0 1.45-1.45 1.45 1.45 0 0 0-1.45-1.45 1.45 1.45 0 0 0 1.45 1.45m1.37 9.74v-8.37H5.09v8.37h2.74z"/></svg>
+                        </a>
+                        <a href="https://www.instagram.com/computerjy/" target="_blank" class="social-icon-btn" aria-label="Instagram">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="footer-col-title">Categories</h4>
+                    <ul class="footer-links-list">
+                        <li><a href="#computers" class="footer-link">💻 Computers &amp; Tech</a></li>
+                        <li><a href="#entertainment" class="footer-link">🎉 Entertainment &amp; Fun</a></li>
+                        <li><a href="#software" class="footer-link">⚡ Freeware &amp; Software</a></li>
+                        <li><a href="#internet" class="footer-link">🌐 Internet &amp; Web Tips</a></li>
+                        <li><a href="#education" class="footer-link">📚 Science &amp; Education</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="footer-col-title">Quick Links</h4>
+                    <ul class="footer-links-list">
+                        <li><a href="preview.html" class="footer-link">🏠 Home</a></li>
+                        <li><a href="preview-single.html" class="footer-link">📄 Sample Article View</a></li>
+                        <li><a href="#contact" class="footer-link">✉️ Contact Me</a></li>
+                        <li><a href="#privacy" class="footer-link">🔒 Privacy Policy</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="footer-col-title">Stay Updated</h4>
+                    <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1rem;">
+                        Get new insights delivered directly to your inbox.
+                    </p>
+                    <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Subscribed to ComputerJy updates!');">
+                        <input type="email" class="newsletter-input" placeholder="Your email..." required />
+                        <button type="submit" class="btn-primary" style="width: 100%;">Subscribe 🚀</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="footer-bottom-bar">
+                <div>
+                    &copy; 2026 <strong>ComputerJy World</strong> &bull; Created with passion by <a href="#contact" style="color: var(--brand-blue); font-weight: 700;">Eyad Salah</a>.
+                </div>
+                <button type="button" class="back-to-top-btn">
+                    <span>Back to top</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                </button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Theme JS -->
+    <script src="assets/js/theme.js"></script>
+</body>
+</html>

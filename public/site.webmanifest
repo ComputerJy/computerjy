@@ -1,0 +1,16 @@
+{
+  "name": "ComputerJy World",
+  "short_name": "ComputerJy",
+  "description": "Entertainment, Tech tips & Occasional software reviews by Eyad Salah",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0B0F19",
+  "theme_color": "#0080FF",
+  "icons": [
+    {
+      "src": "/logo-icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
