@@ -128,6 +128,12 @@ const schemaData = type === 'article' ? {
     <meta name="theme-color" content="#0B0F19" />
     <meta name="color-scheme" content="dark light" />
 
+    <!-- RFC 9727 & RFC 8288 Discovery Links -->
+    <link rel="api-catalog" type="application/linkset+json" href="/.well-known/api-catalog" />
+    <link rel="service-desc" type="application/vnd.oai.openapi+json;version=3.0" href="/api/openapi.json" />
+    <link rel="describedby" type="application/json" href="/search-index.json" />
+    <link rel="service-doc" type="text/html" href="https://developer.wordpress.org/rest-api/" />
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
