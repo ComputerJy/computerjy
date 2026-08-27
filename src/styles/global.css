@@ -159,6 +159,12 @@ h1, h2, h3, h4, h5, h6 {
   border-bottom: 1px solid var(--border-color);
 }
 
+/* Offscreen Feed Optimization */
+.feed-card-deferred {
+  content-visibility: auto;
+  contain-intrinsic-size: auto none auto 420px;
+}
+
 /* Article Content Typography */
 .prose-custom {
   font-size: 1.12rem;

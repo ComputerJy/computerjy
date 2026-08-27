@@ -111,16 +111,9 @@ const schemaData = type === 'article' ? {
     <!-- Schema.org JSON-LD -->
     <script type="application/ld+json" is:inline set:html={JSON.stringify(schemaData)} />
 
-    <!-- Speculation Rules API (Instant Pre-rendering for Chromium browsers) -->
+    <!-- Speculation Rules API (Conservative Prefetching) -->
     <script type="speculationrules" is:inline>
       {
-        "prerender": [
-          {
-            "source": "list",
-            "urls": ["/", "/category/g33ky", "/category/entertainment", "/contact-me"],
-            "eagerness": "moderate"
-          }
-        ],
         "prefetch": [
           {
             "where": { "href_matches": "/*" },
@@ -142,7 +135,7 @@ const schemaData = type === 'article' ? {
     <link rel="service-doc" type="text/html" href="https://developer.wordpress.org/rest-api/" />
     <link rel="ai-catalog" type="application/json" href="/.well-known/ai-catalog.json" />
 
-    <!-- WebMCP API: Expose Browser Tools to AI Agents -->
+    <!-- WebMCP API: Expose Browser Tools to AI Agents (Idle Loaded) -->
     <script is:inline>
       (function() {
         function registerWebMcp() {
@@ -214,12 +207,20 @@ const schemaData = type === 'article' ? {
           }
         }
 
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', registerWebMcp);
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(registerWebMcp, { timeout: 2500 });
         } else {
-          registerWebMcp();
+          window.addEventListener('load', function() {
+            setTimeout(registerWebMcp, 1000);
+          });
         }
-        document.addEventListener('astro:page-load', registerWebMcp);
+        document.addEventListener('astro:page-load', function() {
+          if ('requestIdleCallback' in window) {
+            requestIdleCallback(registerWebMcp);
+          } else {
+            registerWebMcp();
+          }
+        });
       })();
     </script>
 
@@ -244,13 +245,29 @@ const schemaData = type === 'article' ? {
       />
     </noscript>
 
-    <!-- Google Analytics (GA4) -->
-    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-MYP6LK1T99"></script>
+    <!-- Google Analytics (GA4 - Idle Loaded) -->
     <script is:inline>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
       gtag('config', 'G-MYP6LK1T99');
+
+      function initGA() {
+        if (window._gaLoaded) return;
+        window._gaLoaded = true;
+        const gaScript = document.createElement('script');
+        gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-MYP6LK1T99';
+        gaScript.async = true;
+        document.head.appendChild(gaScript);
+      }
+
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(initGA, { timeout: 3000 });
+      } else {
+        window.addEventListener('load', function() {
+          setTimeout(initGA, 1500);
+        });
+      }
 
       // Track virtual page views across Astro ViewTransitions page swaps
       document.addEventListener('astro:after-swap', function() {
