@@ -9,6 +9,10 @@ on:
         default: 'Manual release trigger'
         type: string
 
+# Restrict default GITHUB_TOKEN permissions to least privilege
+permissions:
+  contents: read
+
 jobs:
   build-and-deploy:
     name: Build & Sync to Lightsail
