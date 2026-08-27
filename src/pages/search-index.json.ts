@@ -1,4 +1,5 @@
 import { getPosts } from '../lib/api';
+import { stripHtml } from '../lib/utils';
 import type { APIContext } from 'astro';
 
 export async function GET(context: APIContext) {
@@ -6,11 +7,11 @@ export async function GET(context: APIContext) {
 
   const searchData = posts.map((post) => ({
     id: post.id,
-    title: post.title.rendered,
+    title: stripHtml(post.title.rendered),
     slug: post.slug,
     date: new Date(post.date).toLocaleDateString('en-GB'),
     category: post.primaryCategory?.name || 'Tech',
-    excerpt: post.excerpt.rendered.replace(/<[^>]*>/g, '').slice(0, 120),
+    excerpt: stripHtml(post.excerpt.rendered).slice(0, 120),
   }));
 
   return new Response(JSON.stringify(searchData), {
