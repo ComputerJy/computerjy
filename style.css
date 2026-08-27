@@ -1,0 +1,17 @@
+/*
+Theme Name: ComputerJy World
+Theme URI: https://www.computerjy.com/
+Author: Eyad Salah
+Author URI: https://www.computerjy.com/
+Description: A modern, friendly, tech-savvy and energetic theme for ComputerJy World. Features vibrant brand gradients, dark/light theme switcher, responsive bento grid, reading progress bar, circuit accents, and optimized performance.
+Version: 1.0.0
+Requires at least: 6.0
+Tested up to: 6.7
+Requires PHP: 7.4
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: computerjy
+Tags: blog, entertainment, tech-news, custom-colors, custom-logo, custom-menu, featured-images, flexible-header, full-width-template, theme-options, threaded-comments, translation-ready, dark-mode, responsive
+*/
+
+@import url('assets/css/theme.css');

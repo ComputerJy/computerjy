@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1469,
+    "slug": "contact-me",
+    "title": {
+      "rendered": "Contact Me"
+    },
+    "excerpt": {
+      "rendered": "[contact-form to='eyad@computerjy.com' subject='Computerjy.com Message'][contact-field label='Name' type='name' required='1'/][contact-field label='Email' type='email' required='1'..."
+    },
+    "content": {
+      "rendered": " [contact-form to='eyad@computerjy.com' subject='Computerjy.com Message'][contact-field label='Name' type='name' required='1'/][contact-field label='Email' type='email' required='1'/][contact-field label='Message' type='textarea' required='1'/][/contact-form] "
+    },
+    "date": "2011-04-07 21:10:16",
+    "categories": [],
+    "tags": [],
+    "primaryCategory": {
+      "name": "Tech",
+      "slug": "tech"
+    },
+    "featuredImageUrl": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1200&q=80",
+    "readingTime": "1 min read",
+    "commentsCount": 0,
+    "comments": [],
+    "metaDescription": "Contact me, send me an email. No spamming please, also. This domain is not for sale"
+  },
+  {
+    "id": 1505,
+    "slug": "privacy-policy-2",
+    "title": {
+      "rendered": "Privacy Policy"
+    },
+    "excerpt": {
+      "rendered": "[uc_embedding class=\"gdpr\" show-toggle=\"true\" type=\"all\"]"
+    },
+    "content": {
+      "rendered": "<!-- wp:shortcode -->\n[uc_embedding class=\"gdpr\" show-toggle=\"true\" type=\"all\"]\n<!-- /wp:shortcode -->\n\n<!-- wp:paragraph -->\n<p></p>\n<!-- /wp:paragraph -->"
+    },
+    "date": "2011-04-23 19:51:30",
+    "categories": [],
+    "tags": [],
+    "primaryCategory": {
+      "name": "Tech",
+      "slug": "tech"
+    },
+    "featuredImageUrl": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1200&q=80",
+    "readingTime": "1 min read",
+    "commentsCount": 0,
+    "comments": [],
+    "metaDescription": "[uc_embedding class=\"gdpr\" show-toggle=\"true\" type=\"all\"]"
+  }
+]

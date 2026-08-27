@@ -1,0 +1,23 @@
+[
+  {
+    "id": 2,
+    "name": "Entertainment",
+    "slug": "entertainment",
+    "description": "Who can turn down a little entertainment, It's always necessary to clear up your mind and turn the other way from life problems. Laugh a little, have some fun",
+    "count": 327
+  },
+  {
+    "id": 3,
+    "name": "Geeky",
+    "slug": "g33ky",
+    "description": "Software &amp; Website reviews, Tips &amp; Tricks, Troubleshooting tips, and many more geeky stuff that one might find interesting.",
+    "count": 101
+  },
+  {
+    "id": 1,
+    "name": "Uncategorized",
+    "slug": "uncategorized",
+    "description": "",
+    "count": 17
+  }
+]

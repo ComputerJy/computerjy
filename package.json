@@ -1,0 +1,23 @@
+{
+  "name": "computerjy-world-frontend",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Headless JAMstack frontend for ComputerJy World built with Astro 5 & Tailwind CSS",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.19",
+    "@astrojs/sitemap": "^3.7.3",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.2.8",
+    "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
+}

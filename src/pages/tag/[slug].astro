@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import Sidebar from '../../components/Sidebar.astro';
+import { getPosts, getCategories, getTags } from '../../lib/api';
+import type { WPTag } from '../../lib/types';
+
+export async function getStaticPaths() {
+  const tags = await getTags();
+  return tags.map((tag) => ({
+    params: { slug: tag.slug },
+    props: { tag },
+  }));
+}
+
+interface Props {
+  tag: WPTag;
+}
+
+const { tag } = Astro.props;
+const posts = await getPosts();
+const categories = await getCategories();
+const tags = await getTags();
+
+const tagPosts = posts.filter((p) => p.tags.includes(tag.id));
+const displayPosts = tagPosts.length > 0 ? tagPosts : posts.slice(0, 4);
+---
+
+<BaseLayout title={`#${tag.name} — ComputerJy World`}>
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+    
+    <header class="bg-white dark:bg-dark-surface border border-slate-200/80 dark:border-slate-800 rounded-3xl p-8 sm:p-10 mb-10 shadow-xs relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:bottom-0 before:w-1.5 before:bg-grad-accent">
+      <div class="text-xs uppercase tracking-wider font-extrabold text-brand-pink mb-1">Tag Archive</div>
+      <h1 class="text-3xl sm:text-4xl font-heading font-black text-slate-900 dark:text-white mb-2">
+        #{tag.name}
+      </h1>
+      <p class="text-sm sm:text-base text-slate-500 dark:text-slate-400">
+        Articles tagged with #{tag.name} on ComputerJy World.
+      </p>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div class="lg:col-span-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
+          {displayPosts.map((post) => (
+            <PostCard post={post} />
+          ))}
+        </div>
+      </div>
+
+      <aside class="lg:col-span-4">
+        <Sidebar 
+          categories={categories} 
+          tags={tags} 
+          trendingPosts={posts} 
+        />
+      </aside>
+    </div>
+
+  </main>
+</BaseLayout>

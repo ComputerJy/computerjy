@@ -1,0 +1,72 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroBanner from '../components/HeroBanner.astro';
+import BentoShowcase from '../components/BentoShowcase.astro';
+import PostCard from '../components/PostCard.astro';
+import Sidebar from '../components/Sidebar.astro';
+import { getPosts, getCategories, getTags } from '../lib/api';
+
+const posts = await getPosts();
+const categories = await getCategories();
+const tags = await getTags();
+
+const featuredPost = posts[0];
+const sidePosts = posts.slice(1, 4);
+const feedPosts = posts.slice(4);
+---
+
+<BaseLayout currentPath="/">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+    
+    <!-- Hero Banner -->
+    <HeroBanner />
+
+    <!-- Bento Featured Section -->
+    {featuredPost && <BentoShowcase featuredPost={featuredPost} sidePosts={sidePosts} />}
+
+    <!-- Main Content & Sidebar Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      <!-- Feed Stream (8 cols) -->
+      <div class="lg:col-span-8">
+        <div class="flex items-center justify-between pb-3 mb-6 border-b-2 border-slate-200/80 dark:border-slate-800">
+          <h2 class="text-xl sm:text-2xl font-heading font-black text-slate-900 dark:text-white flex items-center gap-2.5">
+            <span class="w-2.5 h-6 rounded-sm bg-grad-primary"></span>
+            Latest Articles &amp; Insights
+          </h2>
+          <span class="badge-glow text-[11px]">Fresh Content</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
+          {feedPosts.map((post) => (
+            <PostCard post={post} />
+          ))}
+          {/* If feedPosts is small, render initial posts as well */}
+          {feedPosts.length === 0 && posts.slice(1).map((post) => (
+            <PostCard post={post} />
+          ))}
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex items-center justify-center gap-2 pt-6">
+          <span class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm text-white bg-grad-primary shadow-glow-blue">1</span>
+          <a href="#" class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-brand-blue hover:text-brand-blue transition-all">2</a>
+          <a href="#" class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-brand-blue hover:text-brand-blue transition-all">3</a>
+          <span class="px-2 text-slate-400">&hellip;</span>
+          <a href="#" class="px-4 h-10 rounded-xl flex items-center justify-center font-bold text-sm bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-brand-blue hover:text-brand-blue transition-all">Next &rarr;</a>
+        </div>
+      </div>
+
+      <!-- Sidebar (4 cols) -->
+      <aside class="lg:col-span-4">
+        <Sidebar 
+          categories={categories} 
+          tags={tags} 
+          trendingPosts={posts} 
+        />
+      </aside>
+
+    </div>
+
+  </main>
+</BaseLayout>
