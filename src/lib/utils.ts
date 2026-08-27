@@ -18,11 +18,11 @@ export function stripHtml(input: string): string {
     .replace(/</g, '')
     .replace(/>/g, '')
     .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
     .replace(/&#8230;/g, '...')
     .replace(/&#039;/g, "'")
+    .replace(/&amp;/g, '&')
     .trim();
 }
