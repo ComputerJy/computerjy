@@ -18,6 +18,9 @@ fi
 SERVER_HOST="${SERVER_HOST:-${LIGHTSAIL_HOST:-}}"
 SERVER_USER="${SERVER_USER:-ubuntu}"
 KEY_PATH="${KEY_PATH:-${HOME}/<ssh-key-redacted>}"
+KEY_PATH="${KEY_PATH/#\~/$HOME}"
+KEY_PATH="${KEY_PATH/\$\{HOME\}/$HOME}"
+KEY_PATH="${KEY_PATH/\$HOME/$HOME}"
 REMOTE_DEST="${REMOTE_DEST:-/var/www/computerjy_dist}"
 
 if [ -z "${SERVER_HOST}" ]; then
