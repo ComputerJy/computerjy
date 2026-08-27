@@ -144,8 +144,8 @@ const schemaData = type === 'article' ? {
       gtag('js', new Date());
       gtag('config', 'G-0E6WH95Q6Z');
 
-      // Track page views across Astro ViewTransitions
-      document.addEventListener('astro:page-load', function() {
+      // Track virtual page views across Astro ViewTransitions page swaps
+      document.addEventListener('astro:after-swap', function() {
         gtag('event', 'page_view', {
           page_title: document.title,
           page_location: window.location.href,
