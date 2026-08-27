@@ -1,0 +1,46 @@
+name: Deploy to AWS Lightsail
+
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Deployment reason / notes'
+        required: false
+        default: 'Manual update from GitHub Actions'
+
+jobs:
+  build-and-deploy:
+    name: Build & Sync to Lightsail
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Astro Static Site
+        run: npm run build
+
+      - name: Setup SSH Credentials
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.LIGHTSAIL_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.LIGHTSAIL_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy Static Files to Lightsail Webroot
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.LIGHTSAIL_USER }}@${{ secrets.LIGHTSAIL_HOST }} "sudo mkdir -p /var/www/computerjy_dist && sudo chown -R ${{ secrets.LIGHTSAIL_USER }}:${{ secrets.LIGHTSAIL_USER }} /var/www/computerjy_dist"
+          rsync -avz --delete -e "ssh -i ~/.ssh/id_rsa" dist/ ${{ secrets.LIGHTSAIL_USER }}@${{ secrets.LIGHTSAIL_HOST }}:/var/www/computerjy_dist/
+          ssh -i ~/.ssh/id_rsa ${{ secrets.LIGHTSAIL_USER }}@${{ secrets.LIGHTSAIL_HOST }} "sudo chown -R www-data:www-data /var/www/computerjy_dist && sudo chmod -R 755 /var/www/computerjy_dist"
+
+      - name: Success Notification
+        run: echo "🎉 Successfully deployed to https://www.computerjy.com/"
