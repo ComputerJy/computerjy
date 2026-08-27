@@ -6,7 +6,8 @@
   "registration_endpoint": "https://www.computerjy.com/oauth/register",
   "scopes_supported": [
     "read",
-    "write"
+    "write",
+    "comments"
   ],
   "response_types_supported": [
     "code",
@@ -25,5 +26,39 @@
     "S256",
     "plain"
   ],
+  "agent_auth": {
+    "skill": "https://www.computerjy.com/auth.md",
+    "register_uri": "https://www.computerjy.com/oauth/register",
+    "claim_uri": "https://www.computerjy.com/oauth/claim",
+    "revocation_uri": "https://www.computerjy.com/oauth/revoke",
+    "identity_types_supported": [
+      "anonymous",
+      "identity_assertion"
+    ],
+    "credential_types_supported": [
+      "bearer_token"
+    ],
+    "assertion_types_supported": [
+      "verified_email",
+      "urn:ietf:params:oauth:token-type:id-jag"
+    ],
+    "anonymous": {
+      "credential_types_supported": [
+        "bearer_token"
+      ],
+      "claim_uri": "https://www.computerjy.com/oauth/claim"
+    },
+    "identity_assertion": {
+      "assertion_types_supported": [
+        "verified_email",
+        "urn:ietf:params:oauth:token-type:id-jag"
+      ],
+      "credential_types_supported": [
+        "bearer_token"
+      ],
+      "claim_uri": "https://www.computerjy.com/oauth/claim",
+      "revocation_uri": "https://www.computerjy.com/oauth/revoke"
+    }
+  },
   "service_documentation": "https://developer.wordpress.org/rest-api/"
 }

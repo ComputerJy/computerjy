@@ -1,0 +1,25 @@
+{
+  "$schema": "https://raw.githubusercontent.com/modelcontextprotocol/modelcontextprotocol/main/schema/server-card.json",
+  "serverInfo": {
+    "name": "computerjy-world-mcp",
+    "version": "1.0.0",
+    "description": "Model Context Protocol server for ComputerJy World blog search and article access"
+  },
+  "endpoint": "https://www.computerjy.com/mcp",
+  "transport": {
+    "type": "http",
+    "url": "https://www.computerjy.com/mcp"
+  },
+  "capabilities": {
+    "tools": {
+      "listChanged": false
+    },
+    "resources": {
+      "subscribe": false,
+      "listChanged": false
+    },
+    "prompts": {
+      "listChanged": false
+    }
+  }
+}

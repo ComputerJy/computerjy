@@ -12,12 +12,15 @@ header('Access-Control-Allow-Origin: *');
 $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 $uri = rtrim($uri, '/') ?: '/';
 
-// Path to posts data if available
 $dist_dir = '/var/www/computerjy_dist';
-$posts_json_path = $dist_dir . '/data/posts.json';
-if (!file_exists($posts_json_path)) {
-    // Fallback to searching inside dist
-    $posts_json_path = __DIR__ . '/src/data/posts.json';
+
+// 0. Static markdown documents
+if ($uri === '/auth.md' || $uri === '/.well-known/auth.md') {
+    $auth_file = $dist_dir . '/auth.md';
+    if (file_exists($auth_file)) {
+        echo file_get_contents($auth_file);
+        exit;
+    }
 }
 
 function html_to_markdown($html) {
@@ -101,7 +104,8 @@ $output = "# ComputerJy World\n\n";
 $output .= "> Entertainment, Tech tips & Occasional software reviews by Eyad Salah since 2007.\n\n";
 $output .= "Website: https://www.computerjy.com/\n";
 $output .= "API Catalog: https://www.computerjy.com/.well-known/api-catalog\n";
-$output .= "OpenAPI Spec: https://www.computerjy.com/api/openapi.json\n\n";
+$output .= "OpenAPI Spec: https://www.computerjy.com/api/openapi.json\n";
+$output .= "Auth.md: https://www.computerjy.com/auth.md\n\n";
 $output .= "## Articles & Archives\n\n";
 
 if (file_exists($posts_file)) {

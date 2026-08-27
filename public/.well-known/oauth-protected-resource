@@ -1,11 +1,12 @@
 {
-  "resource": "https://www.computerjy.com/wp-json/wp/v2/",
+  "resource": "https://www.computerjy.com",
   "authorization_servers": [
     "https://www.computerjy.com"
   ],
   "scopes_supported": [
     "read",
-    "write"
+    "write",
+    "comments"
   ],
   "bearer_methods_supported": [
     "header"

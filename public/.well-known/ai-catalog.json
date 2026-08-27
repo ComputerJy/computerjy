@@ -1,0 +1,42 @@
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "ComputerJy World",
+    "identifier": "did:web:www.computerjy.com"
+  },
+  "entries": [
+    {
+      "identifier": "urn:air:www.computerjy.com:mcp:server-card",
+      "displayName": "ComputerJy World MCP Server",
+      "type": "application/mcp-server-card+json",
+      "url": "https://www.computerjy.com/.well-known/mcp/server-card.json",
+      "representativeQueries": [
+        "search computerjy tech articles",
+        "find windows and linux tutorials",
+        "retrieve blog post excerpts"
+      ]
+    },
+    {
+      "identifier": "urn:air:www.computerjy.com:api:openapi",
+      "displayName": "ComputerJy World REST API",
+      "type": "application/vnd.oai.openapi+json;version=3.0",
+      "url": "https://www.computerjy.com/api/openapi.json",
+      "representativeQueries": [
+        "query wordpress posts via rest api",
+        "fetch comments by post id",
+        "list tech categories"
+      ]
+    },
+    {
+      "identifier": "urn:air:www.computerjy.com:skill:search-articles",
+      "displayName": "Article Search Skill",
+      "type": "text/markdown",
+      "url": "https://www.computerjy.com/.well-known/agent-skills/search-articles/SKILL.md",
+      "representativeQueries": [
+        "how to search articles on computerjy",
+        "read tech tips and humor blogs",
+        "download blog dataset"
+      ]
+    }
+  ]
+}
