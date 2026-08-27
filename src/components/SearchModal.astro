@@ -103,36 +103,42 @@
   function setupSearchEvents() {
     const searchInput = document.getElementById('searchModalInput') as HTMLInputElement | null;
     const searchTrigger = document.getElementById('searchTrigger');
+    const drawerSearchTrigger = document.getElementById('drawerSearchTrigger');
 
-    searchTrigger?.addEventListener('click', loadSearchIndex);
+    if (searchTrigger) searchTrigger.addEventListener('click', loadSearchIndex);
+    if (drawerSearchTrigger) drawerSearchTrigger.addEventListener('click', loadSearchIndex);
 
-    document.addEventListener('keydown', (e) => {
+    const onSearchKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         loadSearchIndex();
       }
-    });
+    };
 
-    searchInput?.addEventListener('input', (e) => {
-      const q = (e.target as HTMLInputElement).value.trim().toLowerCase();
-      if (!q) {
-        renderResults(searchIndex.slice(0, 5), 'Suggested Articles');
-        return;
-      }
+    document.removeEventListener('keydown', (document as any)._searchIndexKeyHandler);
+    (document as any)._searchIndexKeyHandler = onSearchKey;
+    document.addEventListener('keydown', onSearchKey);
 
-      const matches = searchIndex.filter((item) => 
-        item.title.toLowerCase().includes(q) || 
-        item.category.toLowerCase().includes(q) || 
-        item.excerpt.toLowerCase().includes(q)
-      );
+    if (searchInput) {
+      searchInput.oninput = (e) => {
+        const q = (e.target as HTMLInputElement).value.trim().toLowerCase();
+        if (!q) {
+          renderResults(searchIndex.slice(0, 5), 'Suggested Articles');
+          return;
+        }
 
-      renderResults(matches.slice(0, 10), `Found ${matches.length} articles`);
-    });
+        const matches = searchIndex.filter((item) => 
+          item.title.toLowerCase().includes(q) || 
+          item.category.toLowerCase().includes(q) || 
+          item.excerpt.toLowerCase().includes(q)
+        );
+
+        renderResults(matches.slice(0, 10), `Found ${matches.length} articles`);
+      };
+    }
   }
 
   document.addEventListener('astro:page-load', () => {
     setupSearchEvents();
     if (indexLoaded) renderResults(searchIndex.slice(0, 5), 'Suggested Articles');
   });
-
-  setupSearchEvents();
 </script>
