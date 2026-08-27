@@ -1,51 +1,64 @@
 /**
- * Safely strips all HTML tags and unescapes common entities.
- * Uses iterative sanitization to prevent nested tag injection.
+ * HTML Escaping & Sanitization Utilities
+ */
+
+/**
+ * Escapes HTML special characters to prevent XSS vulnerabilities.
+ */
+export function escapeHtml(input: string): string {
+  if (!input) return '';
+  return input
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+/**
+ * Safely strips all HTML tags and decodes common entities to produce clean plain text.
  */
 export function stripHtml(input: string): string {
   if (!input) return '';
-  let str = input;
-  let prev = '';
-
-  // Iteratively strip HTML tags until no tags remain
-  while (str !== prev) {
-    prev = str;
-    str = str.replace(/<[^>]*>/g, '');
-  }
-
-  // Remove potential orphaned brackets and decode common entities
-  return str
-    .replace(/</g, '')
-    .replace(/>/g, '')
+  return input
+    .replace(/<[^>]+>/g, ' ')
     .replace(/&nbsp;/g, ' ')
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&#8230;/g, '...')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#8230;/g, '...')
-    .replace(/&#039;/g, "'")
     .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ')
     .trim();
 }
 
 /**
- * Sanitizes reader comments by stripping unsafe elements and attributes.
- * Allows only safe formatting tags: <b>, <i>, <em>, <strong>, <code>, <p>, <br>.
+ * Sanitizes reader comments using an escape-first whitelist approach.
+ * Completely escapes all raw HTML to neutralize malicious tags and attributes,
+ * then selectively restores only strictly attribute-less safe formatting tags.
  */
 export function sanitizeCommentHtml(html: string): string {
   if (!html) return '';
-  // Strip dangerous elements entirely
-  let clean = html
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
-    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
-    .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '')
-    .replace(/<embed\b[^<]*(?:(?!<\/embed>)<[^<]*)*<\/embed>/gi, '');
+  
+  // Step 1: Escape all HTML characters
+  const escaped = escapeHtml(html);
 
-  // Strip all on* event attributes (e.g. onload, onclick, onerror)
-  clean = clean.replace(/\son\w+="[^"]*"/gi, '').replace(/\son\w+='[^']*'/gi, '');
-
-  // Strip javascript: URLs
-  clean = clean.replace(/href=["']javascript:[^"']*["']/gi, 'href="#"');
-
-  return clean;
+  // Step 2: Restore strictly safe, attribute-free formatting tags
+  return escaped
+    .replace(/&lt;b&gt;/gi, '<b>')
+    .replace(/&lt;\/b&gt;/gi, '</b>')
+    .replace(/&lt;strong&gt;/gi, '<strong>')
+    .replace(/&lt;\/strong&gt;/gi, '</strong>')
+    .replace(/&lt;i&gt;/gi, '<i>')
+    .replace(/&lt;\/i&gt;/gi, '</i>')
+    .replace(/&lt;em&gt;/gi, '<em>')
+    .replace(/&lt;\/em&gt;/gi, '</em>')
+    .replace(/&lt;code&gt;/gi, '<code>')
+    .replace(/&lt;\/code&gt;/gi, '</code>')
+    .replace(/&lt;p&gt;/gi, '<p>')
+    .replace(/&lt;\/p&gt;/gi, '</p>')
+    .replace(/&lt;br\s*\/?&gt;/gi, '<br />')
+    .replace(/\n\n+/g, '</p><p>')
+    .replace(/\n/g, '<br />');
 }
