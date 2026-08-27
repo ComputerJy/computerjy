@@ -24,6 +24,16 @@ def clean_html(text):
         return ''
     return text.strip()
 
+def strip_tags(html_content):
+    if not html_content:
+        return ''
+    text = html_content
+    prev = ''
+    while text != prev:
+        prev = text
+        text = re.sub(r'<[^>]*>', ' ', text)
+    return re.sub(r'\s+', ' ', text).strip()
+
 def sanitize_slug(raw_slug):
     if not raw_slug:
         return ''
@@ -36,9 +46,8 @@ def sanitize_slug(raw_slug):
 def calculate_reading_time(html_content):
     if not html_content:
         return '1 min read'
-    # Strip HTML tags
-    text = re.sub(r'<[^>]*>', ' ', html_content)
-    words = len(text.strip().split())
+    text = strip_tags(html_content)
+    words = len(text.split())
     minutes = max(1, (words + 199) // 200)
     return f"{minutes} min read"
 
@@ -47,8 +56,9 @@ def parse_wp_xml(xml_path, out_dir):
     with open(xml_path, 'rb') as f:
         raw_bytes = f.read()
 
-    # Strip null bytes and illegal control characters from XML
-    clean_bytes = re.sub(b'[\x00-\x08\x0b\x0c\x0e-\x1f]', b'', raw_bytes)
+    # Strip null bytes and illegal control characters from XML 1.0 (excluding tab 0x09, LF 0x0a, CR 0x0d)
+    illegal_xml_bytes = bytes(b for b in range(32) if b not in (9, 10, 13))
+    clean_bytes = raw_bytes.translate(None, illegal_xml_bytes)
     
     root = ET.fromstring(clean_bytes)
     channel = root.find('channel')
@@ -152,7 +162,7 @@ def parse_wp_xml(xml_path, out_dir):
         post_date = post_date_elem.text if post_date_elem is not None and post_date_elem.text else ''
         
         if not excerpt and content:
-            plain = re.sub(r'<[^>]*>', ' ', content).strip()
+            plain = strip_tags(content)
             excerpt = (plain[:180] + '...') if len(plain) > 180 else plain
 
         # Parse postmeta
