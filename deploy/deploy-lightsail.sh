@@ -1,16 +1,31 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # 1-Click Build & Deploy Script for ComputerJy World on AWS Lightsail
-# SSH Target: ubuntu@<origin-ip-redacted>
-# Key: ~/<ssh-key-redacted>
+# Credentials and server host are loaded from local .env or environment variables
 # ==============================================================================
 
 set -e
 
-KEY_PATH="${HOME}/<ssh-key-redacted>"
-SERVER_HOST="<origin-ip-redacted>"
-SERVER_USER="ubuntu"
-REMOTE_DEST="/var/www/computerjy_dist"
+# Load local .env if it exists
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+if [ -f "${ROOT_DIR}/.env" ]; then
+    # shellcheck disable=SC2046
+    export $(grep -v '^#' "${ROOT_DIR}/.env" | xargs -0 -d '\n' 2>/dev/null || grep -v '^#' "${ROOT_DIR}/.env" | xargs)
+fi
+
+SERVER_HOST="${SERVER_HOST:-${LIGHTSAIL_HOST:-}}"
+SERVER_USER="${SERVER_USER:-ubuntu}"
+KEY_PATH="${KEY_PATH:-${HOME}/<ssh-key-redacted>}"
+REMOTE_DEST="${REMOTE_DEST:-/var/www/computerjy_dist}"
+
+if [ -z "${SERVER_HOST}" ]; then
+    echo "❌ Error: SERVER_HOST is not set."
+    echo "💡 Please set SERVER_HOST in your .env file or environment:"
+    echo "   echo 'SERVER_HOST=your_server_ip' >> .env"
+    exit 1
+fi
 
 echo "🚀 Step 1: Building ComputerJy World Astro Static Site..."
 npm run build
