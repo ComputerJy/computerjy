@@ -1,0 +1,141 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ComputerJy World API",
+    "description": "Public REST APIs for ComputerJy World — tech blog, entertainment, and article discovery by Eyad Salah.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Eyad Salah",
+      "url": "https://www.computerjy.com/contact-me"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://www.computerjy.com",
+      "description": "Production Server"
+    }
+  ],
+  "paths": {
+    "/search-index.json": {
+      "get": {
+        "summary": "Search Index API",
+        "description": "Returns the complete indexed dataset of 413+ articles for client-side and AI agent search.",
+        "responses": {
+          "200": {
+            "description": "Array of indexed articles",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "integer" },
+                      "title": { "type": "string" },
+                      "slug": { "type": "string" },
+                      "date": { "type": "string" },
+                      "category": { "type": "string" },
+                      "excerpt": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/wp-json/wp/v2/posts": {
+      "get": {
+        "summary": "List Posts",
+        "description": "Retrieve published articles from WordPress REST API.",
+        "parameters": [
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 10 }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 1 }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of post objects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "type": "object" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/wp-json/wp/v2/comments": {
+      "get": {
+        "summary": "List Comments",
+        "description": "Retrieve approved comments for a given post.",
+        "parameters": [
+          {
+            "name": "post",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of comment objects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "type": "object" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Submit Comment",
+        "description": "Post a new comment to an article.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["post", "author_name", "author_email", "content"],
+                "properties": {
+                  "post": { "type": "integer" },
+                  "author_name": { "type": "string" },
+                  "author_email": { "type": "string" },
+                  "content": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Comment created"
+          }
+        }
+      }
+    }
+  }
+}

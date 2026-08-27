@@ -1,0 +1,46 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://www.computerjy.com/wp-json/wp/v2/",
+      "service-desc": [
+        {
+          "href": "https://www.computerjy.com/api/openapi.json",
+          "type": "application/vnd.oai.openapi+json;version=3.0"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "https://developer.wordpress.org/rest-api/",
+          "type": "text/html"
+        }
+      ],
+      "status": [
+        {
+          "href": "https://www.computerjy.com/wp-json/",
+          "type": "application/json"
+        }
+      ]
+    },
+    {
+      "anchor": "https://www.computerjy.com/api/",
+      "service-desc": [
+        {
+          "href": "https://www.computerjy.com/api/openapi.json",
+          "type": "application/vnd.oai.openapi+json;version=3.0"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "https://www.computerjy.com/contact-me",
+          "type": "text/html"
+        }
+      ],
+      "status": [
+        {
+          "href": "https://www.computerjy.com/search-index.json",
+          "type": "application/json"
+        }
+      ]
+    }
+  ]
+}
