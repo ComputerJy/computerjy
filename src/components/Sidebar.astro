@@ -18,11 +18,15 @@ const { categories, tags, trendingPosts } = Astro.props;
     <img 
       src="/logo-icon.svg" 
       alt="Eyad Salah" 
+      width="80"
+      height="80"
+      loading="lazy"
+      decoding="async"
       class="w-20 h-20 rounded-full border-4 border-white dark:border-dark-surface mx-auto -mt-10 mb-3 bg-white dark:bg-dark-surface shadow-sm object-cover" 
     />
     <h3 class="font-heading font-extrabold text-lg text-slate-900 dark:text-white mb-0.5">Eyad Salah</h3>
     <div class="text-xs font-bold text-brand-blue mb-3">ComputerJy World &bull; Since 2007</div>
-    <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
+    <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
       Technologist, software enthusiast, and creator sharing independent tech reviews, fun digital curiosities, and practical guides.
     </p>
     <div class="flex items-center justify-center gap-2">
@@ -51,7 +55,7 @@ const { categories, tags, trendingPosts } = Astro.props;
             <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-brand-blue transition-colors leading-snug line-clamp-2 mb-1">
               <a href={`/posts/${post.slug}`}>{post.title.rendered}</a>
             </h4>
-            <div class="text-[10px] text-slate-400">{new Date(post.date).toLocaleDateString('en-GB')}</div>
+            <div class="text-[10px] text-slate-500 dark:text-slate-400">{new Date(post.date).toLocaleDateString('en-GB')}</div>
           </div>
         </article>
       ))}
@@ -70,7 +74,7 @@ const { categories, tags, trendingPosts } = Astro.props;
           class="flex items-center justify-between px-3 py-2 rounded-lg bg-light-subtle dark:bg-dark-subtle text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-brand-blue hover:text-white transition-all group"
         >
           <span>{cat.name}</span>
-          <span class="px-2 py-0.5 rounded-full text-[10px] bg-white dark:bg-dark-surface text-slate-500 group-hover:text-brand-blue font-bold">
+          <span class="px-2 py-0.5 rounded-full text-[10px] bg-white dark:bg-dark-surface text-slate-600 dark:text-slate-400 group-hover:text-brand-blue font-bold">
             {cat.count}
           </span>
         </a>
@@ -87,7 +91,7 @@ const { categories, tags, trendingPosts } = Astro.props;
       {tags.map((tag) => (
         <a 
           href={`/tag/${tag.slug}`} 
-          class="text-[11px] font-semibold px-2.5 py-1 rounded-md bg-light-subtle dark:bg-dark-subtle text-slate-500 dark:text-slate-400 hover:bg-brand-blue hover:text-white transition-all"
+          class="text-[11px] font-semibold px-2.5 py-1 rounded-md bg-light-subtle dark:bg-dark-subtle text-slate-600 dark:text-slate-400 hover:bg-brand-blue hover:text-white transition-all"
         >
           #{tag.name}
         </a>
@@ -99,7 +103,7 @@ const { categories, tags, trendingPosts } = Astro.props;
   <section class="bg-gradient-to-br from-brand-cyan/10 to-brand-purple/10 border border-brand-cyan/30 rounded-2xl p-6 text-center shadow-xs">
     <span class="text-2xl block mb-2">✨</span>
     <h4 class="font-heading font-bold text-sm text-slate-900 dark:text-white mb-1">Join the Community</h4>
-    <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">
+    <p class="text-xs text-slate-600 dark:text-slate-400 mb-4">
       Get fresh tech tips, software discoveries &amp; insights weekly.
     </p>
     <form class="flex flex-col gap-2" onsubmit="event.preventDefault(); alert('Subscribed to ComputerJy World!');">

@@ -9,6 +9,7 @@ interface Props {
   title?: string;
   description?: string;
   image?: string;
+  preloadImage?: string;
   type?: 'website' | 'article';
   publishedTime?: string;
   modifiedTime?: string;
@@ -19,6 +20,7 @@ const {
   title = 'ComputerJy World — Entertainment, Tech tips & Occasional software reviews',
   description = 'Entertainment, Tech tips & Occasional software reviews by Eyad Salah since 2007.',
   image = 'https://www.computerjy.com/assets/images/brand-identity-reference.jpeg',
+  preloadImage,
   type = 'website',
   publishedTime,
   modifiedTime,
@@ -81,6 +83,11 @@ const schemaData = type === 'article' ? {
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalURL} />
+
+    <!-- LCP Critical Image Preload -->
+    {preloadImage && (
+      <link rel="preload" as="image" href={preloadImage} fetchpriority="high" />
+    )}
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content={type} />
@@ -216,13 +223,26 @@ const schemaData = type === 'article' ? {
       })();
     </script>
 
-    <!-- Google Fonts -->
+    <!-- Google Fonts (Non-blocking async load) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link 
+      rel="preload" 
+      as="style" 
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" 
+    />
+    <link 
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" 
       rel="stylesheet" 
+      media="print" 
+      onload="this.media='all'" 
     />
+    <noscript>
+      <link 
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" 
+        rel="stylesheet" 
+      />
+    </noscript>
 
     <!-- Google Analytics (GA4) -->
     <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-MYP6LK1T99"></script>

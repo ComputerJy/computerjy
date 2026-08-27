@@ -31,6 +31,7 @@ const relatedPosts = allPosts.filter((p) => p.slug !== post.slug).slice(0, 3);
   title={`${post.title.rendered} — ComputerJy World`} 
   description={post.excerpt.rendered.replace(/<[^>]*>/g, '')}
   image={post.featuredImageUrl}
+  preloadImage={post.featuredImageUrl}
 >
   <ReadingProgressBar />
 
