@@ -6,12 +6,12 @@
     <link rel="profile" href="https://gmpg.org/xfn/11">
     
     <!-- Google Analytics (GA4) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0E6WH95Q6Z"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MYP6LK1T99"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-0E6WH95Q6Z');
+      gtag('config', 'G-MYP6LK1T99');
     </script>
     
     <!-- Prevent Flash of Unstyled Theme (FOUC) -->
