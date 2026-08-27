@@ -4,9 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       reason:
-        description: 'Deployment reason / notes'
+        description: 'Deployment notes'
         required: false
-        default: 'Manual update from GitHub Actions'
+        default: 'Manual release trigger'
+        type: string
 
 jobs:
   build-and-deploy:
