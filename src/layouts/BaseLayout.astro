@@ -133,6 +133,88 @@ const schemaData = type === 'article' ? {
     <link rel="service-desc" type="application/vnd.oai.openapi+json;version=3.0" href="/api/openapi.json" />
     <link rel="describedby" type="application/json" href="/search-index.json" />
     <link rel="service-doc" type="text/html" href="https://developer.wordpress.org/rest-api/" />
+    <link rel="ai-catalog" type="application/json" href="/.well-known/ai-catalog.json" />
+
+    <!-- WebMCP API: Expose Browser Tools to AI Agents -->
+    <script is:inline>
+      (function() {
+        function registerWebMcp() {
+          const tools = [
+            {
+              name: 'search_articles',
+              description: 'Search across 413+ historical tech tutorials, guides, and humor articles on ComputerJy World',
+              inputSchema: {
+                type: 'object',
+                properties: {
+                  query: { type: 'string', description: 'Search term or keywords' }
+                },
+                required: ['query']
+              },
+              execute: async function(params) {
+                try {
+                  const res = await fetch('/search-index.json');
+                  const data = await res.json();
+                  const q = (params.query || '').toLowerCase();
+                  const results = data.filter(function(p) {
+                    return (p.title && p.title.toLowerCase().includes(q)) || 
+                           (p.excerpt && p.excerpt.toLowerCase().includes(q));
+                  }).slice(0, 5);
+                  return { success: true, results: results };
+                } catch (e) {
+                  return { success: false, error: e.message };
+                }
+              }
+            },
+            {
+              name: 'get_latest_articles',
+              description: 'Fetch the most recent tech and entertainment articles from ComputerJy World',
+              inputSchema: {
+                type: 'object',
+                properties: {
+                  limit: { type: 'number', description: 'Number of articles to fetch (max 10)' }
+                }
+              },
+              execute: async function(params) {
+                try {
+                  const limit = Math.min(params.limit || 5, 10);
+                  const res = await fetch('/search-index.json');
+                  const data = await res.json();
+                  return { success: true, articles: data.slice(0, limit) };
+                } catch (e) {
+                  return { success: false, error: e.message };
+                }
+              }
+            }
+          ];
+
+          if (typeof navigator !== 'undefined' && navigator.modelContext) {
+            if (typeof navigator.modelContext.registerTool === 'function') {
+              tools.forEach(function(tool) {
+                try { navigator.modelContext.registerTool(tool); } catch(e) {}
+              });
+            } else if (typeof navigator.modelContext.provideContext === 'function') {
+              try { navigator.modelContext.provideContext({ tools: tools }); } catch(e) {}
+            }
+          }
+          if (typeof window !== 'undefined' && window.modelContext) {
+            if (typeof window.modelContext.registerTool === 'function') {
+              tools.forEach(function(tool) {
+                try { window.modelContext.registerTool(tool); } catch(e) {}
+              });
+            } else if (typeof window.modelContext.provideContext === 'function') {
+              try { window.modelContext.provideContext({ tools: tools }); } catch(e) {}
+            }
+          }
+        }
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', registerWebMcp);
+        } else {
+          registerWebMcp();
+        }
+        document.addEventListener('astro:page-load', registerWebMcp);
+      })();
+    </script>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

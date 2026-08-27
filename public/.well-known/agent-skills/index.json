@@ -1,0 +1,12 @@
+{
+  "$schema": "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
+  "skills": [
+    {
+      "name": "search-articles",
+      "type": "skill-md",
+      "description": "Search and retrieve historical tech articles, tips, and blog posts from ComputerJy World.",
+      "url": "https://www.computerjy.com/.well-known/agent-skills/search-articles/SKILL.md",
+      "digest": "sha256:bff105c6128ea313953ddb6c418db8b4837df242cdafc1a5db19513a1151a0df"
+    }
+  ]
+}

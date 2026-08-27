@@ -1,0 +1,23 @@
+{
+  "$schema": "https://a2a-protocol.org/schemas/agent-card/v1.json",
+  "name": "ComputerJy World Agent",
+  "version": "1.0.0",
+  "description": "AI Agent interface for ComputerJy World tech archives, software tutorials, and blog articles",
+  "supportedInterfaces": [
+    {
+      "url": "https://www.computerjy.com/api/",
+      "protocol": "http"
+    }
+  ],
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false
+  },
+  "skills": [
+    {
+      "id": "search-articles",
+      "name": "Search Articles",
+      "description": "Search and retrieve historical tech articles, tips, and blog posts from ComputerJy World."
+    }
+  ]
+}
