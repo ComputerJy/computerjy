@@ -26,3 +26,26 @@ export function stripHtml(input: string): string {
     .replace(/&amp;/g, '&')
     .trim();
 }
+
+/**
+ * Sanitizes reader comments by stripping unsafe elements and attributes.
+ * Allows only safe formatting tags: <b>, <i>, <em>, <strong>, <code>, <p>, <br>.
+ */
+export function sanitizeCommentHtml(html: string): string {
+  if (!html) return '';
+  // Strip dangerous elements entirely
+  let clean = html
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+    .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '')
+    .replace(/<embed\b[^<]*(?:(?!<\/embed>)<[^<]*)*<\/embed>/gi, '');
+
+  // Strip all on* event attributes (e.g. onload, onclick, onerror)
+  clean = clean.replace(/\son\w+="[^"]*"/gi, '').replace(/\son\w+='[^']*'/gi, '');
+
+  // Strip javascript: URLs
+  clean = clean.replace(/href=["']javascript:[^"']*["']/gi, 'href="#"');
+
+  return clean;
+}
