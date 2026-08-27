@@ -37,4 +37,4 @@ always_on: true
 
 ## 4. WordPress Ingestion & HTML Sanitization
 - When parsing raw WordPress XML exports in Python, strip invalid XML 1.0 control bytes using `bytes.translate(None, illegal_bytes)` instead of broad regex ranges.
-- When stripping HTML tags in JavaScript/TypeScript, use iterative sanitization to prevent nested tag injection bypasses, and unescape `&amp;` last to prevent double-decoding vulnerabilities.
+- Avoid regex blacklist sanitization and iterative replacement loops (which trigger CodeQL `js/incomplete-sanitization`). Instead, use an **escape-first whitelist** pattern: completely escape all HTML special characters first (`escapeHtml`), and then restore only strictly attribute-free whitelisted tags (e.g. `<b>`, `<i>`, `<code>`, `<p>`, `<br />`). Always unescape `&amp;` last.
