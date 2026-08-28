@@ -159,7 +159,7 @@ add_action( 'wp_enqueue_scripts', 'computerjy_scripts' );
  */
 function computerjy_reading_time( $post_id = null ) {
     $content = get_post_field( 'post_content', $post_id ? $post_id : get_the_ID() );
-    $word_count = str_word_count( strip_tags( $content ) );
+    $word_count = str_word_count( wp_strip_all_tags( $content ) );
     $reading_time = ceil( $word_count / 200 );
     return max( 1, $reading_time ) . ' min read';
 }
