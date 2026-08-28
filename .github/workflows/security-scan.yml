@@ -66,6 +66,12 @@ jobs:
           node-version: 22
           cache: 'npm'
 
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Astro Type & A11y Verification
+        run: npx astro check
+
       - name: Run NPM Security Audit
         run: npm audit --audit-level=high
 

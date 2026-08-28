@@ -46,4 +46,19 @@
             </property>
         </properties>
     </rule>
+
+    <!-- 5. Prevent Overwriting WordPress Global Variables -->
+    <rule ref="WordPress.WP.GlobalVariablesOverride" />
+
+    <!-- 6. Flag Discouraged & Leftover Debug Functions -->
+    <rule ref="WordPress.WP.DiscouragedFunctions" />
+
+    <!-- 7. Enforce Theme Function & Hook Prefixing -->
+    <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+        <properties>
+            <property name="prefixes" type="array">
+                <element value="computerjy" />
+            </property>
+        </properties>
+    </rule>
 </ruleset>

@@ -42,6 +42,13 @@ export interface WPPost {
     slug: string;
   };
   featuredImageUrl?: string;
+  comments?: Array<{
+    id: number;
+    author: string;
+    date: string;
+    content: string;
+    parent?: number;
+  }>;
 }
 
 export interface WPCategory {
