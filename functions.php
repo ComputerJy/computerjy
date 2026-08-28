@@ -253,7 +253,12 @@ function computerjy_comment_callback( $comment, $args, $depth ) {
         <div class="comment-content-wrap">
             <div class="comment-header">
                 <span class="comment-author-name"><?php echo get_comment_author_link(); ?></span>
-                <div class="comment-date"><?php printf( esc_html__( '%1$s at %2$s', 'computerjy' ), esc_html( get_comment_date() ), esc_html( get_comment_time() ) ); ?></div>
+                <div class="comment-date">
+                    <?php
+                    /* translators: 1: comment date, 2: comment time */
+                    printf( esc_html__( '%1$s at %2$s', 'computerjy' ), esc_html( get_comment_date() ), esc_html( get_comment_time() ) );
+                    ?>
+                </div>
             </div>
             <div class="comment-body">
                 <?php comment_text(); ?>
