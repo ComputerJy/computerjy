@@ -18,18 +18,10 @@
     <exclude-pattern>*/.astro/*</exclude-pattern>
     <exclude-pattern>*/assets/*</exclude-pattern>
 
-    <!-- Include WordPress Security sniffs -->
+    <!-- Include WordPress Security and Database safety sniffs -->
     <rule ref="WordPress.Security" />
     <rule ref="WordPress.WP.CapitalPDangit" />
     <rule ref="WordPress.WP.AlternativeFunctions" />
-
-    <!-- Include WordPress-Extra while excluding cosmetic whitespace/tab indentation rules -->
-    <rule ref="WordPress-Extra">
-        <exclude name="Generic.WhiteSpace.DisallowSpaceIndent" />
-        <exclude name="Generic.WhiteSpace.ScopeIndent" />
-        <exclude name="WordPress.WhiteSpace" />
-        <exclude name="PEAR.Functions.FunctionCallSignature" />
-        <exclude name="Squiz.Commenting" />
-        <exclude name="WordPress.Files.FileName" />
-    </rule>
+    <rule ref="WordPress.DB.PreparedSQL" />
+    <rule ref="WordPress.DB.RestrictedFunctions" />
 </ruleset>
