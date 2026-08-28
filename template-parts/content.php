@@ -9,7 +9,7 @@
 <article id="post-<?php the_ID(); ?>" <?php post_class( 'post-card' ); ?>>
     <!-- Card Media / Thumbnail -->
     <a href="<?php the_permalink(); ?>" class="card-media-wrapper" aria-label="<?php the_title_attribute(); ?>">
-        <?php echo computerjy_get_category_badge( get_the_ID() ); ?>
+        <?php echo wp_kses_post( computerjy_get_category_badge( get_the_ID() ) ); ?>
         <?php if ( has_post_thumbnail() ) : ?>
             <?php the_post_thumbnail( 'computerjy-card', array( 'class' => 'card-media-img', 'alt' => the_title_attribute( array( 'echo' => false ) ) ) ); ?>
         <?php else : ?>

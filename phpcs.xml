@@ -17,6 +17,7 @@
     <exclude-pattern>*/dist/*</exclude-pattern>
     <exclude-pattern>*/.astro/*</exclude-pattern>
     <exclude-pattern>*/assets/*</exclude-pattern>
+    <exclude-pattern>*/public/*</exclude-pattern>
 
     <!-- Include WordPress Security and Database safety sniffs -->
     <rule ref="WordPress.Security" />
