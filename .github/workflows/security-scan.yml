@@ -44,7 +44,6 @@ jobs:
           composer global exec -- phpcs -i
 
       - name: Scan WordPress PHP Code Security
-        continue-on-error: true
         run: |
           composer global exec -- phpcs --standard=phpcs.xml
 
@@ -86,4 +85,4 @@ jobs:
       - name: Run Actionlint
         uses: reviewdog/action-actionlint@v1
         with:
-          fail_on_error: true
+          fail_level: error
