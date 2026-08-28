@@ -14,7 +14,7 @@ export async function GET(context: APIContext) {
       title: stripHtml(post.title.rendered),
       pubDate: new Date(post.date),
       description: stripHtml(post.excerpt.rendered),
-      link: `/posts/${post.slug}/`,
+      link: `/posts/${post.slug}`,
     })),
     customData: `<language>en-us</language>`,
   });

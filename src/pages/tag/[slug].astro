@@ -26,7 +26,14 @@ const tagPosts = posts.filter((p) => p.tags.includes(tag.id));
 const displayPosts = tagPosts.length > 0 ? tagPosts : posts.slice(0, 4);
 ---
 
-<BaseLayout title={`#${tag.name} — ComputerJy World`}>
+<BaseLayout 
+  title={`#${tag.name} — ComputerJy World`} 
+  description={`Explore all tutorials, software reviews, and tech insights tagged with #${tag.name} on ComputerJy World.`}
+  breadcrumbs={[
+    { name: 'Home', url: '/' },
+    { name: `#${tag.name}` }
+  ]}
+>
   <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
     
     <header class="bg-white dark:bg-dark-surface border border-slate-200/80 dark:border-slate-800 rounded-3xl p-8 sm:p-10 mb-10 shadow-xs relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:bottom-0 before:w-1.5 before:bg-grad-accent">

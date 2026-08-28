@@ -29,7 +29,14 @@ const categoryPosts = posts.filter(
 const displayPosts = categoryPosts.length > 0 ? categoryPosts : posts.slice(0, 4);
 ---
 
-<BaseLayout title={`${category.name} — ComputerJy World`} description={category.description}>
+<BaseLayout 
+  title={`${category.name} — ComputerJy World`} 
+  description={category.description || `Browse articles, tutorials, and tech insights filed under ${category.name} on ComputerJy World.`}
+  breadcrumbs={[
+    { name: 'Home', url: '/' },
+    { name: category.name }
+  ]}
+>
   <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
     
     <!-- Archive Header Banner -->

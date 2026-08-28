@@ -29,9 +29,17 @@ const relatedPosts = allPosts.filter((p) => p.slug !== post.slug).slice(0, 3);
 
 <BaseLayout 
   title={`${post.title.rendered} — ComputerJy World`} 
-  description={post.excerpt.rendered.replace(/<[^>]*>/g, '')}
+  description={post.excerpt.rendered.replace(/<[^>]*>/g, '').trim()}
   image={post.featuredImageUrl}
   preloadImage={post.featuredImageUrl}
+  type="article"
+  publishedTime={post.date}
+  modifiedTime={post.modified || post.date}
+  breadcrumbs={[
+    { name: 'Home', url: '/' },
+    { name: post.primaryCategory?.name || 'Tech', url: `/category/${post.primaryCategory?.slug || 'tech'}` },
+    { name: post.title.rendered }
+  ]}
 >
   <ReadingProgressBar />
 
@@ -67,11 +75,17 @@ const relatedPosts = allPosts.filter((p) => p.slug !== post.slug).slice(0, 3);
         <!-- Author & Date Meta -->
         <div class="flex items-center justify-between flex-wrap gap-4 pb-6 mb-8 border-b border-slate-100 dark:border-slate-800">
           <div class="flex items-center gap-3">
-            <img src="/logo-icon.svg" alt="Eyad Salah" class="w-11 h-11 rounded-full border border-brand-cyan object-cover" />
+            <img 
+              src="/logo-icon.svg" 
+              alt="Eyad Salah" 
+              width="44" 
+              height="44" 
+              class="w-11 h-11 rounded-full border border-brand-cyan object-cover" 
+            />
             <div>
               <div class="font-heading font-bold text-sm text-slate-900 dark:text-white">Eyad Salah</div>
               <div class="text-xs text-slate-400">
-                {new Date(post.date).toLocaleDateString('en-GB')} &bull; {post.readingTime}
+                <time datetime={post.date}>{new Date(post.date).toLocaleDateString('en-GB')}</time> &bull; {post.readingTime}
               </div>
             </div>
           </div>
@@ -84,7 +98,16 @@ const relatedPosts = allPosts.filter((p) => p.slug !== post.slug).slice(0, 3);
         <!-- Featured Media -->
         {post.featuredImageUrl && (
           <div class="aspect-video rounded-2xl overflow-hidden mb-8 shadow-md">
-            <img src={post.featuredImageUrl} alt={post.title.rendered} class="w-full h-full object-cover" />
+            <img 
+              src={post.featuredImageUrl} 
+              alt={post.title.rendered} 
+              width="1200" 
+              height="675" 
+              loading="eager" 
+              fetchpriority="high" 
+              decoding="async" 
+              class="w-full h-full object-cover" 
+            />
           </div>
         )}
 
