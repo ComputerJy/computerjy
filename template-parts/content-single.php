@@ -13,7 +13,7 @@
         <?php computerjy_breadcrumbs(); ?>
 
         <div style="margin-bottom: 0.85rem;">
-            <?php echo computerjy_get_category_badge( get_the_ID() ); ?>
+            <?php echo wp_kses_post( computerjy_get_category_badge( get_the_ID() ) ); ?>
         </div>
 
         <h1 class="single-post-title"><?php the_title(); ?></h1>
