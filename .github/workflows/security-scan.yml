@@ -1,0 +1,92 @@
+name: Security & Code Quality Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Run weekly security scan on Mondays at 07:00 UTC
+    - cron: '0 7 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  php-security-scan:
+    name: PHP & WordPress Theme Security
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Harden GitHub Actions Runner
+        uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer, phpcs
+
+      - name: Check PHP Syntax (Linting)
+        run: |
+          find . -maxdepth 3 -name "*.php" -not -path "*/node_modules/*" -not -path "*/dist/*" -not -path "*/.astro/*" -exec php -l {} +
+
+      - name: Install WordPress Coding Standards
+        run: |
+          composer global require --dev wp-coding-standards/wpcs dealerdirect/phpcodesniffer-composer-installer
+          composer global exec phpcs -i
+
+      - name: Scan WordPress PHP Code Security
+        continue-on-error: true
+        run: |
+          composer global exec phpcs -- -s \
+            --standard=WordPress-Core,WordPress-Extra \
+            --ignore=node_modules,dist,.astro,assets \
+            --extensions=php \
+            ./*.php ./template-parts/ ./inc/
+
+  npm-audit-scan:
+    name: NPM Dependency Vulnerability Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Harden GitHub Actions Runner
+        uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Run NPM Security Audit
+        run: npm audit --audit-level=high
+
+  workflow-security-scan:
+    name: GitHub Actions Workflow Security
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Harden GitHub Actions Runner
+        uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Run Actionlint
+        uses: reviewdog/action-actionlint@v1
+        with:
+          fail_on_error: true
