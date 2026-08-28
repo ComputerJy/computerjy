@@ -206,18 +206,18 @@ function computerjy_breadcrumbs() {
     echo '<span class="meta-dot"></span>';
 
     if ( is_category() ) {
-        echo '<span>' . single_cat_title( '', false ) . '</span>';
+        echo '<span>' . esc_html( single_cat_title( '', false ) ) . '</span>';
     } elseif ( is_tag() ) {
-        echo '<span>' . single_tag_title( '', false ) . '</span>';
+        echo '<span>' . esc_html( single_tag_title( '', false ) ) . '</span>';
     } elseif ( is_singular( 'post' ) ) {
         $categories = get_the_category();
         if ( ! empty( $categories ) ) {
             echo '<a href="' . esc_url( get_category_link( $categories[0]->term_id ) ) . '">' . esc_html( $categories[0]->name ) . '</a>';
             echo '<span class="meta-dot"></span>';
         }
-        echo '<span>' . wp_trim_words( get_the_title(), 6 ) . '</span>';
+        echo '<span>' . esc_html( wp_trim_words( get_the_title(), 6 ) ) . '</span>';
     } elseif ( is_page() ) {
-        echo '<span>' . get_the_title() . '</span>';
+        echo '<span>' . esc_html( get_the_title() ) . '</span>';
     } elseif ( is_search() ) {
         /* translators: %s: search query */
         echo '<span>' . sprintf( esc_html__( 'Search: %s', 'computerjy' ), esc_html( get_search_query() ) ) . '</span>';
@@ -253,7 +253,7 @@ function computerjy_comment_callback( $comment, $args, $depth ) {
         <div class="comment-content-wrap">
             <div class="comment-header">
                 <span class="comment-author-name"><?php echo get_comment_author_link(); ?></span>
-                <div class="comment-date"><?php printf( esc_html__( '%1$s at %2$s', 'computerjy' ), get_comment_date(), get_comment_time() ); ?></div>
+                <div class="comment-date"><?php printf( esc_html__( '%1$s at %2$s', 'computerjy' ), esc_html( get_comment_date() ), esc_html( get_comment_time() ) ); ?></div>
             </div>
             <div class="comment-body">
                 <?php comment_text(); ?>

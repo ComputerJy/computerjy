@@ -46,11 +46,7 @@ jobs:
       - name: Scan WordPress PHP Code Security
         continue-on-error: true
         run: |
-          composer global exec -- phpcs -s \
-            --standard=WordPress-Core,WordPress-Extra \
-            --ignore=node_modules,dist,.astro,assets \
-            --extensions=php \
-            ./*.php ./template-parts/ ./inc/
+          composer global exec -- phpcs --standard=phpcs.xml
 
   npm-audit-scan:
     name: NPM Dependency Vulnerability Audit
