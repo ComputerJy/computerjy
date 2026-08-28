@@ -1,0 +1,9 @@
+# ComputerJy World - Security Disclosure Policy
+# Specification: RFC 9116 (https://www.rfc-editor.org/rfc/rfc9116)
+
+Contact: https://www.computerjy.com/contact-me
+Contact: mailto:security@computerjy.com
+Expires: 2027-08-29T00:00:00.000Z
+Preferred-Languages: en, ar
+Canonical: https://www.computerjy.com/.well-known/security.txt
+Policy: https://www.computerjy.com/privacy-policy
