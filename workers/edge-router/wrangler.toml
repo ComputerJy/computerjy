@@ -21,7 +21,7 @@ enabled = true
 
 [[r2_buckets]]
 binding = "ASSETS"
-bucket_name = "computerjy-dist"
+bucket_name = "computerjy-bucket"
 
 # ------------------------------------------------------------------------------
 # CUTOVER — leave commented until the checks in deploy/cloudflare-r2.md pass.
