@@ -210,6 +210,36 @@ describe('decodeEntities', () => {
     expect(decodeEntities('&amp;lt;')).toBe('&lt;');
   });
 
+  // Comment content and term descriptions reach decodeEntities, so these are
+  // reachable from visitor-submitted text. Before the code-point guard each of
+  // these threw a RangeError out of String.fromCodePoint and crashed the build.
+  it.each([
+    ['&#1114112;', 'decimal one past the maximum'],
+    ['&#x110000;', 'hex one past the maximum'],
+    ['&#99999999999999;', 'far out of range'],
+    ['&#xFFFFFFFFFF;', 'overlong hex, parseInt returns Infinity'],
+  ])('preserves %s (%s) instead of throwing', (input) => {
+    expect(() => decodeEntities(input)).not.toThrow();
+    expect(decodeEntities(input)).toBe(input);
+  });
+
+  it('preserves lone surrogates rather than emitting ill-formed UTF-16', () => {
+    // These do not throw, but they cannot be encoded as valid UTF-8 on the way
+    // into a built page.
+    expect(decodeEntities('&#xD800;')).toBe('&#xD800;');
+    expect(decodeEntities('&#55296;')).toBe('&#55296;');
+  });
+
+  it('still decodes the highest code point it is allowed to', () => {
+    expect(decodeEntities('&#x10FFFF;')).toBe(String.fromCodePoint(0x10ffff));
+  });
+
+  it('decodes valid entities either side of an out-of-range one', () => {
+    expect(decodeEntities('a&#8217;b&#1114112;c&#8230;d')).toBe(
+      'a\u2019b&#1114112;c\u2026d'
+    );
+  });
+
   it('leaves a string with no entities unchanged', () => {
     expect(decodeEntities('plain text, no entities here')).toBe(
       'plain text, no entities here'

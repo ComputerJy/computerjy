@@ -151,11 +151,40 @@ const NAMED_ENTITIES: Array<[RegExp, string]> = [
   [/&amp;/g, '&'],
 ];
 
+/** Highest code point Unicode defines; String.fromCodePoint throws above it. */
+const MAX_CODE_POINT = 0x10ffff;
+
+/**
+ * Converts one numeric character reference, or returns it unchanged when the
+ * value does not denote a usable character.
+ *
+ * Comment content and term descriptions reach this function, so the input is not
+ * all owner-authored. `String.fromCodePoint` throws a RangeError for anything
+ * above 0x10FFFF, which means an approved comment containing "&#1114112;",
+ * "&#x110000;" or "&#99999999999999;" would crash the build with an error that is
+ * not a WpApiError. Overlong hex is covered too: parseInt returns Infinity.
+ *
+ * Lone surrogates (0xD800-0xDFFF) do not throw but yield ill-formed UTF-16 that
+ * cannot be encoded as valid UTF-8 on the way into a built page, so they are left
+ * alone for the same reason. In both cases the original text is preserved rather
+ * than dropped, so nothing silently disappears from a comment.
+ */
+function codePointToString(value: number, original: string): string {
+  const usable =
+    Number.isInteger(value) &&
+    value >= 0 &&
+    value <= MAX_CODE_POINT &&
+    !(value >= 0xd800 && value <= 0xdfff);
+  return usable ? String.fromCodePoint(value) : original;
+}
+
 function decodeNumericEntities(text: string): string {
   return text
-    .replace(/&#(\d+);/g, (_, dec: string) => String.fromCodePoint(Number(dec)))
-    .replace(/&#[xX]([0-9a-fA-F]+);/g, (_, hex: string) =>
-      String.fromCodePoint(parseInt(hex, 16))
+    .replace(/&#(\d+);/g, (match, dec: string) =>
+      codePointToString(Number(dec), match)
+    )
+    .replace(/&#[xX]([0-9a-fA-F]+);/g, (match, hex: string) =>
+      codePointToString(parseInt(hex, 16), match)
     );
 }
 
