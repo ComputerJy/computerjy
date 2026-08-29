@@ -30,3 +30,31 @@ describe('sanitizeSlug', () => {
     expect(sanitizeSlug('')).toBe('');
   });
 });
+
+import { resolveFeaturedImage, PLACEHOLDER_IMAGE } from '../src/lib/normalize';
+
+describe('resolveFeaturedImage', () => {
+  it('prefers the real WordPress featured media URL', () => {
+    expect(
+      resolveFeaturedImage('https://x.com/real.jpg', '<img src="https://x.com/inline.jpg">')
+    ).toBe('https://x.com/real.jpg');
+  });
+
+  it('falls back to the first inline img when there is no featured media', () => {
+    expect(
+      resolveFeaturedImage(undefined, '<p>hi</p><img src="https://x.com/inline.jpg"><img src="https://x.com/second.jpg">')
+    ).toBe('https://x.com/inline.jpg');
+  });
+
+  it('accepts single-quoted src attributes', () => {
+    expect(resolveFeaturedImage(undefined, "<img src='https://x.com/q.jpg'>")).toBe('https://x.com/q.jpg');
+  });
+
+  it('ignores non-http srcs such as data URIs', () => {
+    expect(resolveFeaturedImage(undefined, '<img src="data:image/png;base64,AAAA">')).toBe(PLACEHOLDER_IMAGE);
+  });
+
+  it('falls back to the Unsplash placeholder when there is no image at all', () => {
+    expect(resolveFeaturedImage(undefined, '<p>no images here</p>')).toBe(PLACEHOLDER_IMAGE);
+  });
+});
