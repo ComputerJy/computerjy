@@ -276,3 +276,59 @@ describe('parity with the production vhost', () => {
     }
   );
 });
+
+describe('legacy WordPress permalinks', () => {
+  it.each([
+    ['/2015/07/clickbait-headlines/', 'clickbait-headlines'],
+    ['/2015/07/clickbait-headlines', 'clickbait-headlines'],
+    // WordPress's day-and-name structure, in case it was ever the setting.
+    ['/2015/07/27/clickbait-headlines/', 'clickbait-headlines'],
+  ])('redirects %s to the canonical post URL', (path, slug) => {
+    expect(decide(path)).toEqual({
+      kind: 'redirect',
+      location: `/posts/${slug}`,
+      verifyKey: `posts/${slug}/index.html`,
+    });
+  });
+
+  // Otherwise a dead link becomes a redirect into a 404, which is worse.
+  it('names the key the handler must confirm before redirecting', () => {
+    const decision = decide('/2015/07/gone-for-good/');
+    expect(decision).toMatchObject({
+      verifyKey: 'posts/gone-for-good/index.html',
+    });
+  });
+
+  it('points an agent at the canonical URL instead of the origin', () => {
+    expect(
+      decide('/2015/07/clickbait-headlines/', 'GET', 'text/markdown').kind
+    ).toBe('redirect');
+  });
+
+  it.each([
+    '/posts/clickbait-headlines',
+    '/2015/07/', // a date archive, which the static site has no equivalent for
+    '/2015/',
+    '/20155/07/something',
+    '/2015/7/something',
+    '/2015/07/nested/deeper/slug',
+  ])('leaves %s alone', (path) => {
+    expect(decide(path).kind).not.toBe('redirect');
+  });
+
+  // A four-digit-bounded year keeps a real slug starting with digits safe.
+  it('does not swallow a post whose slug begins with digits', () => {
+    expect(decide('/posts/101-greatest-george-carlin-quotes').kind).toBe(
+      'asset'
+    );
+  });
+
+  it('never overrides the WordPress or blocked-file rules', () => {
+    expect(decide('/wp-content/2015/07/image.jpg').kind).toBe('origin');
+    expect(decide('/2015/07/.env').kind).toBe('forbidden');
+  });
+
+  it('refuses a slug carrying an encoded separator', () => {
+    expect(decide('/2015/07/a%2F..%2Fetc/').kind).not.toBe('redirect');
+  });
+});

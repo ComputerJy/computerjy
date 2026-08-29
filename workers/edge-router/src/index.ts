@@ -38,6 +38,7 @@ interface R2Bucket {
     key: string,
     options?: { onlyIf?: Headers; range?: Headers }
   ): Promise<R2ObjectBody | null>;
+  head(key: string): Promise<{ readonly httpEtag: string } | null>;
 }
 
 interface Env {
@@ -164,6 +165,22 @@ export default {
 
     if (decision.kind === 'origin') {
       return fetch(request);
+    }
+
+    if (decision.kind === 'redirect') {
+      // Confirmed before redirecting: a slug that no longer exists gets the 404
+      // page, not a hop into one.
+      const target = await env.ASSETS.head(decision.verifyKey);
+      if (target === null) return serveNotFound(env.ASSETS);
+
+      const headers = new Headers({
+        Location: `${decision.location}${url.search}`,
+        // Long enough to spare the lookup, short enough that a wrong answer is
+        // not cached for a year.
+        'Cache-Control': 'public, max-age=86400',
+      });
+      applyStandardHeaders(headers);
+      return new Response(null, { status: 301, headers });
     }
 
     // Plain reads can come straight off the edge; anything conditional or
