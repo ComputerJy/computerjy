@@ -1,0 +1,40 @@
+# ==============================================================================
+# ComputerJy edge Worker — serves the Astro build from R2, WordPress from origin
+# ==============================================================================
+#
+# Deploy:  cd workers/edge-router && npx wrangler deploy
+# Dev:     npx wrangler dev --remote      (hits the real R2 bucket)
+#
+# CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN come from the environment, so
+# no account identifier is tracked here. See deploy/cloudflare-r2.md.
+
+name = "computerjy-edge"
+main = "src/index.ts"
+compatibility_date = "2026-08-30"
+
+# No *.workers.dev hostname: a second public origin serving the same pages
+# would compete with the canonical URLs. Smoke-test with `wrangler dev --remote`.
+workers_dev = false
+
+[observability]
+enabled = true
+
+[[r2_buckets]]
+binding = "ASSETS"
+bucket_name = "computerjy-dist"
+
+# ------------------------------------------------------------------------------
+# CUTOVER — leave commented until the checks in deploy/cloudflare-r2.md pass.
+# ------------------------------------------------------------------------------
+# Uncommenting these and deploying puts the Worker in front of production
+# traffic. Rolling back is deleting the routes again (or `wrangler delete`);
+# Lightsail keeps receiving the same build over rsync throughout, so the origin
+# can serve the site unaided the moment the routes are gone.
+#
+# [[routes]]
+# pattern = "www.computerjy.com/*"
+# zone_name = "computerjy.com"
+#
+# [[routes]]
+# pattern = "computerjy.com/*"
+# zone_name = "computerjy.com"
