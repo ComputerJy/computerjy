@@ -467,3 +467,81 @@ describe('unwrapPhoton host anchoring', () => {
     );
   });
 });
+
+import { pickHeroImageUrl, HERO_TARGET_WIDTH } from '../src/lib/normalize';
+
+describe('pickHeroImageUrl', () => {
+  const full =
+    'https://www.computerjy.com/wp-content/uploads/2011/05/Defrag.jpg';
+  const dir = 'https://www.computerjy.com/wp-content/uploads/2011/05';
+
+  it('falls back to the original when there are no sizes at all', () => {
+    expect(pickHeroImageUrl(full)).toBe(full);
+    expect(pickHeroImageUrl(full, {})).toBe(full);
+    expect(pickHeroImageUrl(full, { sizes: {} })).toBe(full);
+  });
+
+  it('builds the local derivative URL from `file`, not the Photon source_url', () => {
+    // Real shape of attachment 1522: 830x610 original, medium_large 768x564.
+    // Its size.source_url is https://i0.wp.com/...Defrag.jpg?fit=768%2C564 --
+    // the ORIGINAL plus a resize parameter, which unwrapPhotonUrl would reduce
+    // straight back to the full-size file. Only `file` names the derivative.
+    expect(
+      pickHeroImageUrl(full, {
+        sizes: {
+          thumbnail: { file: 'Defrag-150x150.jpg', width: 150 },
+          medium: { file: 'Defrag-300x220.jpg', width: 300 },
+          medium_large: { file: 'Defrag-768x564.jpg', width: 768 },
+          full: { file: 'Defrag.jpg', width: 830 },
+        },
+      })
+    ).toBe(`${dir}/Defrag-768x564.jpg`);
+  });
+
+  it('keeps the original when every derivative is too small', () => {
+    // facebook.jpg is 603x763; its largest derivative is 237x300. Serving that
+    // into a 700px slot is the pre-migration behaviour issue #14 mistook for a
+    // payload regression.
+    expect(
+      pickHeroImageUrl(full, {
+        sizes: {
+          thumbnail: { file: 'facebook-150x150.jpg', width: 150 },
+          medium: { file: 'facebook-237x300.jpg', width: 237 },
+        },
+      })
+    ).toBe(full);
+  });
+
+  it('takes the smallest derivative at or above the target, not the largest', () => {
+    expect(
+      pickHeroImageUrl(full, {
+        sizes: {
+          a: { file: 'x-699x400.jpg', width: HERO_TARGET_WIDTH - 1 },
+          b: { file: 'x-700x400.jpg', width: HERO_TARGET_WIDTH },
+          c: { file: 'x-1600x900.jpg', width: 1600 },
+        },
+      })
+    ).toBe(`${dir}/x-700x400.jpg`);
+  });
+
+  it('ignores malformed size entries', () => {
+    expect(
+      pickHeroImageUrl(full, {
+        sizes: {
+          broken: undefined,
+          nofile: { width: 900 } as never,
+          nowidth: { file: 'x.jpg' } as never,
+          good: { file: 'g-900x600.jpg', width: 900 },
+        },
+      })
+    ).toBe(`${dir}/g-900x600.jpg`);
+  });
+
+  it('leaves a URL with no path separator alone', () => {
+    expect(
+      pickHeroImageUrl('Defrag.jpg', {
+        sizes: { a: { file: 'b.jpg', width: 900 } },
+      })
+    ).toBe('Defrag.jpg');
+  });
+});
