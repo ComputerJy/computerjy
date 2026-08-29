@@ -82,6 +82,19 @@ jobs:
         env:
           WP_BUILD_TOKEN: ${{ secrets.WP_BUILD_TOKEN }}
 
+      # Catches a *code* regression before merge. The deploy workflow runs the same
+      # verification against the build it is about to publish, which is what catches an
+      # *upstream* regression that appears with no commit at all.
+      - name: Build Astro Static Site
+        run: npm run build
+        env:
+          WP_BUILD_TOKEN: ${{ secrets.WP_BUILD_TOKEN }}
+
+      - name: Verify Build
+        run: npm run verify:build
+        env:
+          WP_BUILD_TOKEN: ${{ secrets.WP_BUILD_TOKEN }}
+
       - name: Run NPM Security Audit
         run: npm audit --audit-level=high
 
