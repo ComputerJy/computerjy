@@ -58,7 +58,8 @@ src/
 │   ├── wp-client.ts              # WordPress REST API HTTP client
 │   ├── wp-loader.ts              # Content Layer loader that fetches WP data at build time
 │   ├── normalize.ts              # Normalizes raw WP API responses into content schema
-│   └── types.ts                  # TypeScript definitions
+│   ├── types.ts                  # TypeScript definitions
+│   └── utils.ts                  # HTML escaping/stripping helpers for RSS & search index
 ├── pages/
 │   ├── 404.astro                 # Custom 404 error page
 │   ├── category/[slug].astro     # Dynamic category archives

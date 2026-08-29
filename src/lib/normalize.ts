@@ -136,7 +136,7 @@ export interface NormalizedComment {
   parent: number;
 }
 export interface Term { name: string; slug: string }
-export interface NormalizedPost {
+export type NormalizedPost = {
   id: number;
   slug: string;
   title: { rendered: string };
@@ -150,7 +150,7 @@ export interface NormalizedPost {
   featuredImageUrl: string;
   readingTime: string;
   comments: NormalizedComment[];
-}
+};
 
 /** parse_wp_export.py used this when a post had no categories. */
 export const DEFAULT_CATEGORY: Term = { name: 'Tech', slug: 'tech' };
