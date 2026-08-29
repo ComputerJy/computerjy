@@ -45,6 +45,16 @@ jobs:
         env:
           WP_BUILD_TOKEN: ${{ secrets.WP_BUILD_TOKEN }}
 
+      # Gates the deploy. Content comes from a live WordPress install whose plugins can
+      # change the rendered site with no commit here — Jetpack Photon and entity-encoded
+      # .rendered fields both did exactly that during the migration, and unit tests,
+      # astro check and a green build all passed through them. A failure here means
+      # nothing is rsynced, so a regression is never published.
+      - name: Verify Build
+        run: npm run verify:build
+        env:
+          WP_BUILD_TOKEN: ${{ secrets.WP_BUILD_TOKEN }}
+
       - name: Setup SSH Credentials
         run: |
           mkdir -p ~/.ssh
