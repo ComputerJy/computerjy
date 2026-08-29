@@ -25,14 +25,21 @@ A modern, high-performance, tech-savvy, and energetic theme suite built for **[C
 
 ---
 
-## ⚡ 1. Modern Headless Frontend (Astro 5 + Tailwind)
+## ⚡ 1. Modern Headless Frontend (Astro 7 + Tailwind)
 
-The primary frontend is built with **Astro 5** and **Tailwind CSS**, consuming the live **WordPress REST API** (`https://www.computerjy.com/wp-json/wp/v2/`) with an offline-resilient fallback dataset.
+The primary frontend is built with **Astro 7** and **Tailwind CSS**, fetching all content from
+the live **WordPress REST API** (`https://www.computerjy.com/wp-json/wp/v2/`) at build time via
+the Astro Content Layer (`src/content.config.ts`, `src/lib/wp-loader.ts`).
+
+There is no bundled content snapshot and no offline fallback: if the API is unreachable the
+build fails rather than shipping stale content. Publishing in WordPress therefore requires a
+rebuild for changes to appear on the static site.
 
 ### Project Structure
 
 ```text
 src/
+├── content.config.ts             # Astro Content Layer collections (posts, categories, tags)
 ├── components/
 │   ├── AuthorCard.astro          # Eyad Salah bio & social widget
 │   ├── BentoShowcase.astro       # Hero featured article + 3 side cards
@@ -48,6 +55,9 @@ src/
 │   └── BaseLayout.astro          # ViewTransitions router & zero-FOUC script
 ├── lib/
 │   ├── api.ts                    # WP REST API client with in-memory caching
+│   ├── wp-client.ts              # WordPress REST API HTTP client
+│   ├── wp-loader.ts              # Content Layer loader that fetches WP data at build time
+│   ├── normalize.ts              # Normalizes raw WP API responses into content schema
 │   └── types.ts                  # TypeScript definitions
 ├── pages/
 │   ├── 404.astro                 # Custom 404 error page
