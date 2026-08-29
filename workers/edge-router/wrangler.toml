@@ -24,17 +24,17 @@ binding = "ASSETS"
 bucket_name = "computerjy-bucket"
 
 # ------------------------------------------------------------------------------
-# CUTOVER — leave commented until the checks in deploy/cloudflare-r2.md pass.
+# ROUTES — live. See deploy/cloudflare-r2.md for rollback.
 # ------------------------------------------------------------------------------
-# Uncommenting these and deploying puts the Worker in front of production
-# traffic. Rolling back is deleting the routes again (or `wrangler delete`);
-# Lightsail keeps receiving the same build over rsync throughout, so the origin
-# can serve the site unaided the moment the routes are gone.
-#
-# [[routes]]
-# pattern = "www.computerjy.com/*"
-# zone_name = "computerjy.com"
-#
-# [[routes]]
-# pattern = "computerjy.com/*"
-# zone_name = "computerjy.com"
+# These routes put the Worker in front of production traffic. Rolling back is
+# deleting them again and redeploying (or `wrangler delete`); Lightsail keeps
+# receiving the same build over rsync throughout, so the origin can serve the
+# site unaided the moment the routes are gone.
+
+[[routes]]
+pattern = "www.computerjy.com/*"
+zone_name = "computerjy.com"
+
+[[routes]]
+pattern = "computerjy.com/*"
+zone_name = "computerjy.com"

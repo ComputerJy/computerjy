@@ -4,11 +4,14 @@ Serves the Astro build (`dist/`) from a Cloudflare R2 bucket through a Worker,
 and leaves `/wp-admin`, `/wp-json`, `/wp-content` and `markdown.php` on the
 Lightsail origin.
 
-Nothing here is live until you create the two API tokens, add the six GitHub
-secrets, and uncomment the routes in
-[`workers/edge-router/wrangler.toml`](../workers/edge-router/wrangler.toml).
-Until then `deploy.yml` behaves exactly as it always has: build, verify, rsync
-to Lightsail.
+**This is live.** The Worker holds `www.computerjy.com/*` and
+`computerjy.com/*`, and every deploy mirrors the build into R2 and purges the
+edge. Steps 1–8 below are kept as the record of how it was set up and as the
+procedure for rebuilding it; the rollback is at the end.
+
+Lightsail still receives the same build on every deploy and can serve the whole
+site unaided, so removing the routes is a complete rollback with nothing to
+restore.
 
 ## What is in the repo
 
@@ -16,10 +19,10 @@ to Lightsail.
 | ----------------------------------- | ----------------------------------------------------------------------------------- |
 | `workers/edge-router/src/router.ts` | The whole routing table as pure functions — no I/O, unit-tested.                    |
 | `workers/edge-router/src/index.ts`  | R2 reads, conditional/range handling, edge cache, origin pass-through.              |
-| `workers/edge-router/wrangler.toml` | Worker config. Routes are commented out; uncommenting them **is** the cutover.      |
+| `workers/edge-router/wrangler.toml` | Worker config, including the two live production routes.                            |
 | `tests/edge-router.test.ts`         | The routing table, plus a parity check that reads `lightsail-apache.conf` directly. |
 | `tests/edge-worker.test.ts`         | The handler end to end against a fake R2 bucket: statuses, headers, pass-throughs.  |
-| `.github/workflows/deploy.yml`      | R2 sync + cache purge steps, both gated on the secrets being present.               |
+| `.github/workflows/deploy.yml`      | R2 sync + cache purge steps, both active.                                           |
 
 ## Deployment model: both targets, always
 
@@ -165,7 +168,9 @@ Uncomment the two `[[routes]]` blocks in `wrangler.toml`, then:
 cd workers/edge-router && npx wrangler deploy
 ```
 
-The Worker is in front of production the moment that returns.
+The Worker is in front of production the moment that returns. A token without
+"All Zones" falls back to updating each route individually, which is fine and
+prints the routes it attached.
 
 ## Step 8 — verify in production
 
@@ -210,6 +215,16 @@ hand. These are the deliberate differences:
 
 Redirects are unchanged: the Worker adds none, so the apex/www and HTTP/HTTPS
 behaviour stays whatever Cloudflare and the port-80 vhost already do.
+
+Two things production showed that neither the vhost nor the Worker controls:
+
+- **Cloudflare rewrites `Referrer-Policy` to `same-origin`** on every response in
+  this zone. Both the Worker's `strict-origin-when-cross-origin` and the vhost's
+  identical setting are overridden, and were before the cutover too. If the
+  stricter value matters it has to be changed in the dashboard, not here.
+- **HTML loses its `ETag`**, because Cloudflare compresses it and drops the
+  strong validator. Apache's responses behave the same way, so HTML has never
+  revalidated with a 304 on this site. Hashed assets keep theirs.
 
 ## Out of scope
 
