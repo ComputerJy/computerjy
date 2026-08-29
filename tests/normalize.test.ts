@@ -132,6 +132,43 @@ describe('https upgrades', () => {
   });
 });
 
+import { unwrapPhotonUrl, unwrapPhotonInContent } from '../src/lib/normalize';
+
+describe('unwrapPhotonUrl', () => {
+  it('unwraps an own-domain Photon URL, dropping the query', () => {
+    expect(
+      unwrapPhotonUrl(
+        'https://i0.wp.com/www.computerjy.com/wp-content/uploads/2013/09/MacPC.jpg?resize=590%2C400&ssl=1'
+      )
+    ).toBe('https://www.computerjy.com/wp-content/uploads/2013/09/MacPC.jpg');
+  });
+
+  it('unwraps an external-host Photon URL', () => {
+    expect(unwrapPhotonUrl('https://i0.wp.com/1.bp.blogspot.com/x/y.jpeg?w=840'))
+      .toBe('https://1.bp.blogspot.com/x/y.jpeg');
+  });
+
+  it('leaves a non-Photon URL untouched', () => {
+    expect(unwrapPhotonUrl('https://www.computerjy.com/wp-content/uploads/2013/09/MacPC.jpg'))
+      .toBe('https://www.computerjy.com/wp-content/uploads/2013/09/MacPC.jpg');
+  });
+});
+
+describe('unwrapPhotonInContent', () => {
+  it('rewrites every occurrence in a string containing two Photon URLs', () => {
+    const html =
+      '<img src="https://i0.wp.com/a.com/x.jpg?w=840"><img src="https://i0.wp.com/b.com/y.jpg?resize=1%2C2&ssl=1">';
+    expect(unwrapPhotonInContent(html)).toBe(
+      '<img src="https://a.com/x.jpg"><img src="https://b.com/y.jpg">'
+    );
+  });
+
+  it('leaves content with no Photon URLs unchanged', () => {
+    const html = '<img src="https://www.computerjy.com/wp-content/uploads/2013/09/MacPC.jpg">';
+    expect(unwrapPhotonInContent(html)).toBe(html);
+  });
+});
+
 import { normalizePost, DEFAULT_CATEGORY } from '../src/lib/normalize';
 import type { RawWpPost, NormalizedComment } from '../src/lib/normalize';
 

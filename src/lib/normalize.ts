@@ -96,6 +96,25 @@ export function upgradeUrlToHttps(url?: string): string | undefined {
   return url.startsWith('http://') ? url.replace(/^http:\/\//, 'https://') : url;
 }
 
+/**
+ * Jetpack Photon rewrites <img src> in content.rendered to
+ * https://i0.wp.com/<original-host>/<path>?<params>. The published site was built from the raw
+ * XML export and uses the original URLs. Photon is measurably worse here: own-domain images come
+ * back ~2.4x larger without WebP, and external-host images 302 to HTML instead of serving.
+ * Unwrapping restores both parity with the published site and the better asset.
+ */
+export function unwrapPhotonUrl(url: string): string {
+  const match = url.match(/^https?:\/\/i[0-9]\.wp\.com\/(.+)$/);
+  if (!match) return url;
+  return `https://${match[1].split('?')[0]}`;
+}
+
+/** Applies unwrapPhotonUrl to every Photon URL embedded in a block of HTML. */
+export function unwrapPhotonInContent(html: string): string {
+  if (!html || !html.includes('.wp.com/')) return html;
+  return html.replace(/https?:\/\/i[0-9]\.wp\.com\/[^"'\s)]+/g, (m) => unwrapPhotonUrl(m));
+}
+
 export interface RawWpPost {
   id: number;
   slug: string;
@@ -142,7 +161,7 @@ export function normalizePost(
   termsById: Map<number, Term>,
   commentsByPostId: Map<number, NormalizedComment[]>
 ): NormalizedPost {
-  const content = upgradeContentToHttps(raw.content?.rendered ?? '');
+  const content = upgradeContentToHttps(unwrapPhotonInContent(raw.content?.rendered ?? ''));
 
   const categories = raw.categories
     .map((id) => termsById.get(id))
@@ -152,7 +171,7 @@ export function normalizePost(
     .filter((t): t is Term => Boolean(t));
 
   const mediaUrl = raw.featured_media
-    ? upgradeUrlToHttps(mediaById.get(raw.featured_media))
+    ? unwrapPhotonUrl(upgradeUrlToHttps(mediaById.get(raw.featured_media)) ?? '') || undefined
     : undefined;
 
   return {

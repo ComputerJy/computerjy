@@ -31,7 +31,11 @@ if (missing.length || extra.length) {
 
 // --- 2. Featured image parity -------------------------------------------
 // og:image is HTML-escaped in the built output, so decode before comparing.
-const decode = (s) => s.replace(/&amp;/g, '&').replace(/&#39;/g, "'").replace(/&quot;/g, '"');
+const decode = (s) =>
+  s.replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+   .replace(/&amp;/g, '&')
+   .replace(/&#39;/g, "'")
+   .replace(/&quot;/g, '"');
 let imageMismatches = 0;
 
 for (const post of golden) {
