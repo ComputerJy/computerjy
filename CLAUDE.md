@@ -70,13 +70,17 @@ Consequences:
 - The zone is on Cloudflare **Full (Strict)**, so the origin certificate must cover every proxied hostname.
   Don't infer the SSL mode from external probes: Cloudflare flattens proxied CNAMEs to A records, so `dig` cannot
   distinguish a CNAME (validated against its target) from an A record, and a 200 proves nothing either way.
-- `workers/edge-router/` is a Cloudflare Worker that serves `dist/` from an R2 bucket and passes WordPress,
-  `*.php` and `Accept: text/markdown` through to Lightsail. It is **not live**: `wrangler.toml` ships with its
-  routes commented out, and the R2 sync and cache-purge steps in `deploy.yml` are gated on secrets that do not
-  exist yet, so the rsync to `/var/www/computerjy_dist` remains the only deploy path. `src/router.ts` is a port of
-  `deploy/lightsail-apache.conf` — change them together; `tests/edge-router.test.ts` reads the vhost at test time
-  and fails if the `Link` or security headers drift apart. Cutover, rollback and the token scopes are in
-  `deploy/cloudflare-r2.md`.
+- **The public site is served by a Cloudflare Worker, not Apache.** `workers/edge-router/` holds
+  `www.computerjy.com/*` and `computerjy.com/*`, serving `dist/` out of the R2 bucket `computerjy-bucket` and
+  passing WordPress, `*.php` and `Accept: text/markdown` through to Lightsail. Apache still serves those
+  pass-throughs and still receives the full build over rsync on every deploy, so deleting the Worker routes is a
+  complete rollback. `src/router.ts` is a port of `deploy/lightsail-apache.conf` — **change them together**;
+  `tests/edge-router.test.ts` reads the vhost at test time and fails if the `Link` or security headers drift
+  apart. Editing the vhost alone no longer changes what visitors get. Deploys mirror to R2 then purge the edge,
+  and a failed purge fails the deploy, because HTML is served with `s-maxage=3600`. Rollback, token scopes and the
+  parity matrix are in `deploy/cloudflare-r2.md`.
+- Cloudflare overrides `Referrer-Policy` to `same-origin` zone-wide, so neither the vhost's nor the Worker's
+  `strict-origin-when-cross-origin` reaches clients. Don't "fix" it in either config — it is a dashboard setting.
 
 ## Repo-local rules (`.agents/rules/*.md`, always-on)
 
