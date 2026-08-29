@@ -1,12 +1,17 @@
 import type { Loader, LoaderContext } from 'astro/loaders';
 import { fetchAllPaginated, fetchByIds, WpApiError } from './wp-client';
-import { normalizePost, decodeEntities } from './normalize';
-import type { RawWpPost, NormalizedComment, Term } from './normalize';
+import { normalizePost, decodeEntities, pickHeroImageUrl } from './normalize';
+import type {
+  RawWpPost,
+  NormalizedComment,
+  Term,
+  MediaDetails,
+} from './normalize';
 
 const POST_FIELDS =
   'id,slug,title,excerpt,content,date,modified,categories,tags,featured_media';
 const TERM_FIELDS = 'id,name,slug,count,description';
-const MEDIA_FIELDS = 'id,source_url';
+const MEDIA_FIELDS = 'id,source_url,media_details';
 const COMMENT_FIELDS = 'id,post,parent,author_name,date,content';
 
 interface RawTerm {
@@ -19,6 +24,7 @@ interface RawTerm {
 interface RawMedia {
   id: number;
   source_url: string;
+  media_details?: MediaDetails;
 }
 interface RawComment {
   id: number;
@@ -68,8 +74,13 @@ export function wpPostsLoader(): Loader {
         termsById.set(t.id, { name: decodeEntities(t.name), slug: t.slug });
       }
 
+      // Resolve each featured image to an appropriately sized derivative rather
+      // than the full-size upload; see pickHeroImageUrl.
       const mediaById = new Map<number, string>(
-        rawMedia.map((m) => [m.id, m.source_url])
+        rawMedia.map((m) => [
+          m.id,
+          pickHeroImageUrl(m.source_url, m.media_details),
+        ])
       );
 
       const commentsByPostId = new Map<number, NormalizedComment[]>();

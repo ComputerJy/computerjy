@@ -38,6 +38,59 @@ export const PLACEHOLDER_IMAGE =
  * with no re.I flag. Matching case-insensitively here would resolve an image
  * for posts that currently show the placeholder, breaking parity.
  */
+/**
+ * The widest slot the hero URL is rendered into (BentoShowcase, 700px). The same
+ * URL also feeds PostCard (400px), the post page hero and og:image, so this is the
+ * size that has to be satisfied.
+ */
+export const HERO_TARGET_WIDTH = 700;
+
+export interface MediaSize {
+  /** Derivative filename, e.g. "Defrag-768x564.jpg". */
+  file: string;
+  width: number;
+}
+export interface MediaDetails {
+  sizes?: Record<string, MediaSize | undefined>;
+}
+
+/**
+ * Chooses the smallest generated size that is still wide enough for the largest
+ * slot, falling back to the original.
+ *
+ * The build previously requested only `source_url`, which is always the full-size
+ * upload -- an 830x610 original shipped where a 768x564 derivative would do.
+ *
+ * The URL is rebuilt from the media item's own source_url directory plus the
+ * size's `file`. Each size entry also carries a `source_url`, but on this site it
+ * is a Jetpack Photon URL (i0.wp.com/...Defrag.jpg?fit=768%2C564) pointing at the
+ * ORIGINAL with a resize parameter -- so unwrapPhotonUrl reduces it straight back
+ * to the full-size file and the selection is silently undone. `file` is the only
+ * field naming the real derivative, which is what issue #14 believed had been
+ * lost with the "-WxH" filename.
+ *
+ * It deliberately does NOT pick the smallest available size. The pre-migration
+ * site served a 237x300 thumbnail into a 700px slot, which is where the issue's
+ * "4.7x payload increase" comes from: that is an undersized image, not merely a
+ * smaller one. Where no derivative reaches the target -- because the original is
+ * itself narrower -- the original is correct and is used unchanged.
+ */
+export function pickHeroImageUrl(
+  sourceUrl: string,
+  details?: MediaDetails
+): string {
+  const slash = sourceUrl.lastIndexOf('/');
+  if (slash < 0) return sourceUrl;
+
+  const chosen = Object.values(details?.sizes ?? {})
+    .filter((s): s is MediaSize => Boolean(s?.file) && Number(s?.width) > 0)
+    .filter((s) => s.width >= HERO_TARGET_WIDTH)
+    .sort((a, b) => a.width - b.width)[0];
+
+  if (!chosen) return sourceUrl;
+  return `${sourceUrl.slice(0, slash)}/${chosen.file}`;
+}
+
 export function resolveFeaturedImage(
   mediaUrl: string | undefined,
   contentHtml: string
