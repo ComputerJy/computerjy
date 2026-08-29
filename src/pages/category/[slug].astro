@@ -22,11 +22,13 @@ const posts = await getPosts();
 const categories = await getCategories();
 const tags = await getTags();
 
-// Filter posts by category slug (or show all in demo fallback)
-const categoryPosts = posts.filter(
-  (p) => p.primaryCategory?.slug === category.slug || p.categories.includes(category.id)
-);
-const displayPosts = categoryPosts.length > 0 ? categoryPosts : posts.slice(0, 4);
+// `categories` already contains every category slug including the primary one,
+// so the old primaryCategory comparison and the always-false id check both go.
+const categoryPosts = posts.filter((p) => p.categories.includes(category.slug));
+if (categoryPosts.length === 0) {
+  throw new Error(`Category "${category.slug}" produced zero posts - the filter is broken.`);
+}
+const displayPosts = categoryPosts;
 ---
 
 <BaseLayout 

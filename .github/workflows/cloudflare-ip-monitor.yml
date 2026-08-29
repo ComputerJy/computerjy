@@ -1,0 +1,83 @@
+name: Cloudflare IP Range Monitor
+
+# Cloudflare's published IP ranges are allow-listed in the origin firewall (ufw).
+# If Cloudflare publishes a NEW range that the firewall does not allow, Cloudflare
+# loses access to the origin and the site goes down. This job alerts on divergence;
+# it never edits the firewall.
+
+on:
+  schedule:
+    # Daily 07:15 UTC. Only notifies on divergence, so daily costs nothing
+    # and shrinks the outage-risk detection window from 7 days to 1.
+    - cron: '15 7 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check-ranges:
+    name: Compare published ranges to firewall allowlist
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Harden GitHub Actions Runner
+        uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Fetch Cloudflare published ranges
+        run: |
+          set -euo pipefail
+          curl -fsS --retry 3 --retry-delay 5 https://www.cloudflare.com/ips-v4 -o /tmp/v4
+          curl -fsS --retry 3 --retry-delay 5 https://www.cloudflare.com/ips-v6 -o /tmp/v6
+          awk 1 /tmp/v4 /tmp/v6 | tr -d '\r' | sed '/^[[:space:]]*$/d' | sort -u > /tmp/published.txt
+          echo "fetched $(wc -l < /tmp/published.txt) ranges"
+
+      - name: Sanity-check the fetch
+        # A truncated or error-page response must NOT be reported as "ranges changed".
+        run: |
+          set -euo pipefail
+          V4=$(grep -c '^[0-9]' /tmp/published.txt || true)
+          V6=$(grep -c ':'      /tmp/published.txt || true)
+          if [ "$V4" -lt 10 ] || [ "$V6" -lt 5 ]; then
+            echo "::error::Fetched list looks wrong (v4=$V4 v6=$V6). Treating as a FETCH FAILURE, not a range change."
+            exit 1
+          fi
+          if grep -qvE '^[0-9a-fA-F:.]+/[0-9]{1,3}$' /tmp/published.txt; then
+            echo "::error::Fetched list contains non-CIDR lines. Treating as a FETCH FAILURE."
+            exit 1
+          fi
+          echo "sanity OK: $V4 IPv4 + $V6 IPv6"
+
+      - name: Compare against the firewall allowlist
+        run: |
+          set -euo pipefail
+          sed '/^[[:space:]]*#/d; /^[[:space:]]*$/d' deploy/cloudflare-ips.txt \
+            | tr -d '\r' | sort -u > /tmp/allowlist.txt
+
+          if diff -u /tmp/allowlist.txt /tmp/published.txt > /tmp/diff.txt; then
+            echo "No change - firewall allowlist matches Cloudflare's published ranges."
+            exit 0
+          fi
+
+          {
+            echo '### Cloudflare IP ranges changed'
+            echo ''
+            echo '`+` published by Cloudflare but **NOT allowed through the firewall** - outage risk.'
+            echo '`-` allowed through the firewall but no longer published - stale, safe to prune.'
+            echo ''
+            echo '```diff'
+            cat /tmp/diff.txt
+            echo '```'
+            echo ''
+            echo 'Fix: `sudo bash deploy/update-cloudflare-firewall.sh` on the origin, verify,'
+            echo 'then update `deploy/cloudflare-ips.txt` and commit.'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          cat /tmp/diff.txt
+          echo "::error::Cloudflare ranges diverge from the firewall allowlist - see job summary."
+          exit 1

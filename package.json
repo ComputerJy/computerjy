@@ -2,13 +2,16 @@
   "name": "computerjy-world-frontend",
   "type": "module",
   "version": "1.0.0",
-  "description": "Headless JAMstack frontend for ComputerJy World built with Astro 5 & Tailwind CSS",
+  "description": "Headless JAMstack frontend for ComputerJy World built with Astro 7 & Tailwind CSS",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "check": "astro check",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",
@@ -19,6 +22,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.7"
   }
 }

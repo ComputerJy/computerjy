@@ -22,8 +22,13 @@ const posts = await getPosts();
 const categories = await getCategories();
 const tags = await getTags();
 
-const tagPosts = posts.filter((p) => p.tags.includes(tag.id));
-const displayPosts = tagPosts.length > 0 ? tagPosts : posts.slice(0, 4);
+const tagPosts = posts.filter((p) => p.tags.includes(tag.slug));
+// Terms are filtered to count > 0 before pages are generated, so an empty result
+// means the filter is broken. Fail the build instead of silently showing filler.
+if (tagPosts.length === 0) {
+  throw new Error(`Tag "${tag.slug}" produced zero posts - the tag filter is broken.`);
+}
+const displayPosts = tagPosts;
 ---
 
 <BaseLayout 
