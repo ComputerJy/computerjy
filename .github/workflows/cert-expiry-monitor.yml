@@ -6,6 +6,12 @@ name: Origin Certificate Expiry Monitor
 # starts failing is therefore invisible until the certificate lapses.
 #
 # This job is that missing alarm. It only reads and reports; it never renews.
+#
+# GitHub disables `schedule:` triggers in a repository with no commits for 60 days,
+# and a monitor that has silently stopped running looks exactly like one reporting
+# no problems. Nothing inside the workflow can detect this -- if it is disabled it
+# does not run to notice. If this repo goes quiet, check the Actions tab: a disabled
+# schedule is shown there with a button to re-enable it.
 
 on:
   schedule:
