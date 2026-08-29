@@ -24,6 +24,22 @@ function buildRequestInit(): RequestInit | undefined {
   return token ? { headers: { 'X-Build-Auth': token } } : undefined;
 }
 
+/**
+ * A rejection from an edge proxy looks identical to one from the origin unless you
+ * report the edge's own headers. `cf-mitigated` names which Cloudflare product blocked
+ * the request, and `cf-ray` identifies it in the Cloudflare dashboard's event log —
+ * without these, diagnosing a 403 means guessing.
+ */
+function edgeDiagnostics(res: Response): string {
+  const parts = ['server', 'cf-mitigated', 'cf-ray']
+    .map((h) => [h, res.headers.get(h)] as const)
+    .filter((pair): pair is readonly [string, string] => pair[1] !== null)
+    .map(([h, v]) => `${h}=${v}`);
+  const sentAuth =
+    typeof process !== 'undefined' && process.env?.WP_BUILD_TOKEN ? 'X-Build-Auth sent' : 'no X-Build-Auth';
+  return `[${[...parts, sentAuth].join(', ')}]`;
+}
+
 async function fetchPage(
   endpoint: string,
   fields: string,
@@ -38,7 +54,7 @@ async function fetchPage(
     throw new WpApiError(`Network failure fetching ${url}: ${(cause as Error).message}`);
   }
   if (!res.ok) {
-    throw new WpApiError(`GET ${url} returned ${res.status} ${res.statusText}`);
+    throw new WpApiError(`GET ${url} returned ${res.status} ${res.statusText} ${edgeDiagnostics(res)}`);
   }
   return res;
 }
@@ -105,7 +121,7 @@ export async function fetchByIds<T extends { id: number }>(
     throw new WpApiError(`Network failure fetching ${url}: ${(cause as Error).message}`);
   }
   if (!res.ok) {
-    throw new WpApiError(`GET ${url} returned ${res.status} ${res.statusText}`);
+    throw new WpApiError(`GET ${url} returned ${res.status} ${res.statusText} ${edgeDiagnostics(res)}`);
   }
   const items = (await res.json()) as T[];
   const got = new Set(items.map((i) => i.id));
