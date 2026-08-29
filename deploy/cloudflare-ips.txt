@@ -1,0 +1,38 @@
+# Cloudflare IP ranges allowed through the origin firewall (ufw) on :80 and :443.
+#
+# This file is the canonical record of what is configured on the Lightsail origin.
+# It is compared weekly against Cloudflare's published list by
+# .github/workflows/cloudflare-ip-monitor.yml -- that job FAILS if they diverge,
+# because a newly-published Cloudflare range that is not allowed here means
+# Cloudflare cannot reach the origin and the site goes down.
+#
+# To re-sync after a change:
+#   1. ssh to the origin
+#   2. sudo bash deploy/update-cloudflare-firewall.sh
+#   3. verify the site, cancel the rollback timer as the script instructs
+#   4. update this file and commit
+#
+# Sources: https://www.cloudflare.com/ips-v4  https://www.cloudflare.com/ips-v6
+# Last synced with the origin: 2026-08-29 (15 IPv4 + 7 IPv6 = 44 ufw rules)
+103.21.244.0/22
+103.22.200.0/22
+103.31.4.0/22
+104.16.0.0/13
+104.24.0.0/14
+108.162.192.0/18
+131.0.72.0/22
+141.101.64.0/18
+162.158.0.0/15
+172.64.0.0/13
+173.245.48.0/20
+188.114.96.0/20
+190.93.240.0/20
+197.234.240.0/22
+198.41.128.0/17
+2400:cb00::/32
+2405:8100::/32
+2405:b500::/32
+2606:4700::/32
+2803:f800::/32
+2a06:98c0::/29
+2c0f:f248::/32
