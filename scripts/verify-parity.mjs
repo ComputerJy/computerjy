@@ -89,16 +89,31 @@ if (imageMismatches) {
   pass(`Featured images: ${imageIdentical} identical, ${imageAccepted} accepted deviations, 0 unexpected`);
 }
 
-// --- 3. Category page counts (must not regress) --------------------------
-const goldenByCat = {};
-for (const p of golden) {
-  const s = p.primaryCategory?.slug ?? 'tech';
-  goldenByCat[s] = (goldenByCat[s] ?? 0) + 1;
-}
-for (const [slug, count] of Object.entries(goldenByCat)) {
+// --- 3. Category membership (assertion) ---
+// Expected = posts whose golden `categories` array contains the slug. That matches WordPress's
+// own counts exactly (entertainment 327, g33ky 101, uncategorized 17). The old site filtered by
+// primaryCategory alone and under-listed g33ky by 32 posts, so asserting on primary counts would
+// enshrine that bug. Extra links on the page are the sidebar's trending posts.
+const SIDEBAR_MAX = 5;
+const allCategorySlugs = new Set(golden.flatMap((p) => p.categories));
+for (const slug of allCategorySlugs) {
   const file = `dist/category/${slug}/index.html`;
   if (!existsSync(file)) { fail(`category page missing: ${slug}`); continue; }
-  console.log(`info category/${slug}: golden primary-category count ${count}`);
+  const html = readFileSync(file, 'utf8');
+  const onPage = new Set(
+    [...html.matchAll(/href="\/posts\/([^"]+)"/g)].map((m) => m[1]).filter((s) => !s.includes('${'))
+  );
+  const expected = golden.filter((p) => p.categories.includes(slug)).map((p) => p.slug);
+  const missing = expected.filter((s) => !onPage.has(s));
+  const extra = [...onPage].filter((s) => !expected.includes(s));
+  if (missing.length) {
+    fail(`category/${slug}: ${missing.length} of ${expected.length} expected posts missing`);
+    missing.slice(0, 5).forEach((s) => console.error(`   missing: ${s}`));
+  } else if (extra.length > SIDEBAR_MAX) {
+    fail(`category/${slug}: ${extra.length} unexpected posts (sidebar allows ${SIDEBAR_MAX})`);
+  } else {
+    pass(`category/${slug}: all ${expected.length} posts present (+${extra.length} sidebar)`);
+  }
 }
 
 // --- 4. Tag pages must now differ from one another -----------------------
@@ -118,6 +133,25 @@ if (tagDirs.length && distinct.size === 1) {
 } else {
   pass(`Tag pages: ${distinct.size} distinct post sets across ${tagDirs.length} tags`);
 }
+
+// --- 4b. Tag membership (assertion) ---
+const allTagSlugs = new Set(golden.flatMap((p) => p.tags));
+let tagFailures = 0;
+for (const slug of allTagSlugs) {
+  const file = `dist/tag/${slug}/index.html`;
+  if (!existsSync(file)) continue; // terms with count 0 legitimately have no page
+  const html = readFileSync(file, 'utf8');
+  const onPage = new Set(
+    [...html.matchAll(/href="\/posts\/([^"]+)"/g)].map((m) => m[1]).filter((s) => !s.includes('${'))
+  );
+  const expected = golden.filter((p) => p.tags.includes(slug)).map((p) => p.slug);
+  const missing = expected.filter((s) => !onPage.has(s));
+  if (missing.length) {
+    fail(`tag/${slug}: ${missing.length} of ${expected.length} expected posts missing`);
+    tagFailures++;
+  }
+}
+if (tagFailures === 0) pass(`Tag membership: every tagged post present across ${allTagSlugs.size} tags`);
 
 console.log(failures === 0 ? '\nPARITY OK' : `\nPARITY FAILED (${failures})`);
 process.exit(failures === 0 ? 0 : 1);
