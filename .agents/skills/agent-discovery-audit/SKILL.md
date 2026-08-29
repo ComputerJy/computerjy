@@ -41,7 +41,7 @@ Verify that all agent discovery endpoints are present and valid in `public/`:
    ```
 
 2. **Web Server Headers & Rewrites**:
-   Check `deploy/lightsail-apache.conf` and `deploy/lightsail-nginx.conf` to confirm:
+   Check `deploy/lightsail-apache.conf` (the only web server config; the origin runs Apache) to confirm:
    - `Link` headers pointing to discovery endpoints.
    - `Accept: text/markdown` negotiation routes to `public/markdown.php`.
    - Content-Type headers for well-known JSON files.

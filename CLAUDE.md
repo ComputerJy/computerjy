@@ -85,7 +85,7 @@ Two rule files carry hard constraints that CI and CodeQL enforce. Read them befo
 
 The site deliberately implements RFC 9727 / 8288 / 8414 / 9728, MCP, A2A, Agent Skills, and WebMCP. Artifacts live in `public/.well-known/` (`api-catalog`, `agent-card.json`, `ai-catalog.json`, `mcp/server-card.json`, `agent-skills/index.json`, `oauth-*`, `auth.md`) plus `public/api/openapi.json` and `public/markdown.php`. `.agents/rules/ai-agent-discovery.md` specifies the exact content types, headers, and JSON shapes — follow it rather than improvising.
 
-Serving these correctly depends on the **web server config**, which is checked in but applied by hand on the server: `deploy/lightsail-apache.conf` (production — sets the `Link` header, the `Accept: text/markdown` → `markdown.php` rewrite guarded by an on-disk `-f` check, and per-path content types) and `deploy/lightsail-nginx.conf` (alternative). Editing the well-known files usually implies a matching config change.
+Serving these correctly depends on the **web server config**, which is checked in but applied by hand on the server: `deploy/lightsail-apache.conf` — production, and the only web server config in the repo, kept byte-identical to the live vhost. It sets the `Link` header, the `Accept: text/markdown` → `markdown.php` rewrite guarded by an on-disk `-f` check, and per-path content types. Editing the well-known files usually implies a matching config change.
 
 `src/layouts/BaseLayout.astro` registers WebMCP tools via `navigator.modelContext` / `window.modelContext` and holds all JSON-LD, GA4 idle-loading, and theme scripts — it is large and central; most cross-cutting frontend changes land there.
 
@@ -107,3 +107,7 @@ Serving these correctly depends on the **web server config**, which is checked i
 Commits follow Conventional Commits with a scope: `fix(security):`, `ci(phpcs):`, `feat(agent):`, `perf:`, `docs(rules):`.
 
 Shell output is filtered by `rtk`; use `rtk proxy <cmd>` when you need raw `git`/`gh` output.
+
+GitHub disables `schedule:` triggers after 60 days without a commit, which silently stops
+`cloudflare-ip-monitor` and `cert-expiry-monitor` — both of which exist to catch failures that are
+otherwise invisible. If the repo goes quiet, check the Actions tab for a disabled schedule.

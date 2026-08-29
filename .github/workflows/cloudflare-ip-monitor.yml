@@ -4,6 +4,12 @@ name: Cloudflare IP Range Monitor
 # If Cloudflare publishes a NEW range that the firewall does not allow, Cloudflare
 # loses access to the origin and the site goes down. This job alerts on divergence;
 # it never edits the firewall.
+#
+# GitHub disables `schedule:` triggers in a repository with no commits for 60 days,
+# and a monitor that has silently stopped running looks exactly like one reporting
+# no problems. Nothing inside the workflow can detect this -- if it is disabled it
+# does not run to notice. If this repo goes quiet, check the Actions tab: a disabled
+# schedule is shown there with a button to re-enable it.
 
 on:
   schedule:
