@@ -211,6 +211,7 @@ hand. These are the deliberate differences:
 | `Accept: text/markdown`      | Local `-f` check, then `markdown.php`    | Always forwarded to the origin              | Same outcome — the origin still runs its own `-f` check first               |
 | Any `*.php`                  | Executed from the webroot                | Forwarded to the origin                     | Identical outcome, and the bucket can never leak PHP source                 |
 | Compression                  | `mod_brotli` / `mod_deflate`             | Cloudflare's edge compression               | Nothing to configure                                                        |
+| Legacy `/YYYY/MM/<slug>`     | 404                                      | 301 to `/posts/<slug>`                      | WordPress's old permalinks; its own canonical redirect never sees them      |
 | Immutable `_astro/*`         | 1 year by MIME type                      | 1 year **+ `immutable`**                    | Filenames are content-hashed                                                |
 
 Redirects are unchanged: the Worker adds none, so the apex/www and HTTP/HTTPS

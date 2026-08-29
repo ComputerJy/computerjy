@@ -65,6 +65,18 @@ const WELL_KNOWN_JSON =
   /^\/\.well-known\/(openid-configuration|oauth-authorization-server|oauth-protected-resource|ai-catalog\.json|mcp\/server-card\.json|agent-skills\/index\.json|agent-card\.json|a2a\.json)$/;
 
 /**
+ * WordPress served this site at `/YYYY/MM/<slug>` (with an optional day
+ * segment) for a decade before the Astro migration moved every post to
+ * `/posts/<slug>`. Those are the URLs a decade of inbound links point at, and
+ * WordPress's own canonical redirect cannot rescue them: date paths are not in
+ * the pass-through list, so WordPress never sees the request.
+ *
+ * The year is bounded to four digits and the month and day to two, so a real
+ * post whose slug happens to start with digits cannot be swallowed by this.
+ */
+const LEGACY_PERMALINK = /^\/(\d{4})\/(\d{2})(?:\/(\d{2}))?\/([^/]+)\/?$/;
+
+/**
  * Apache `Alias /feed …/rss.xml` and `Alias /sitemap.xml …/sitemap-index.xml`.
  * Both point at a single file, so only the exact path (with or without a
  * trailing slash) resolves.
@@ -85,7 +97,13 @@ const PATH_ALIASES: Readonly<Record<string, string>> = {
 export type RouteDecision =
   | { kind: 'origin'; reason: OriginReason }
   | { kind: 'forbidden' }
-  | { kind: 'asset'; candidates: string[] };
+  | { kind: 'asset'; candidates: string[] }
+  /**
+   * A permanent move to `location`, but only once `verifyKey` is confirmed to
+   * exist. Redirecting an unknown slug would turn one 404 into a redirect into
+   * another 404, which is worse for both crawlers and readers.
+   */
+  | { kind: 'redirect'; location: string; verifyKey: string };
 
 export type OriginReason =
   'wordpress' | 'php' | 'markdown' | 'method' | 'unmapped';
@@ -159,16 +177,45 @@ export function route(
     return { kind: 'origin', reason: 'method' };
   }
 
-  // 5. Markdown content negotiation. The origin's rewrite already checks for a
+  // 5. Legacy WordPress permalinks. Ahead of markdown negotiation so an agent
+  //    asking for text/markdown is pointed at the canonical URL rather than
+  //    handed a 404 by the origin.
+  const legacy = LEGACY_PERMALINK.exec(pathname);
+  if (legacy !== null) {
+    const rawSlug = legacy[4];
+    let slug: string;
+    try {
+      slug = decodeURIComponent(rawSlug);
+    } catch {
+      return { kind: 'origin', reason: 'unmapped' };
+    }
+    // %2F and friends could otherwise smuggle a separator into the key.
+    if (
+      !slug.includes('/') &&
+      !slug.includes('\0') &&
+      slug !== '.' &&
+      slug !== '..'
+    ) {
+      return {
+        kind: 'redirect',
+        // Built from the still-encoded segment: the Location header must not
+        // carry anything the URL parser has already normalised away.
+        location: `/posts/${rawSlug}`,
+        verifyKey: `posts/${slug}/index.html`,
+      };
+    }
+  }
+
+  // 6. Markdown content negotiation. The origin's rewrite already checks for a
   //    real file before delegating to markdown.php, so forwarding the original
   //    URL preserves both the `-f` guard and markdown.php's `REQUEST_URI`.
   if (wantsMarkdown(accept)) return { kind: 'origin', reason: 'markdown' };
 
-  // 6. Single-file aliases.
+  // 7. Single-file aliases.
   const alias = PATH_ALIASES[pathname];
   if (alias !== undefined) return { kind: 'asset', candidates: [alias] };
 
-  // 7. Static build, served from R2.
+  // 8. Static build, served from R2.
   const candidates = assetCandidates(pathname);
   if (candidates === null) return { kind: 'origin', reason: 'unmapped' };
   return { kind: 'asset', candidates };

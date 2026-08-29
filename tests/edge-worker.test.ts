@@ -27,6 +27,10 @@ function fakeBucket(objects: Record<string, [string, string?]>) {
         body: new Response(body).body ?? undefined,
       };
     },
+    async head(key: string) {
+      this.reads.push(`HEAD ${key}`);
+      return objects[key] === undefined ? null : { httpEtag: `"etag-${key}"` };
+    },
   };
 }
 
@@ -207,5 +211,60 @@ describe('the origin keeps everything it owns', () => {
 
     expect(res.status).toBe(403);
     expect(bucket.reads).toEqual([]);
+  });
+});
+
+describe('legacy WordPress permalinks', () => {
+  it('301s to the canonical URL once the target is confirmed', async () => {
+    const bucket = fakeBucket(BUILD);
+    const res = await worker.fetch(
+      get('/2015/07/some-slug/'),
+      { ASSETS: bucket },
+      ctx
+    );
+
+    expect(res.status).toBe(301);
+    expect(res.headers.get('Location')).toBe('/posts/some-slug');
+    expect(bucket.reads).toEqual(['HEAD posts/some-slug/index.html']);
+  });
+
+  // The whole point of the confirmation step.
+  it('404s rather than redirecting to a post that no longer exists', async () => {
+    const bucket = fakeBucket(BUILD);
+    const res = await worker.fetch(
+      get('/2015/07/deleted-years-ago/'),
+      { ASSETS: bucket },
+      ctx
+    );
+
+    expect(res.status).toBe(404);
+    expect(res.headers.get('Location')).toBeNull();
+    expect(await res.text()).toBe('<html>not found</html>');
+  });
+
+  it('carries the query string across', async () => {
+    const bucket = fakeBucket(BUILD);
+    const res = await worker.fetch(
+      get('/2015/07/some-slug/?utm_source=newsletter'),
+      { ASSETS: bucket },
+      ctx
+    );
+
+    expect(res.headers.get('Location')).toBe(
+      '/posts/some-slug?utm_source=newsletter'
+    );
+  });
+
+  it('keeps the security headers on the redirect itself', async () => {
+    const bucket = fakeBucket(BUILD);
+    const res = await worker.fetch(
+      get('/2015/07/some-slug'),
+      { ASSETS: bucket },
+      ctx
+    );
+
+    expect(res.status).toBe(301);
+    expect(res.headers.get('X-Content-Type-Options')).toBe('nosniff');
+    expect(res.headers.get('Cache-Control')).toBe('public, max-age=86400');
   });
 });
