@@ -1,0 +1,126 @@
+name: Origin Certificate Expiry Monitor
+
+# The origin's Let's Encrypt certificate renews unattended via certbot's systemd timer.
+# Nothing reports a failed renewal: the ACME account carries no contact address, and
+# Let's Encrypt discontinued expiry notification emails in June 2025. A renewal that
+# starts failing is therefore invisible until the certificate lapses.
+#
+# This job is that missing alarm. It only reads and reports; it never renews.
+
+on:
+  schedule:
+    # Daily 07:30 UTC, just after the Cloudflare IP monitor. Certbot renews at 30 days
+    # remaining, so a healthy certificate never falls below that; alerting at 21 leaves
+    # a 9-day margin against flapping and still gives three weeks to intervene.
+    - cron: '30 7 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CERT_PATH: /etc/letsencrypt/live/computerjy.com/cert.pem
+  WARN_DAYS: 21
+  # Cloudflare connects to the origin as www.computerjy.com. Both names must stay on
+  # the certificate: dropping www is exactly what would break Full (Strict) mode.
+  REQUIRED_NAMES: computerjy.com www.computerjy.com
+
+jobs:
+  check-expiry:
+    name: Check origin certificate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Harden GitHub Actions Runner
+        uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+
+      - name: Setup SSH Credentials
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          echo "${{ secrets.LIGHTSAIL_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.LIGHTSAIL_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Read certificate from the origin
+        # The remote script always exits 0 and prints a verdict instead. That keeps a
+        # transport failure (SSH down, host key changed) distinguishable from a real
+        # expiry finding — the next step treats a missing verdict as "the monitor is
+        # blind", which is its own alertable condition rather than a silent pass.
+        run: |
+          set -uo pipefail
+          ssh -i ~/.ssh/id_rsa -o ConnectTimeout=20 -o BatchMode=yes \
+            ${{ secrets.LIGHTSAIL_USER }}@${{ secrets.LIGHTSAIL_HOST }} \
+            "sudo openssl x509 -in '${CERT_PATH}' -noout -enddate -ext subjectAltName 2>&1" \
+            > /tmp/cert.txt 2>/tmp/ssh-err.txt
+          echo "ssh_exit=$?" >> "$GITHUB_ENV"
+          echo "--- remote output ---"
+          cat /tmp/cert.txt || true
+          echo "--- stderr ---"
+          cat /tmp/ssh-err.txt || true
+
+      - name: Evaluate expiry and subject names
+        run: |
+          set -uo pipefail
+
+          fail() { echo "::error::$1"; echo "$1" >> "$GITHUB_STEP_SUMMARY"; exit 1; }
+
+          if ! grep -q '^notAfter=' /tmp/cert.txt; then
+            {
+              echo '### Certificate monitor could not read the origin'
+              echo ''
+              echo 'This is a monitoring failure, not a confirmed expiry — but the alarm is'
+              echo 'blind until it is fixed, so it is reported as loudly as a real finding.'
+              echo ''
+              echo '```'
+              tail -20 /tmp/ssh-err.txt 2>/dev/null || echo '(no stderr captured)'
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+            fail "Could not read ${CERT_PATH} from the origin (ssh exit ${ssh_exit:-unknown})."
+          fi
+
+          END=$(sed -n 's/^notAfter=//p' /tmp/cert.txt)
+          END_EPOCH=$(date -u -d "$END" +%s) || fail "Unparseable notAfter value: $END"
+          NOW_EPOCH=$(date -u +%s)
+          DAYS=$(( (END_EPOCH - NOW_EPOCH) / 86400 ))
+
+          # Dots are escaped so a name is matched literally. The trailing alternation
+          # anchors the end of the name, so "DNS:www.computerjy.com" does not satisfy a
+          # requirement for the apex "computerjy.com".
+          MISSING=""
+          for name in $REQUIRED_NAMES; do
+            escaped=$(printf '%s' "$name" | sed 's/\./\\./g')
+            grep -qE "DNS:${escaped}(,|$| )" /tmp/cert.txt || MISSING="$MISSING $name"
+          done
+
+          {
+            echo '### Origin certificate'
+            echo ''
+            echo "- Expires: \`$END\` (**$DAYS days**)"
+            echo "- Threshold: $WARN_DAYS days"
+            echo "- Required names:$( [ -n "$MISSING" ] && echo " **missing:$MISSING**" || echo ' all present' )"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          STATUS=0
+
+          if [ -n "$MISSING" ]; then
+            echo "::error::Certificate is missing required name(s):$MISSING"
+            echo '' >> "$GITHUB_STEP_SUMMARY"
+            echo 'Cloudflare reaches the origin as `www.computerjy.com`. Reissue covering both names.' >> "$GITHUB_STEP_SUMMARY"
+            STATUS=1
+          fi
+
+          if [ "$DAYS" -lt "$WARN_DAYS" ]; then
+            echo "::error::Origin certificate expires in $DAYS days — renewal has likely been failing."
+            {
+              echo ''
+              echo 'Certbot renews at 30 days remaining, so this means unattended renewal is broken.'
+              echo 'On the origin: `sudo certbot renew --dry-run` and check `/var/log/letsencrypt/letsencrypt.log`.'
+            } >> "$GITHUB_STEP_SUMMARY"
+            STATUS=1
+          fi
+
+          [ "$STATUS" -eq 0 ] && echo "Certificate healthy: $DAYS days remaining, all required names present."
+          exit "$STATUS"
