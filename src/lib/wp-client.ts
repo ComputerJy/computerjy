@@ -10,6 +10,20 @@ export class WpApiError extends Error {
 
 const PER_PAGE = 100;
 
+/**
+ * Cloudflare's bot protection rejects datacenter IP ranges, so CI runners receive a
+ * 403 from the edge before the request ever reaches WordPress. When WP_BUILD_TOKEN is
+ * set, every request carries it as X-Build-Auth, and a Cloudflare WAF rule skips bot
+ * protection for requests presenting the matching value.
+ *
+ * Unset locally and anywhere the source IP is not challenged, in which case no header
+ * is sent and behaviour is unchanged.
+ */
+function buildRequestInit(): RequestInit | undefined {
+  const token = typeof process !== 'undefined' ? process.env?.WP_BUILD_TOKEN : undefined;
+  return token ? { headers: { 'X-Build-Auth': token } } : undefined;
+}
+
 async function fetchPage(
   endpoint: string,
   fields: string,
@@ -19,7 +33,7 @@ async function fetchPage(
   const url = `${API_BASE}/${endpoint}?per_page=${PER_PAGE}&page=${page}&_fields=${fields}`;
   let res: Response;
   try {
-    res = await fetchImpl(url);
+    res = await fetchImpl(url, buildRequestInit());
   } catch (cause) {
     throw new WpApiError(`Network failure fetching ${url}: ${(cause as Error).message}`);
   }
@@ -86,7 +100,7 @@ export async function fetchByIds<T extends { id: number }>(
   const url = `${API_BASE}/${endpoint}?include=${ids.join(',')}&per_page=100&_fields=${fields}`;
   let res: Response;
   try {
-    res = await fetchImpl(url);
+    res = await fetchImpl(url, buildRequestInit());
   } catch (cause) {
     throw new WpApiError(`Network failure fetching ${url}: ${(cause as Error).message}`);
   }

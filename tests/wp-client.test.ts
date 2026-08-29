@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import { fetchAllPaginated, fetchByIds, WpApiError } from '../src/lib/wp-client';
 
 function mockFetch(pages: unknown[][], total: number) {
@@ -87,5 +87,46 @@ describe('fetchByIds', () => {
     const out = await fetchByIds<{ id: number }>('media', 'id', [], f as typeof fetch);
     expect(out).toEqual([]);
     expect(called).toBe(false);
+  });
+});
+
+describe('WP_BUILD_TOKEN header', () => {
+  // Cloudflare bot protection 403s GitHub runner IPs; a WAF skip rule keyed on this
+  // header is what lets CI and the deploy build reach the API.
+  const original = process.env.WP_BUILD_TOKEN;
+  afterEach(() => {
+    if (original === undefined) delete process.env.WP_BUILD_TOKEN;
+    else process.env.WP_BUILD_TOKEN = original;
+  });
+
+  function capturingFetch(seen: Array<RequestInit | undefined>) {
+    return async (_url: string | URL, init?: RequestInit): Promise<Response> => {
+      seen.push(init);
+      return new Response(JSON.stringify([{ id: 1 }]), {
+        status: 200,
+        headers: { 'X-WP-Total': '1', 'X-WP-TotalPages': '1' },
+      });
+    };
+  }
+
+  it('sends X-Build-Auth when WP_BUILD_TOKEN is set', async () => {
+    process.env.WP_BUILD_TOKEN = 'sekrit';
+    const seen: Array<RequestInit | undefined> = [];
+    await fetchAllPaginated('posts', 'id', capturingFetch(seen) as typeof fetch);
+    expect((seen[0]?.headers as Record<string, string>)?.['X-Build-Auth']).toBe('sekrit');
+  });
+
+  it('sends no header when WP_BUILD_TOKEN is unset', async () => {
+    delete process.env.WP_BUILD_TOKEN;
+    const seen: Array<RequestInit | undefined> = [];
+    await fetchAllPaginated('posts', 'id', capturingFetch(seen) as typeof fetch);
+    expect(seen[0]).toBeUndefined();
+  });
+
+  it('applies the header to fetchByIds as well', async () => {
+    process.env.WP_BUILD_TOKEN = 'sekrit';
+    const seen: Array<RequestInit | undefined> = [];
+    await fetchByIds('media', 'id', [1], capturingFetch(seen) as typeof fetch);
+    expect((seen[0]?.headers as Record<string, string>)?.['X-Build-Auth']).toBe('sekrit');
   });
 });
