@@ -95,3 +95,79 @@ export function upgradeUrlToHttps(url?: string): string | undefined {
   if (!url) return url;
   return url.startsWith('http://') ? url.replace(/^http:\/\//, 'https://') : url;
 }
+
+export interface RawWpPost {
+  id: number;
+  slug: string;
+  title: { rendered: string };
+  content: { rendered: string };
+  excerpt: { rendered: string };
+  date: string;
+  modified: string;
+  categories: number[];
+  tags: number[];
+  featured_media: number;
+}
+export interface NormalizedComment {
+  id: number;
+  post_id: number;
+  author: string;
+  date: string;
+  content: string;
+  parent: number;
+}
+export interface Term { name: string; slug: string }
+export interface NormalizedPost {
+  id: number;
+  slug: string;
+  title: { rendered: string };
+  excerpt: { rendered: string };
+  content: { rendered: string };
+  date: string;
+  modified: string;
+  categories: string[];
+  tags: string[];
+  primaryCategory: Term;
+  featuredImageUrl: string;
+  readingTime: string;
+  comments: NormalizedComment[];
+}
+
+/** parse_wp_export.py used this when a post had no categories. */
+export const DEFAULT_CATEGORY: Term = { name: 'Tech', slug: 'tech' };
+
+export function normalizePost(
+  raw: RawWpPost,
+  mediaById: Map<number, string>,
+  termsById: Map<number, Term>,
+  commentsByPostId: Map<number, NormalizedComment[]>
+): NormalizedPost {
+  const content = upgradeContentToHttps(raw.content?.rendered ?? '');
+
+  const categories = raw.categories
+    .map((id) => termsById.get(id))
+    .filter((t): t is Term => Boolean(t));
+  const tags = raw.tags
+    .map((id) => termsById.get(id))
+    .filter((t): t is Term => Boolean(t));
+
+  const mediaUrl = raw.featured_media
+    ? upgradeUrlToHttps(mediaById.get(raw.featured_media))
+    : undefined;
+
+  return {
+    id: raw.id,
+    slug: sanitizeSlug(raw.slug),
+    title: { rendered: raw.title?.rendered ?? '' },
+    excerpt: { rendered: resolveExcerpt(raw.excerpt?.rendered ?? '', content) },
+    content: { rendered: content },
+    date: raw.date,
+    modified: raw.modified || raw.date,
+    categories: categories.map((c) => c.slug),
+    tags: tags.map((t) => t.slug),
+    primaryCategory: categories[0] ?? DEFAULT_CATEGORY,
+    featuredImageUrl: resolveFeaturedImage(mediaUrl, content),
+    readingTime: calculateReadingTime(content),
+    comments: commentsByPostId.get(raw.id) ?? [],
+  };
+}

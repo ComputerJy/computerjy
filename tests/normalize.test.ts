@@ -131,3 +131,76 @@ describe('https upgrades', () => {
     expect(upgradeUrlToHttps(undefined)).toBeUndefined();
   });
 });
+
+import { normalizePost, DEFAULT_CATEGORY } from '../src/lib/normalize';
+import type { RawWpPost, NormalizedComment } from '../src/lib/normalize';
+
+const raw: RawWpPost = {
+  id: 42,
+  slug: '%d8%a7%d8%a8%d9%84%d9%8a%d8%b3-%d9%88%d8%a7%d9%84%d8%b9%d8%b1%d8%a8',
+  title: { rendered: 'Title' },
+  content: { rendered: '<p>' + 'word '.repeat(400) + '</p>' },
+  excerpt: { rendered: '<p>Ex</p>' },
+  date: '2015-06-11T10:00:00',
+  modified: '2016-01-01T10:00:00',
+  categories: [7, 9],
+  tags: [11],
+  featured_media: 0,
+};
+const terms = new Map([
+  [7, { name: 'Geeky', slug: 'g33ky' }],
+  [9, { name: 'Fun', slug: 'fun' }],
+  [11, { name: 'Humor', slug: 'humor' }],
+]);
+
+describe('normalizePost', () => {
+  it('uses the decoded slug so existing URLs are preserved', () => {
+    expect(normalizePost(raw, new Map(), terms, new Map()).slug).toBe('ابليس-والعرب');
+  });
+
+  it('maps category and tag ids to slug strings', () => {
+    const p = normalizePost(raw, new Map(), terms, new Map());
+    expect(p.categories).toEqual(['g33ky', 'fun']);
+    expect(p.tags).toEqual(['humor']);
+  });
+
+  it('uses the first category as primaryCategory', () => {
+    expect(normalizePost(raw, new Map(), terms, new Map()).primaryCategory)
+      .toEqual({ name: 'Geeky', slug: 'g33ky' });
+  });
+
+  it('falls back to the Tech default when a post has no categories', () => {
+    const p = normalizePost({ ...raw, categories: [] }, new Map(), terms, new Map());
+    expect(p.primaryCategory).toEqual(DEFAULT_CATEGORY);
+    expect(DEFAULT_CATEGORY).toEqual({ name: 'Tech', slug: 'tech' });
+  });
+
+  it('resolves featured media by id when present', () => {
+    const media = new Map([[5, 'https://x.com/feat.jpg']]);
+    const p = normalizePost({ ...raw, featured_media: 5 }, media, terms, new Map());
+    expect(p.featuredImageUrl).toBe('https://x.com/feat.jpg');
+  });
+
+  it('computes reading time from the content', () => {
+    expect(normalizePost(raw, new Map(), terms, new Map()).readingTime).toBe('2 min read');
+  });
+
+  it('attaches comments for its own post id only', () => {
+    const c: NormalizedComment = { id: 1, post_id: 42, author: 'A', date: 'd', content: 'c', parent: 0 };
+    const other: NormalizedComment = { id: 2, post_id: 99, author: 'B', date: 'd', content: 'c', parent: 0 };
+    const byPost = new Map([[42, [c]], [99, [other]]]);
+    expect(normalizePost(raw, new Map(), terms, byPost).comments).toEqual([c]);
+  });
+
+  it('defaults to an empty comments array', () => {
+    expect(normalizePost(raw, new Map(), terms, new Map()).comments).toEqual([]);
+  });
+
+  it('upgrades http URLs inside content', () => {
+    const p = normalizePost(
+      { ...raw, content: { rendered: '<img src="http://a/b.jpg">' } },
+      new Map(), terms, new Map()
+    );
+    expect(p.content.rendered).toBe('<img src="https://a/b.jpg">');
+  });
+});
