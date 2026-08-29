@@ -14,7 +14,8 @@ Ensure environment variables and credentials are configured in `.env` (or inheri
 
 - `SERVER_HOST`: The Lightsail server IP or hostname.
 - `SERVER_USER`: Typically `ubuntu`.
-- `KEY_PATH`: Path to the SSH private key (e.g. `~/<ssh-key-redacted>`).
+- `KEY_PATH`: Path to the SSH private key (e.g. `~/.ssh/lightsail.pem`). Set the real path in `.env`;
+  never name the actual key file in a tracked file.
 - `REMOTE_DEST`: Destination directory (defaults to `/var/www/computerjy_dist`).
 
 Check that `.env` exists:

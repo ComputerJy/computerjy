@@ -17,7 +17,7 @@ fi
 
 SERVER_HOST="${SERVER_HOST:-${LIGHTSAIL_HOST:-}}"
 SERVER_USER="${SERVER_USER:-ubuntu}"
-KEY_PATH="${KEY_PATH:-${HOME}/<ssh-key-redacted>}"
+KEY_PATH="${KEY_PATH:-${HOME}/.ssh/lightsail.pem}"
 KEY_PATH="${KEY_PATH/#\~/$HOME}"
 KEY_PATH="${KEY_PATH/\$\{HOME\}/$HOME}"
 KEY_PATH="${KEY_PATH/\$HOME/$HOME}"
