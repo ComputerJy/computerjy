@@ -1,8 +1,7 @@
 import { getPosts } from '../lib/api';
 import { stripHtml } from '../lib/utils';
-import type { APIContext } from 'astro';
 
-export async function GET(context: APIContext) {
+export async function GET() {
   const posts = await getPosts();
 
   const searchData = posts.map((post) => ({
