@@ -312,3 +312,30 @@ describe('normalizePost', () => {
     expect(p.comments[0].content).toBe('Q&A');
   });
 });
+
+describe('unwrapPhoton host anchoring', () => {
+  // Raised by CodeQL js/incomplete-url-substring-sanitization: a substring check
+  // cannot distinguish a host from a look-alike. These pin the anchored behaviour.
+  it('ignores a look-alike host that merely mentions .wp.com/ in a query', () => {
+    const html = '<img src="https://evil.com/?x=.wp.com/pwn.jpg">';
+    expect(unwrapPhotonInContent(html)).toBe(html);
+  });
+
+  it('ignores a host that only prefixes i0.wp.com', () => {
+    const html = '<img src="https://i0.wp.com.evil.com/pwn.jpg">';
+    expect(unwrapPhotonInContent(html)).toBe(html);
+  });
+
+  it('ignores a Photon-looking path on another host', () => {
+    const html = '<img src="https://evil.com/i0.wp.com/x.jpg">';
+    expect(unwrapPhotonInContent(html)).toBe(html);
+  });
+
+  it('still unwraps a genuine Photon URL alongside a look-alike', () => {
+    const html =
+      '<img src="https://evil.com/?x=.wp.com/a.jpg"><img src="https://i0.wp.com/example.com/b.jpg?w=1">';
+    expect(unwrapPhotonInContent(html)).toBe(
+      '<img src="https://evil.com/?x=.wp.com/a.jpg"><img src="https://example.com/b.jpg">'
+    );
+  });
+});

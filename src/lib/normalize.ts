@@ -109,9 +109,16 @@ export function unwrapPhotonUrl(url: string): string {
   return `https://${match[1].split('?')[0]}`;
 }
 
-/** Applies unwrapPhotonUrl to every Photon URL embedded in a block of HTML. */
+/**
+ * Applies unwrapPhotonUrl to every Photon URL embedded in a block of HTML.
+ *
+ * The pattern is anchored at the scheme, so `i[0-9].wp.com` must be the host itself:
+ * neither `https://evil.com/?x=.wp.com/` nor `https://i0.wp.com.evil.com/` matches.
+ * A substring pre-check was removed here deliberately — it read like a host check
+ * while being only a fast path, and the anchored pattern is the real test.
+ */
 export function unwrapPhotonInContent(html: string): string {
-  if (!html || !html.includes('.wp.com/')) return html;
+  if (!html) return html;
   return html.replace(/https?:\/\/i[0-9]\.wp\.com\/[^"'\s)]+/g, (m) => unwrapPhotonUrl(m));
 }
 
