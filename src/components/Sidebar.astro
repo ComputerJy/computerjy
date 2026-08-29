@@ -11,115 +11,183 @@ const { categories, tags, trendingPosts } = Astro.props;
 ---
 
 <div class="flex flex-col gap-8">
-  
   <!-- Author Profile Card -->
-  <section class="bg-white dark:bg-dark-surface border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 text-center shadow-xs transition-colors duration-300 relative overflow-hidden">
+  <section
+    class="bg-white dark:bg-dark-surface border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 text-center shadow-xs transition-colors duration-300 relative overflow-hidden"
+  >
     <div class="h-16 bg-grad-primary -mx-6 -mt-6 mb-0"></div>
-    <img 
-      src="/logo-icon.svg" 
-      alt="Eyad Salah" 
+    <img
+      src="/logo-icon.svg"
+      alt="Eyad Salah"
       width="80"
       height="80"
       loading="lazy"
       decoding="async"
-      class="w-20 h-20 rounded-full border-4 border-white dark:border-dark-surface mx-auto -mt-10 mb-3 bg-white dark:bg-dark-surface shadow-sm object-cover" 
+      class="w-20 h-20 rounded-full border-4 border-white dark:border-dark-surface mx-auto -mt-10 mb-3 bg-white dark:bg-dark-surface shadow-sm object-cover"
     />
-    <h3 class="font-heading font-extrabold text-lg text-slate-900 dark:text-white mb-0.5">Eyad Salah</h3>
-    <div class="text-xs font-bold text-brand-blue mb-3">ComputerJy World &bull; Since 2007</div>
+    <h3
+      class="font-heading font-extrabold text-lg text-slate-900 dark:text-white mb-0.5"
+    >
+      Eyad Salah
+    </h3>
+    <div class="text-xs font-bold text-brand-blue mb-3">
+      ComputerJy World &bull; Since 2007
+    </div>
     <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
-      Technologist, software enthusiast, and creator sharing independent tech reviews, fun digital curiosities, and practical guides.
+      Technologist, software enthusiast, and creator sharing independent tech
+      reviews, fun digital curiosities, and practical guides.
     </p>
     <div class="flex items-center justify-center gap-2">
-      <a href="https://x.com/ComputerJy" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-full flex items-center justify-center bg-light-subtle dark:bg-dark-subtle border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-brand-blue hover:text-white transition-all" aria-label="X / Twitter">
-        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      <a
+        href="https://x.com/ComputerJy"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="w-8 h-8 rounded-full flex items-center justify-center bg-light-subtle dark:bg-dark-subtle border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-brand-blue hover:text-white transition-all"
+        aria-label="X / Twitter"
+      >
+        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"
+          ><path
+            d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+          ></path></svg
+        >
       </a>
-      <a href="https://www.facebook.com/computerjy" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-full flex items-center justify-center bg-light-subtle dark:bg-dark-subtle border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-brand-blue hover:text-white transition-all" aria-label="Facebook">
-        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      <a
+        href="https://www.facebook.com/computerjy"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="w-8 h-8 rounded-full flex items-center justify-center bg-light-subtle dark:bg-dark-subtle border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-brand-blue hover:text-white transition-all"
+        aria-label="Facebook"
+      >
+        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"
+          ><path
+            d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+          ></path></svg
+        >
       </a>
-      <a href="https://www.linkedin.com/in/computerjy" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-full flex items-center justify-center bg-light-subtle dark:bg-dark-subtle border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-brand-blue hover:text-white transition-all" aria-label="LinkedIn">
-        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76a1.45 1.45 0 0 0 1.45-1.45 1.45 1.45 0 0 0-1.45-1.45 1.45 1.45 0 0 0 1.45 1.45m1.37 9.74v-8.37H5.09v8.37h2.74z"/></svg>
+      <a
+        href="https://www.linkedin.com/in/computerjy"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="w-8 h-8 rounded-full flex items-center justify-center bg-light-subtle dark:bg-dark-subtle border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-brand-blue hover:text-white transition-all"
+        aria-label="LinkedIn"
+      >
+        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"
+          ><path
+            d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76a1.45 1.45 0 0 0 1.45-1.45 1.45 1.45 0 0 0-1.45-1.45 1.45 1.45 0 0 0 1.45 1.45m1.37 9.74v-8.37H5.09v8.37h2.74z"
+          ></path></svg
+        >
       </a>
     </div>
   </section>
 
   <!-- Trending Articles -->
-  <section class="bg-white dark:bg-dark-surface border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-xs">
-    <h3 class="font-heading font-bold text-sm text-slate-900 dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+  <section
+    class="bg-white dark:bg-dark-surface border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-xs"
+  >
+    <h3
+      class="font-heading font-bold text-sm text-slate-900 dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800"
+    >
       <span>🔥 Trending Insights</span>
     </h3>
     <div class="flex flex-col gap-4">
-      {trendingPosts.slice(0, 4).map((post, idx) => (
-        <article class="grid grid-cols-[28px_1fr] gap-3 items-start group">
-          <span class="font-heading font-black text-lg text-gradient leading-none">0{idx + 1}</span>
-          <div>
-            <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-brand-blue transition-colors leading-snug line-clamp-2 mb-1">
-              <a href={`/posts/${post.slug}`}>{post.title.rendered}</a>
-            </h4>
-            <div class="text-[10px] text-slate-500 dark:text-slate-400">{new Date(post.date).toLocaleDateString('en-GB')}</div>
-          </div>
-        </article>
-      ))}
+      {
+        trendingPosts.slice(0, 4).map((post, idx) => (
+          <article class="grid grid-cols-[28px_1fr] gap-3 items-start group">
+            <span class="font-heading font-black text-lg text-gradient leading-none">
+              0{idx + 1}
+            </span>
+            <div>
+              <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-brand-blue transition-colors leading-snug line-clamp-2 mb-1">
+                <a href={`/posts/${post.slug}`}>{post.title.rendered}</a>
+              </h4>
+              <div class="text-[10px] text-slate-500 dark:text-slate-400">
+                {new Date(post.date).toLocaleDateString('en-GB')}
+              </div>
+            </div>
+          </article>
+        ))
+      }
     </div>
   </section>
 
   <!-- Categories Widget -->
-  <section class="bg-white dark:bg-dark-surface border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-xs">
-    <h3 class="font-heading font-bold text-sm text-slate-900 dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+  <section
+    class="bg-white dark:bg-dark-surface border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-xs"
+  >
+    <h3
+      class="font-heading font-bold text-sm text-slate-900 dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800"
+    >
       <span>📂 Categories</span>
     </h3>
     <div class="flex flex-col gap-2">
-      {categories.map((cat) => (
-        <a 
-          href={`/category/${cat.slug}`} 
-          class="flex items-center justify-between px-3 py-2 rounded-lg bg-light-subtle dark:bg-dark-subtle text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-brand-blue hover:text-white transition-all group"
-        >
-          <span>{cat.name}</span>
-          <span class="px-2 py-0.5 rounded-full text-[10px] bg-white dark:bg-dark-surface text-slate-600 dark:text-slate-400 group-hover:text-brand-blue font-bold">
-            {cat.count}
-          </span>
-        </a>
-      ))}
+      {
+        categories.map((cat) => (
+          <a
+            href={`/category/${cat.slug}`}
+            class="flex items-center justify-between px-3 py-2 rounded-lg bg-light-subtle dark:bg-dark-subtle text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-brand-blue hover:text-white transition-all group"
+          >
+            <span>{cat.name}</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] bg-white dark:bg-dark-surface text-slate-600 dark:text-slate-400 group-hover:text-brand-blue font-bold">
+              {cat.count}
+            </span>
+          </a>
+        ))
+      }
     </div>
   </section>
 
   <!-- Popular Tags Cloud -->
-  <section class="bg-white dark:bg-dark-surface border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-xs">
-    <h3 class="font-heading font-bold text-sm text-slate-900 dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+  <section
+    class="bg-white dark:bg-dark-surface border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-xs"
+  >
+    <h3
+      class="font-heading font-bold text-sm text-slate-900 dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800"
+    >
       <span>🏷️ Popular Tags</span>
     </h3>
     <div class="flex flex-wrap gap-1.5">
-      {tags.map((tag) => (
-        <a 
-          href={`/tag/${tag.slug}`} 
-          class="text-[11px] font-semibold px-2.5 py-1 rounded-md bg-light-subtle dark:bg-dark-subtle text-slate-600 dark:text-slate-400 hover:bg-brand-blue hover:text-white transition-all"
-        >
-          #{tag.name}
-        </a>
-      ))}
+      {
+        tags.map((tag) => (
+          <a
+            href={`/tag/${tag.slug}`}
+            class="text-[11px] font-semibold px-2.5 py-1 rounded-md bg-light-subtle dark:bg-dark-subtle text-slate-600 dark:text-slate-400 hover:bg-brand-blue hover:text-white transition-all"
+          >
+            #{tag.name}
+          </a>
+        ))
+      }
     </div>
   </section>
 
   <!-- Community Newsletter -->
-  <section class="bg-gradient-to-br from-brand-cyan/10 to-brand-purple/10 border border-brand-cyan/30 rounded-2xl p-6 text-center shadow-xs">
+  <section
+    class="bg-gradient-to-br from-brand-cyan/10 to-brand-purple/10 border border-brand-cyan/30 rounded-2xl p-6 text-center shadow-xs"
+  >
     <span class="text-2xl block mb-2">✨</span>
-    <h4 class="font-heading font-bold text-sm text-slate-900 dark:text-white mb-1">Join the Community</h4>
+    <h4
+      class="font-heading font-bold text-sm text-slate-900 dark:text-white mb-1"
+    >
+      Join the Community
+    </h4>
     <p class="text-xs text-slate-600 dark:text-slate-400 mb-4">
       Get fresh tech tips, software discoveries &amp; insights weekly.
     </p>
-    <form class="flex flex-col gap-2" onsubmit="event.preventDefault(); alert('Subscribed to ComputerJy World!');">
-      <input 
-        type="email" 
-        placeholder="Your email address" 
-        required 
+    <form
+      class="flex flex-col gap-2"
+      onsubmit="event.preventDefault(); alert('Subscribed to ComputerJy World!');"
+    >
+      <input
+        type="email"
+        placeholder="Your email address"
+        required
         class="w-full px-3 py-2 text-xs rounded-lg bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-brand-blue"
       />
-      <button 
-        type="submit" 
+      <button
+        type="submit"
         class="w-full py-2 text-xs font-bold rounded-lg text-white bg-grad-primary hover:shadow-glow-blue transition-all"
       >
         Join Free 🚀
       </button>
     </form>
   </section>
-
 </div>

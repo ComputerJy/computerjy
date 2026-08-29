@@ -8,107 +8,159 @@ const categories = await getCategories();
 const tags = await getTags();
 ---
 
-<BaseLayout title="Contact Me — ComputerJy World" description="Get in touch with Eyad Salah, founder of ComputerJy World.">
+<BaseLayout
+  title="Contact Me — ComputerJy World"
+  description="Get in touch with Eyad Salah, founder of ComputerJy World."
+>
   <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-      
       <!-- Contact Content Column (8 cols) -->
-      <article class="lg:col-span-8 bg-white dark:bg-dark-surface border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-10 shadow-xs">
-        
+      <article
+        class="lg:col-span-8 bg-white dark:bg-dark-surface border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-10 shadow-xs"
+      >
         <div class="mb-4">
           <span class="badge-glow text-xs">✉️ Get in Touch</span>
         </div>
 
-        <h1 class="text-3xl sm:text-4xl font-heading font-black text-slate-900 dark:text-white mb-4">
+        <h1
+          class="text-3xl sm:text-4xl font-heading font-black text-slate-900 dark:text-white mb-4"
+        >
           Contact Me
         </h1>
-        <p class="text-sm sm:text-base text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">
-          Have a tech question, software review suggestion, feedback, or collaboration idea? Feel free to reach out via the form below or connect directly on social media.
+        <p
+          class="text-sm sm:text-base text-slate-500 dark:text-slate-400 mb-8 leading-relaxed"
+        >
+          Have a tech question, software review suggestion, feedback, or
+          collaboration idea? Feel free to reach out via the form below or
+          connect directly on social media.
         </p>
 
         <!-- Social Channels Bar -->
-        <div class="flex flex-wrap gap-3 p-4 rounded-2xl bg-light-subtle dark:bg-dark-subtle border border-slate-200/80 dark:border-slate-800 mb-8">
-          <a href="https://x.com/ComputerJy" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 hover:border-brand-blue hover:text-brand-blue transition-all">
-            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        <div
+          class="flex flex-wrap gap-3 p-4 rounded-2xl bg-light-subtle dark:bg-dark-subtle border border-slate-200/80 dark:border-slate-800 mb-8"
+        >
+          <a
+            href="https://x.com/ComputerJy"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 hover:border-brand-blue hover:text-brand-blue transition-all"
+          >
+            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"
+              ><path
+                d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+              ></path></svg
+            >
             <span>@ComputerJy</span>
           </a>
-          <a href="https://www.linkedin.com/in/computerjy" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 hover:border-brand-blue hover:text-brand-blue transition-all">
-            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76a1.45 1.45 0 0 0 1.45-1.45 1.45 1.45 0 0 0-1.45-1.45 1.45 1.45 0 0 0 1.45 1.45m1.37 9.74v-8.37H5.09v8.37h2.74z"/></svg>
+          <a
+            href="https://www.linkedin.com/in/computerjy"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 hover:border-brand-blue hover:text-brand-blue transition-all"
+          >
+            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"
+              ><path
+                d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76a1.45 1.45 0 0 0 1.45-1.45 1.45 1.45 0 0 0-1.45-1.45 1.45 1.45 0 0 0 1.45 1.45m1.37 9.74v-8.37H5.09v8.37h2.74z"
+              ></path></svg
+            >
             <span>LinkedIn</span>
           </a>
-          <a href="https://www.facebook.com/computerjy" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 hover:border-brand-blue hover:text-brand-blue transition-all">
-            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          <a
+            href="https://www.facebook.com/computerjy"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 hover:border-brand-blue hover:text-brand-blue transition-all"
+          >
+            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"
+              ><path
+                d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+              ></path></svg
+            >
             <span>Facebook</span>
           </a>
         </div>
 
         <!-- Interactive Contact Form -->
-        <form id="contactForm" class="flex flex-col gap-4" onsubmit="event.preventDefault(); alert('Message sent successfully! Eyad will get back to you soon. 🚀'); this.reset();">
+        <form
+          id="contactForm"
+          class="flex flex-col gap-4"
+          onsubmit="event.preventDefault(); alert('Message sent successfully! Eyad will get back to you soon. 🚀'); this.reset();"
+        >
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label for="contactName" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Your Name *</label>
-              <input 
-                type="text" 
-                id="contactName" 
-                required 
-                placeholder="Eyad Salah" 
+              <label
+                for="contactName"
+                class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5"
+                >Your Name *</label
+              >
+              <input
+                type="text"
+                id="contactName"
+                required
+                placeholder="Eyad Salah"
                 class="w-full px-4 py-3 text-xs sm:text-sm rounded-xl bg-light-subtle dark:bg-dark-subtle border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-brand-blue"
               />
             </div>
             <div>
-              <label for="contactEmail" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Your Email *</label>
-              <input 
-                type="email" 
-                id="contactEmail" 
-                required 
-                placeholder="name@example.com" 
+              <label
+                for="contactEmail"
+                class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5"
+                >Your Email *</label
+              >
+              <input
+                type="email"
+                id="contactEmail"
+                required
+                placeholder="name@example.com"
                 class="w-full px-4 py-3 text-xs sm:text-sm rounded-xl bg-light-subtle dark:bg-dark-subtle border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-brand-blue"
               />
             </div>
           </div>
 
           <div>
-            <label for="contactSubject" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Subject</label>
-            <input 
-              type="text" 
-              id="contactSubject" 
-              placeholder="Software Review / Collaboration / Question" 
+            <label
+              for="contactSubject"
+              class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5"
+              >Subject</label
+            >
+            <input
+              type="text"
+              id="contactSubject"
+              placeholder="Software Review / Collaboration / Question"
               class="w-full px-4 py-3 text-xs sm:text-sm rounded-xl bg-light-subtle dark:bg-dark-subtle border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-brand-blue"
             />
           </div>
 
           <div>
-            <label for="contactMessage" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Your Message *</label>
-            <textarea 
-              id="contactMessage" 
-              rows="5" 
-              required 
-              placeholder="Write your message here..." 
+            <label
+              for="contactMessage"
+              class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5"
+              >Your Message *</label
+            >
+            <textarea
+              id="contactMessage"
+              rows="5"
+              required
+              placeholder="Write your message here..."
               class="w-full px-4 py-3 text-xs sm:text-sm rounded-xl bg-light-subtle dark:bg-dark-subtle border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-brand-blue resize-y"
             ></textarea>
           </div>
 
           <div class="pt-2">
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               class="px-8 py-3 rounded-xl font-bold text-xs sm:text-sm text-white bg-grad-primary hover:shadow-glow-blue transition-all"
             >
               Send Message 🚀
             </button>
           </div>
         </form>
-
       </article>
 
       <!-- Sidebar (4 cols) -->
       <aside class="lg:col-span-4">
-        <Sidebar 
-          categories={categories} 
-          tags={tags} 
-          trendingPosts={posts} 
-        />
+        <Sidebar categories={categories} tags={tags} trendingPosts={posts} />
       </aside>
-
     </div>
   </main>
 </BaseLayout>

@@ -74,7 +74,10 @@ export function calculateReadingTime(html: string): string {
 }
 
 /** Rendered excerpt if present, else 180 chars of stripped content. */
-export function resolveExcerpt(renderedExcerpt: string, contentHtml: string): string {
+export function resolveExcerpt(
+  renderedExcerpt: string,
+  contentHtml: string
+): string {
   const trimmed = (renderedExcerpt || '').trim();
   if (trimmed) return trimmed;
   const plain = stripTagsForCounting(contentHtml);
@@ -93,7 +96,9 @@ export function upgradeContentToHttps(html: string): string {
 
 export function upgradeUrlToHttps(url?: string): string | undefined {
   if (!url) return url;
-  return url.startsWith('http://') ? url.replace(/^http:\/\//, 'https://') : url;
+  return url.startsWith('http://')
+    ? url.replace(/^http:\/\//, 'https://')
+    : url;
 }
 
 /**
@@ -119,7 +124,9 @@ export function unwrapPhotonUrl(url: string): string {
  */
 export function unwrapPhotonInContent(html: string): string {
   if (!html) return html;
-  return html.replace(/https?:\/\/i[0-9]\.wp\.com\/[^"'\s)]+/g, (m) => unwrapPhotonUrl(m));
+  return html.replace(/https?:\/\/i[0-9]\.wp\.com\/[^"'\s)]+/g, (m) =>
+    unwrapPhotonUrl(m)
+  );
 }
 
 /**
@@ -147,7 +154,9 @@ const NAMED_ENTITIES: Array<[RegExp, string]> = [
 function decodeNumericEntities(text: string): string {
   return text
     .replace(/&#(\d+);/g, (_, dec: string) => String.fromCodePoint(Number(dec)))
-    .replace(/&#[xX]([0-9a-fA-F]+);/g, (_, hex: string) => String.fromCodePoint(parseInt(hex, 16)));
+    .replace(/&#[xX]([0-9a-fA-F]+);/g, (_, hex: string) =>
+      String.fromCodePoint(parseInt(hex, 16))
+    );
 }
 
 /**
@@ -196,7 +205,10 @@ export interface NormalizedComment {
   content: string;
   parent: number;
 }
-export interface Term { name: string; slug: string }
+export interface Term {
+  name: string;
+  slug: string;
+}
 // `type`, not `interface`: an interface has no implicit index signature and
 // fails the `Record<string, unknown>` constraint parseData() expects. Do not
 // "tidy" this back into an interface - it has broken the build once already.
@@ -225,7 +237,9 @@ export function normalizePost(
   termsById: Map<number, Term>,
   commentsByPostId: Map<number, NormalizedComment[]>
 ): NormalizedPost {
-  const content = upgradeContentToHttps(unwrapPhotonInContent(raw.content?.rendered ?? ''));
+  const content = upgradeContentToHttps(
+    unwrapPhotonInContent(raw.content?.rendered ?? '')
+  );
 
   const categories = raw.categories
     .map((id) => termsById.get(id))
@@ -235,7 +249,9 @@ export function normalizePost(
     .filter((t): t is Term => Boolean(t));
 
   const mediaUrl = raw.featured_media
-    ? unwrapPhotonUrl(upgradeUrlToHttps(mediaById.get(raw.featured_media)) ?? '') || undefined
+    ? unwrapPhotonUrl(
+        upgradeUrlToHttps(mediaById.get(raw.featured_media)) ?? ''
+      ) || undefined
     : undefined;
 
   return {
@@ -245,7 +261,11 @@ export function normalizePost(
     // Entities are decoded after resolveExcerpt() has already done any
     // tag-stripping - decoding first could turn an entity-encoded pseudo-tag
     // (e.g. "&lt;script&gt;") into a real one before the stripper sees it.
-    excerpt: { rendered: decodeEntities(resolveExcerpt(raw.excerpt?.rendered ?? '', content)) },
+    excerpt: {
+      rendered: decodeEntities(
+        resolveExcerpt(raw.excerpt?.rendered ?? '', content)
+      ),
+    },
     content: { rendered: content },
     date: raw.date,
     modified: raw.modified || raw.date,

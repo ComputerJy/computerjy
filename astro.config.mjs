@@ -6,9 +6,7 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://www.computerjy.com',
   trailingSlash: 'never',
-  integrations: [
-    sitemap(),
-  ],
+  integrations: [sitemap()],
   vite: {
     plugins: [tailwindcss()],
   },

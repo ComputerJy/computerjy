@@ -18,13 +18,15 @@ const categories = await getCategories();
 const tags = await getTags();
 ---
 
-<BaseLayout 
-  title={`Articles — Page ${page.currentPage} — ComputerJy World`} 
+<BaseLayout
+  title={`Articles — Page ${page.currentPage} — ComputerJy World`}
   description={`Browse historical articles, software reviews and tech tips on ComputerJy World - Page ${page.currentPage}.`}
 >
   <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
     <div class="mb-8">
-      <h1 class="text-2xl sm:text-3xl font-heading font-black text-slate-900 dark:text-white flex items-center gap-2.5">
+      <h1
+        class="text-2xl sm:text-3xl font-heading font-black text-slate-900 dark:text-white flex items-center gap-2.5"
+      >
         <span class="w-2.5 h-6 rounded-sm bg-grad-primary"></span>
         All Articles (Page {page.currentPage})
       </h1>
@@ -34,25 +36,16 @@ const tags = await getTags();
       <!-- Feed Stream (8 cols) -->
       <div class="lg:col-span-8">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
-          {page.data.map((post) => (
-            <PostCard post={post} />
-          ))}
+          {page.data.map((post) => <PostCard post={post} />)}
         </div>
 
         <!-- Working Responsive Pagination -->
-        <Pagination 
-          currentPage={page.currentPage} 
-          totalPages={page.lastPage} 
-        />
+        <Pagination currentPage={page.currentPage} totalPages={page.lastPage} />
       </div>
 
       <!-- Sidebar (4 cols) -->
       <aside class="lg:col-span-4">
-        <Sidebar 
-          categories={categories} 
-          tags={tags} 
-          trendingPosts={posts} 
-        />
+        <Sidebar categories={categories} tags={tags} trendingPosts={posts} />
       </aside>
     </div>
   </main>

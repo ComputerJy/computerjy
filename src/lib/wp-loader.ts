@@ -3,16 +3,30 @@ import { fetchAllPaginated, fetchByIds, WpApiError } from './wp-client';
 import { normalizePost, decodeEntities } from './normalize';
 import type { RawWpPost, NormalizedComment, Term } from './normalize';
 
-const POST_FIELDS = 'id,slug,title,excerpt,content,date,modified,categories,tags,featured_media';
+const POST_FIELDS =
+  'id,slug,title,excerpt,content,date,modified,categories,tags,featured_media';
 const TERM_FIELDS = 'id,name,slug,count,description';
 const MEDIA_FIELDS = 'id,source_url';
 const COMMENT_FIELDS = 'id,post,parent,author_name,date,content';
 
-interface RawTerm { id: number; name: string; slug: string; count: number; description?: string }
-interface RawMedia { id: number; source_url: string }
+interface RawTerm {
+  id: number;
+  name: string;
+  slug: string;
+  count: number;
+  description?: string;
+}
+interface RawMedia {
+  id: number;
+  source_url: string;
+}
 interface RawComment {
-  id: number; post: number; parent: number;
-  author_name: string; date: string; content: { rendered: string };
+  id: number;
+  post: number;
+  parent: number;
+  author_name: string;
+  date: string;
+  content: { rendered: string };
 }
 
 export function wpPostsLoader(): Loader {
@@ -21,28 +35,42 @@ export function wpPostsLoader(): Loader {
     async load({ store, parseData, logger }: LoaderContext): Promise<void> {
       logger.info('Fetching content from the WordPress REST API');
 
-      const [rawPosts, rawCategories, rawTags, rawComments] = await Promise.all([
-        fetchAllPaginated<RawWpPost>('posts', POST_FIELDS),
-        fetchAllPaginated<RawTerm>('categories', TERM_FIELDS),
-        fetchAllPaginated<RawTerm>('tags', TERM_FIELDS),
-        // Comments are optional content (unlike posts/categories/tags/media):
-        // a spam purge can legitimately leave zero, and that must not fail
-        // the build.
-        fetchAllPaginated<RawComment>('comments', COMMENT_FIELDS, fetch, { allowEmpty: true }),
-      ]);
+      const [rawPosts, rawCategories, rawTags, rawComments] = await Promise.all(
+        [
+          fetchAllPaginated<RawWpPost>('posts', POST_FIELDS),
+          fetchAllPaginated<RawTerm>('categories', TERM_FIELDS),
+          fetchAllPaginated<RawTerm>('tags', TERM_FIELDS),
+          // Comments are optional content (unlike posts/categories/tags/media):
+          // a spam purge can legitimately leave zero, and that must not fail
+          // the build.
+          fetchAllPaginated<RawComment>('comments', COMMENT_FIELDS, fetch, {
+            allowEmpty: true,
+          }),
+        ]
+      );
 
       // Posts reference only a handful of media ids; fetch exactly those rather
       // than the full media library (see wp-client.ts fetchByIds - the site's
       // media X-WP-Total disagrees with what pagination actually returns).
-      const mediaIds = [...new Set(rawPosts.map((p) => p.featured_media).filter((id) => id > 0))];
-      const rawMedia = await fetchByIds<RawMedia>('media', MEDIA_FIELDS, mediaIds);
+      const mediaIds = [
+        ...new Set(
+          rawPosts.map((p) => p.featured_media).filter((id) => id > 0)
+        ),
+      ];
+      const rawMedia = await fetchByIds<RawMedia>(
+        'media',
+        MEDIA_FIELDS,
+        mediaIds
+      );
 
       const termsById = new Map<number, Term>();
       for (const t of [...rawCategories, ...rawTags]) {
         termsById.set(t.id, { name: decodeEntities(t.name), slug: t.slug });
       }
 
-      const mediaById = new Map<number, string>(rawMedia.map((m) => [m.id, m.source_url]));
+      const mediaById = new Map<number, string>(
+        rawMedia.map((m) => [m.id, m.source_url])
+      );
 
       const commentsByPostId = new Map<number, NormalizedComment[]>();
       for (const c of rawComments) {
@@ -59,8 +87,12 @@ export function wpPostsLoader(): Loader {
       }
 
       const posts = rawPosts
-        .map((raw) => normalizePost(raw, mediaById, termsById, commentsByPostId))
-        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        .map((raw) =>
+          normalizePost(raw, mediaById, termsById, commentsByPostId)
+        )
+        .sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
 
       // The store persists across builds. Clearing first means a shrunken or
       // empty fetch can never leave the previous build's entries in place.
@@ -126,5 +158,6 @@ function termLoader(name: string, endpoint: string): Loader {
   };
 }
 
-export const wpCategoriesLoader = (): Loader => termLoader('wp-categories', 'categories');
+export const wpCategoriesLoader = (): Loader =>
+  termLoader('wp-categories', 'categories');
 export const wpTagsLoader = (): Loader => termLoader('wp-tags', 'tags');

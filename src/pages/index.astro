@@ -19,20 +19,26 @@ const totalPages = Math.ceil((posts.length - 4) / 12);
 
 <BaseLayout currentPath="/" preloadImage={featuredPost?.featuredImageUrl}>
   <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-    
     <!-- Hero Banner -->
     <HeroBanner />
 
     <!-- Bento Featured Section -->
-    {featuredPost && <BentoShowcase featuredPost={featuredPost} sidePosts={sidePosts} />}
+    {
+      featuredPost && (
+        <BentoShowcase featuredPost={featuredPost} sidePosts={sidePosts} />
+      )
+    }
 
     <!-- Main Content & Sidebar Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-      
       <!-- Feed Stream (8 cols) -->
       <div class="lg:col-span-8">
-        <div class="flex items-center justify-between pb-3 mb-6 border-b-2 border-slate-200/80 dark:border-slate-800">
-          <h2 class="text-xl sm:text-2xl font-heading font-black text-slate-900 dark:text-white flex items-center gap-2.5">
+        <div
+          class="flex items-center justify-between pb-3 mb-6 border-b-2 border-slate-200/80 dark:border-slate-800"
+        >
+          <h2
+            class="text-xl sm:text-2xl font-heading font-black text-slate-900 dark:text-white flex items-center gap-2.5"
+          >
             <span class="w-2.5 h-6 rounded-sm bg-grad-primary"></span>
             Latest Articles &amp; Insights
           </h2>
@@ -40,28 +46,17 @@ const totalPages = Math.ceil((posts.length - 4) / 12);
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
-          {feedPosts.map((post) => (
-            <PostCard post={post} />
-          ))}
+          {feedPosts.map((post) => <PostCard post={post} />)}
         </div>
 
         <!-- Working Responsive Pagination -->
-        <Pagination 
-          currentPage={1} 
-          totalPages={totalPages} 
-        />
+        <Pagination currentPage={1} totalPages={totalPages} />
       </div>
 
       <!-- Sidebar (4 cols) -->
       <aside class="lg:col-span-4">
-        <Sidebar 
-          categories={categories} 
-          tags={tags} 
-          trendingPosts={posts} 
-        />
+        <Sidebar categories={categories} tags={tags} trendingPosts={posts} />
       </aside>
-
     </div>
-
   </main>
 </BaseLayout>

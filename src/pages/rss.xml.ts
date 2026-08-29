@@ -8,7 +8,8 @@ export async function GET(context: APIContext) {
 
   return rss({
     title: 'ComputerJy World',
-    description: 'Entertainment, Tech tips & Occasional software reviews by Eyad Salah.',
+    description:
+      'Entertainment, Tech tips & Occasional software reviews by Eyad Salah.',
     site: context.site || 'https://www.computerjy.com',
     items: posts.map((post) => ({
       title: stripHtml(post.title.rendered),

@@ -6,42 +6,45 @@ interface Props {
 const { currentPath = '/' } = Astro.props;
 ---
 
-<header class="sticky top-0 z-50 h-[72px] glass-header transition-all duration-300">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between gap-4">
-    
+<header
+  class="sticky top-0 z-50 h-[72px] glass-header transition-all duration-300"
+>
+  <div
+    class="max-w-7xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between gap-4"
+  >
     <!-- Brand Logo -->
     <a href="/" class="flex items-center gap-3 group">
-      <img 
-        src="/logo.svg" 
-        alt="ComputerJy World" 
-        class="h-10 sm:h-11 w-auto transition-transform duration-200 group-hover:scale-105 group-hover:-rotate-1" 
-        width="220" 
-        height="44" 
+      <img
+        src="/logo.svg"
+        alt="ComputerJy World"
+        class="h-10 sm:h-11 w-auto transition-transform duration-200 group-hover:scale-105 group-hover:-rotate-1"
+        width="220"
+        height="44"
       />
     </a>
 
     <!-- Desktop Nav -->
     <nav class="hidden md:flex items-center gap-1">
-      <a 
-        href="/" 
+      <a
+        href="/"
         class={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-colors duration-200 ${currentPath === '/' ? 'text-brand-blue bg-light-subtle dark:bg-dark-subtle' : 'text-slate-600 dark:text-slate-300 hover:text-brand-blue hover:bg-light-subtle dark:hover:bg-dark-subtle'}`}
       >
         Home
       </a>
-      <a 
-        href="/category/g33ky" 
+      <a
+        href="/category/g33ky"
         class={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-colors duration-200 ${currentPath.includes('/category/g33ky') ? 'text-brand-blue bg-light-subtle dark:bg-dark-subtle' : 'text-slate-600 dark:text-slate-300 hover:text-brand-blue hover:bg-light-subtle dark:hover:bg-dark-subtle'}`}
       >
         Geeky &amp; Tech Tips
       </a>
-      <a 
-        href="/category/entertainment" 
+      <a
+        href="/category/entertainment"
         class={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-colors duration-200 ${currentPath.includes('/category/entertainment') ? 'text-brand-blue bg-light-subtle dark:bg-dark-subtle' : 'text-slate-600 dark:text-slate-300 hover:text-brand-blue hover:bg-light-subtle dark:hover:bg-dark-subtle'}`}
       >
         Entertainment
       </a>
-      <a 
-        href="/contact-me" 
+      <a
+        href="/contact-me"
         class={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-colors duration-200 ${currentPath === '/contact-me' ? 'text-brand-blue bg-light-subtle dark:bg-dark-subtle' : 'text-slate-600 dark:text-slate-300 hover:text-brand-blue hover:bg-light-subtle dark:hover:bg-dark-subtle'}`}
       >
         Contact
@@ -51,91 +54,122 @@ const { currentPath = '/' } = Astro.props;
     <!-- Header Actions -->
     <div class="flex items-center gap-2.5">
       <!-- Search Button -->
-      <button 
-        id="searchTrigger" 
-        type="button" 
+      <button
+        id="searchTrigger"
+        type="button"
         class="flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-500 dark:text-slate-400 bg-light-subtle dark:bg-dark-subtle border border-slate-200/60 dark:border-slate-800 hover:border-brand-blue/50 hover:text-slate-900 dark:hover:text-white transition-all shadow-sm"
         aria-label="Search website"
       >
-        <svg class="w-3.5 h-3.5 text-brand-blue" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <svg
+          class="w-3.5 h-3.5 text-brand-blue"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          viewBox="0 0 24 24"
+        >
           <circle cx="11" cy="11" r="8"></circle>
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
         <span class="hidden sm:inline">Search</span>
-        <kbd class="hidden sm:inline-block font-mono text-[10px] px-1.5 py-0.5 rounded bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-700 text-slate-400">⌘K</kbd>
+        <kbd
+          class="hidden sm:inline-block font-mono text-[10px] px-1.5 py-0.5 rounded bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-700 text-slate-400"
+          >⌘K</kbd
+        >
       </button>
 
       <!-- Theme Switcher -->
-      <button 
-        id="themeToggleBtn" 
-        type="button" 
+      <button
+        id="themeToggleBtn"
+        type="button"
         class="w-10 h-10 rounded-full flex items-center justify-center bg-light-subtle dark:bg-dark-subtle border border-slate-200/60 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-brand-amber hover:border-brand-amber transition-all"
         aria-label="Toggle theme"
       >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <svg
+          class="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
         </svg>
       </button>
 
       <!-- Mobile Menu Button -->
-      <button 
-        id="mobileMenuBtn" 
-        type="button" 
+      <button
+        id="mobileMenuBtn"
+        type="button"
         class="md:hidden w-10 h-10 rounded-xl flex items-center justify-center bg-light-subtle dark:bg-dark-subtle border border-slate-200/60 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:text-brand-blue hover:border-brand-blue/40 transition-all cursor-pointer shadow-xs"
         aria-label="Open mobile navigation menu"
         aria-expanded="false"
         aria-controls="mobileDrawer"
       >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+        <svg
+          class="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.2"
+          viewBox="0 0 24 24"
+        >
           <line x1="3" y1="12" x2="21" y2="12"></line>
           <line x1="3" y1="6" x2="21" y2="6"></line>
           <line x1="3" y1="18" x2="21" y2="18"></line>
         </svg>
       </button>
     </div>
-
   </div>
 </header>
 
 <!-- Mobile Side Navigation Backdrop Overlay -->
-<div 
-  id="mobileDrawerBackdrop" 
-  class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 md:hidden" 
+<div
+  id="mobileDrawerBackdrop"
+  class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 md:hidden"
   aria-hidden="true"
-></div>
+>
+</div>
 
 <!-- Mobile Side Navigation Drawer -->
-<aside 
-  id="mobileDrawer" 
+<aside
+  id="mobileDrawer"
   class="fixed top-0 right-0 bottom-0 z-50 w-[85%] max-w-sm bg-white dark:bg-dark-surface border-l border-slate-200/80 dark:border-slate-800 shadow-2xl flex flex-col justify-between translate-x-full transition-transform duration-300 ease-out md:hidden overflow-y-auto"
-  role="dialog" 
-  aria-modal="true" 
+  role="dialog"
+  aria-modal="true"
   aria-label="Mobile Navigation"
   tabindex="-1"
 >
   <!-- Drawer Main Body -->
   <div class="p-6 flex flex-col gap-6">
     <!-- Top Bar: Brand & Close Button -->
-    <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+    <div
+      class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800"
+    >
       <a href="/" class="flex items-center gap-2 group">
-        <img 
-          src="/logo-icon.svg" 
-          alt="ComputerJy World" 
-          class="h-8 w-8 rounded-lg" 
-          width="32" 
-          height="32" 
+        <img
+          src="/logo-icon.svg"
+          alt="ComputerJy World"
+          class="h-8 w-8 rounded-lg"
+          width="32"
+          height="32"
         />
-        <span class="font-heading font-black text-lg text-slate-900 dark:text-white">
+        <span
+          class="font-heading font-black text-lg text-slate-900 dark:text-white"
+        >
           Computer<span class="text-brand-cyan">Jy</span>
         </span>
       </a>
-      <button 
-        id="mobileDrawerCloseBtn" 
-        type="button" 
+      <button
+        id="mobileDrawerCloseBtn"
+        type="button"
         class="w-9 h-9 rounded-xl flex items-center justify-center bg-light-subtle dark:bg-dark-subtle border border-slate-200/80 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-slate-700 transition-all cursor-pointer"
         aria-label="Close navigation menu"
       >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <svg
+          class="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          viewBox="0 0 24 24"
+        >
           <line x1="18" y1="6" x2="6" y2="18"></line>
           <line x1="6" y1="6" x2="18" y2="18"></line>
         </svg>
@@ -143,94 +177,186 @@ const { currentPath = '/' } = Astro.props;
     </div>
 
     <!-- Quick Search Action -->
-    <button 
-      id="drawerSearchTrigger" 
-      type="button" 
+    <button
+      id="drawerSearchTrigger"
+      type="button"
       class="flex items-center justify-between w-full px-4 py-3 rounded-2xl bg-light-subtle dark:bg-dark-subtle border border-slate-200/80 dark:border-slate-800 text-xs font-medium text-slate-500 dark:text-slate-400 hover:border-brand-blue/50 hover:text-slate-900 dark:hover:text-white transition-all shadow-xs cursor-pointer"
     >
       <div class="flex items-center gap-2.5">
-        <svg class="w-4 h-4 text-brand-blue" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <svg
+          class="w-4 h-4 text-brand-blue"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          viewBox="0 0 24 24"
+        >
           <circle cx="11" cy="11" r="8"></circle>
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
         <span>Search 400+ articles...</span>
       </div>
-      <kbd class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-700 text-slate-400">⌘K</kbd>
+      <kbd
+        class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-700 text-slate-400"
+        >⌘K</kbd
+      >
     </button>
 
     <!-- Navigation Menu Links -->
     <nav class="flex flex-col gap-1.5" aria-label="Mobile Menu Links">
-      <div class="px-2 pb-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Navigation</div>
-      
-      <a 
-        href="/" 
+      <div
+        class="px-2 pb-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider"
+      >
+        Navigation
+      </div>
+
+      <a
+        href="/"
         class={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold transition-all ${currentPath === '/' ? 'bg-brand-blue/10 text-brand-blue dark:bg-brand-blue/20' : 'text-slate-700 dark:text-slate-200 hover:bg-light-subtle dark:hover:bg-dark-subtle hover:text-brand-blue'}`}
       >
-        <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        <svg
+          class="w-4 h-4 opacity-70"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          ><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+          ></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg
+        >
         <span>Home</span>
       </a>
 
-      <a 
-        href="/category/g33ky" 
+      <a
+        href="/category/g33ky"
         class={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold transition-all ${currentPath.includes('/category/g33ky') ? 'bg-brand-blue/10 text-brand-blue dark:bg-brand-blue/20' : 'text-slate-700 dark:text-slate-200 hover:bg-light-subtle dark:hover:bg-dark-subtle hover:text-brand-blue'}`}
       >
         <div class="flex items-center gap-3">
-          <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2"></rect><line x1="8" x2="16" y1="21" y2="21"></line><line x1="12" x2="12" y1="17" y2="21"></line></svg>
+          <svg
+            class="w-4 h-4 opacity-70"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            ><rect width="20" height="14" x="2" y="3" rx="2"></rect><line
+              x1="8"
+              x2="16"
+              y1="21"
+              y2="21"></line><line x1="12" x2="12" y1="17" y2="21"></line></svg
+          >
           <span>Geeky &amp; Tech Tips</span>
         </div>
-        <span class="text-[10px] px-2 py-0.5 rounded-full bg-light-subtle dark:bg-dark-subtle font-bold text-slate-500 dark:text-slate-400">101</span>
+        <span
+          class="text-[10px] px-2 py-0.5 rounded-full bg-light-subtle dark:bg-dark-subtle font-bold text-slate-500 dark:text-slate-400"
+          >101</span
+        >
       </a>
 
-      <a 
-        href="/category/entertainment" 
+      <a
+        href="/category/entertainment"
         class={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold transition-all ${currentPath.includes('/category/entertainment') ? 'bg-brand-blue/10 text-brand-blue dark:bg-brand-blue/20' : 'text-slate-700 dark:text-slate-200 hover:bg-light-subtle dark:hover:bg-dark-subtle hover:text-brand-blue'}`}
       >
         <div class="flex items-center gap-3">
-          <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          <svg
+            class="w-4 h-4 opacity-70"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            ><polygon
+              points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+            ></polygon></svg
+          >
           <span>Entertainment</span>
         </div>
-        <span class="text-[10px] px-2 py-0.5 rounded-full bg-light-subtle dark:bg-dark-subtle font-bold text-slate-500 dark:text-slate-400">327</span>
+        <span
+          class="text-[10px] px-2 py-0.5 rounded-full bg-light-subtle dark:bg-dark-subtle font-bold text-slate-500 dark:text-slate-400"
+          >327</span
+        >
       </a>
 
-      <a 
-        href="/contact-me" 
+      <a
+        href="/contact-me"
         class={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold transition-all ${currentPath === '/contact-me' ? 'bg-brand-blue/10 text-brand-blue dark:bg-brand-blue/20' : 'text-slate-700 dark:text-slate-200 hover:bg-light-subtle dark:hover:bg-dark-subtle hover:text-brand-blue'}`}
       >
-        <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
+        <svg
+          class="w-4 h-4 opacity-70"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          ><rect width="20" height="16" x="2" y="4" rx="2"></rect><path
+            d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg
+        >
         <span>Contact Eyad</span>
       </a>
 
-      <a 
-        href="/privacy-policy" 
+      <a
+        href="/privacy-policy"
         class={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold transition-all ${currentPath === '/privacy-policy' ? 'bg-brand-blue/10 text-brand-blue dark:bg-brand-blue/20' : 'text-slate-700 dark:text-slate-200 hover:bg-light-subtle dark:hover:bg-dark-subtle hover:text-brand-blue'}`}
       >
-        <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path></svg>
+        <svg
+          class="w-4 h-4 opacity-70"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          ><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path></svg
+        >
         <span>Privacy Policy</span>
       </a>
     </nav>
 
     <!-- Popular Topic Tags -->
-    <div class="flex flex-col gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-      <div class="px-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Quick Topics</div>
+    <div
+      class="flex flex-col gap-2 pt-2 border-t border-slate-100 dark:border-slate-800"
+    >
+      <div
+        class="px-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider"
+      >
+        Quick Topics
+      </div>
       <div class="flex flex-wrap gap-1.5 px-2">
-        <a href="/tag/computers" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-light-subtle dark:bg-dark-subtle text-slate-600 dark:text-slate-300 hover:bg-brand-blue hover:text-white transition-all">#computers</a>
-        <a href="/tag/windows" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-light-subtle dark:bg-dark-subtle text-slate-600 dark:text-slate-300 hover:bg-brand-blue hover:text-white transition-all">#windows</a>
-        <a href="/tag/programming" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-light-subtle dark:bg-dark-subtle text-slate-600 dark:text-slate-300 hover:bg-brand-blue hover:text-white transition-all">#programming</a>
-        <a href="/tag/humor" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-light-subtle dark:bg-dark-subtle text-slate-600 dark:text-slate-300 hover:bg-brand-blue hover:text-white transition-all">#humor</a>
+        <a
+          href="/tag/computers"
+          class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-light-subtle dark:bg-dark-subtle text-slate-600 dark:text-slate-300 hover:bg-brand-blue hover:text-white transition-all"
+          >#computers</a
+        >
+        <a
+          href="/tag/windows"
+          class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-light-subtle dark:bg-dark-subtle text-slate-600 dark:text-slate-300 hover:bg-brand-blue hover:text-white transition-all"
+          >#windows</a
+        >
+        <a
+          href="/tag/programming"
+          class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-light-subtle dark:bg-dark-subtle text-slate-600 dark:text-slate-300 hover:bg-brand-blue hover:text-white transition-all"
+          >#programming</a
+        >
+        <a
+          href="/tag/humor"
+          class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-light-subtle dark:bg-dark-subtle text-slate-600 dark:text-slate-300 hover:bg-brand-blue hover:text-white transition-all"
+          >#humor</a
+        >
       </div>
     </div>
   </div>
 
   <!-- Drawer Footer: Theme & Socials -->
-  <div class="p-6 border-t border-slate-100 dark:border-slate-800 bg-light-subtle/50 dark:bg-dark-subtle/50 flex flex-col gap-4">
+  <div
+    class="p-6 border-t border-slate-100 dark:border-slate-800 bg-light-subtle/50 dark:bg-dark-subtle/50 flex flex-col gap-4"
+  >
     <!-- Theme Toggle inside Drawer -->
-    <button 
-      id="drawerThemeToggleBtn" 
-      type="button" 
+    <button
+      id="drawerThemeToggleBtn"
+      type="button"
       class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-white dark:bg-dark-surface border border-slate-200/80 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 hover:border-brand-amber transition-all cursor-pointer"
     >
       <div class="flex items-center gap-2.5">
-        <svg class="w-4 h-4 text-brand-amber" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <svg
+          class="w-4 h-4 text-brand-amber"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
           <circle cx="12" cy="12" r="4"></circle>
           <path d="M12 2v2"></path>
           <path d="M12 20v2"></path>
@@ -243,23 +369,74 @@ const { currentPath = '/' } = Astro.props;
         </svg>
         <span>Toggle Theme</span>
       </div>
-      <span class="text-[10px] px-2 py-0.5 rounded-md bg-light-subtle dark:bg-dark-subtle text-slate-500 font-mono uppercase" id="drawerThemeStateLabel">Dark</span>
+      <span
+        class="text-[10px] px-2 py-0.5 rounded-md bg-light-subtle dark:bg-dark-subtle text-slate-500 font-mono uppercase"
+        id="drawerThemeStateLabel">Dark</span
+      >
     </button>
 
     <!-- Social Icons -->
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <a href="https://x.com/ComputerJy" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg flex items-center justify-center bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-brand-blue hover:text-white transition-all shadow-xs" aria-label="X / Twitter">
-          <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        <a
+          href="https://x.com/ComputerJy"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="w-8 h-8 rounded-lg flex items-center justify-center bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-brand-blue hover:text-white transition-all shadow-xs"
+          aria-label="X / Twitter"
+        >
+          <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"
+            ><path
+              d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+            ></path></svg
+          >
         </a>
-        <a href="https://www.facebook.com/computerjy" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg flex items-center justify-center bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-brand-blue hover:text-white transition-all shadow-xs" aria-label="Facebook">
-          <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        <a
+          href="https://www.facebook.com/computerjy"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="w-8 h-8 rounded-lg flex items-center justify-center bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-brand-blue hover:text-white transition-all shadow-xs"
+          aria-label="Facebook"
+        >
+          <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"
+            ><path
+              d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+            ></path></svg
+          >
         </a>
-        <a href="https://www.linkedin.com/in/computerjy" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg flex items-center justify-center bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-brand-blue hover:text-white transition-all shadow-xs" aria-label="LinkedIn">
-          <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76a1.45 1.45 0 0 0 1.45-1.45 1.45 1.45 0 0 0-1.45-1.45 1.45 1.45 0 0 0 1.45 1.45m1.37 9.74v-8.37H5.09v8.37h2.74z"/></svg>
+        <a
+          href="https://www.linkedin.com/in/computerjy"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="w-8 h-8 rounded-lg flex items-center justify-center bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-brand-blue hover:text-white transition-all shadow-xs"
+          aria-label="LinkedIn"
+        >
+          <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"
+            ><path
+              d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76a1.45 1.45 0 0 0 1.45-1.45 1.45 1.45 0 0 0-1.45-1.45 1.45 1.45 0 0 0 1.45 1.45m1.37 9.74v-8.37H5.09v8.37h2.74z"
+            ></path></svg
+          >
         </a>
-        <a href="https://www.instagram.com/computerjy/" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg flex items-center justify-center bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-brand-blue hover:text-white transition-all shadow-xs" aria-label="Instagram">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+        <a
+          href="https://www.instagram.com/computerjy/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="w-8 h-8 rounded-lg flex items-center justify-center bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-brand-blue hover:text-white transition-all shadow-xs"
+          aria-label="Instagram"
+        >
+          <svg
+            class="w-3.5 h-3.5"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            ><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path
+              d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line
+              x1="17.5"
+              y1="6.5"
+              x2="17.51"
+              y2="6.5"></line></svg
+          >
         </a>
       </div>
       <div class="text-[11px] text-slate-400 font-semibold">Since 2007</div>
@@ -281,7 +458,8 @@ const { currentPath = '/' } = Astro.props;
 
     function updateThemeLabel() {
       if (!drawerThemeLabel) return;
-      const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+      const currentTheme =
+        document.documentElement.getAttribute('data-theme') || 'dark';
       drawerThemeLabel.textContent = currentTheme;
     }
 
@@ -368,7 +546,10 @@ const { currentPath = '/' } = Astro.props;
       }
     };
 
-    document.removeEventListener('keydown', (document as any)._drawerEscapeHandler);
+    document.removeEventListener(
+      'keydown',
+      (document as any)._drawerEscapeHandler
+    );
     (document as any)._drawerEscapeHandler = onKeyDown;
     document.addEventListener('keydown', onKeyDown);
   }

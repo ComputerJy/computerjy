@@ -8,7 +8,10 @@ import {
 
 describe('findForbiddenMatches', () => {
   it('reports every match of a forbidden pattern', () => {
-    const hits = findForbiddenMatches('a &amp;#8217; b &amp;#038; c', /&amp;#\d+;/g);
+    const hits = findForbiddenMatches(
+      'a &amp;#8217; b &amp;#038; c',
+      /&amp;#\d+;/g
+    );
     expect(hits).toEqual(['&amp;#8217;', '&amp;#038;']);
   });
 
@@ -25,7 +28,9 @@ describe('findForbiddenMatches', () => {
 
 describe('percentEncodedSlugs', () => {
   it('flags directory names containing percent-encoding', () => {
-    expect(percentEncodedSlugs(['ok-slug', '%d8%a7%d8%a8', 'also-ok'])).toEqual(['%d8%a7%d8%a8']);
+    expect(percentEncodedSlugs(['ok-slug', '%d8%a7%d8%a8', 'also-ok'])).toEqual(
+      ['%d8%a7%d8%a8']
+    );
   });
 
   it('accepts decoded non-ASCII names', () => {
@@ -48,7 +53,11 @@ describe('comparePostSets', () => {
   });
 
   it('fails when extras exceed the allowance', () => {
-    const r = comparePostSets(['a'], new Set(['a', 's1', 's2', 's3', 's4', 's5']), 4);
+    const r = comparePostSets(
+      ['a'],
+      new Set(['a', 's1', 's2', 's3', 's4', 's5']),
+      4
+    );
     expect(r.ok).toBe(false);
   });
 });

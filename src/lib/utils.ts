@@ -40,7 +40,7 @@ export function stripHtml(input: string): string {
  */
 export function sanitizeCommentHtml(html: string): string {
   if (!html) return '';
-  
+
   // Step 1: Escape all HTML characters
   const escaped = escapeHtml(html);
 
