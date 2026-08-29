@@ -81,3 +81,30 @@ jobs:
           cat /tmp/diff.txt
           echo "::error::Cloudflare ranges diverge from the firewall allowlist - see job summary."
           exit 1
+
+      # Runs even when the comparison above failed, so a range change and a stale
+      # Apache config are reported together rather than one masking the other.
+      - name: Check the mod_remoteip config matches the allowlist
+        if: always()
+        run: |
+          set -euo pipefail
+          if bash deploy/generate-remoteip-conf.sh | diff -u deploy/lightsail-remoteip.conf - > /tmp/conf-diff.txt; then
+            echo "mod_remoteip trusted-proxy list matches deploy/cloudflare-ips.txt."
+            exit 0
+          fi
+          {
+            echo '### `deploy/lightsail-remoteip.conf` is stale'
+            echo ''
+            echo 'Apache would stop trusting `CF-Connecting-IP` from any range it is missing, and'
+            echo 'those requests would silently go back to logging the Cloudflare edge IP.'
+            echo ''
+            echo '```diff'
+            cat /tmp/conf-diff.txt
+            echo '```'
+            echo ''
+            echo 'Fix: `bash deploy/generate-remoteip-conf.sh > deploy/lightsail-remoteip.conf`, commit,'
+            echo 'then re-apply it on the origin.'
+          } >> "$GITHUB_STEP_SUMMARY"
+          cat /tmp/conf-diff.txt
+          echo "::error::deploy/lightsail-remoteip.conf does not match deploy/cloudflare-ips.txt."
+          exit 1

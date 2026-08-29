@@ -1,6 +1,9 @@
-# Cloudflare IP ranges allowed through the origin firewall (ufw) on :80 and :443.
+# Cloudflare IP ranges allowed through the origin firewall (ufw) on :80 and :443,
+# and trusted by Apache's mod_remoteip as proxies whose CF-Connecting-IP is honoured.
 #
-# This file is the canonical record of what is configured on the Lightsail origin.
+# This file is the canonical record of what is configured on the Lightsail origin,
+# and the single source for both consumers -- deploy/lightsail-remoteip.conf is
+# generated from it so the two allowlists cannot drift apart.
 # It is compared weekly against Cloudflare's published list by
 # .github/workflows/cloudflare-ip-monitor.yml -- that job FAILS if they diverge,
 # because a newly-published Cloudflare range that is not allowed here means
@@ -10,7 +13,12 @@
 #   1. ssh to the origin
 #   2. sudo bash deploy/update-cloudflare-firewall.sh
 #   3. verify the site, cancel the rollback timer as the script instructs
-#   4. update this file and commit
+#   4. update this file
+#   5. regenerate and re-apply the Apache trusted-proxy list:
+#        bash deploy/generate-remoteip-conf.sh > deploy/lightsail-remoteip.conf
+#      then copy it to /etc/apache2/conf-available/remoteip.conf on the origin
+#      and `systemctl reload apache2`
+#   6. commit
 #
 # Sources: https://www.cloudflare.com/ips-v4  https://www.cloudflare.com/ips-v6
 # Last synced with the origin: 2026-08-29 (15 IPv4 + 7 IPv6 = 44 ufw rules)
