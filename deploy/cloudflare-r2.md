@@ -36,7 +36,7 @@ not a transitional hedge, it is the design:
 
 Cloudflare dashboard → **R2** → **Create bucket**.
 
-- Name: `computerjy-dist` (must match `bucket_name` in `wrangler.toml`)
+- Name: `computerjy-bucket` (must match `bucket_name` in `wrangler.toml`)
 - Location: Automatic
 - **Do not** attach a public custom domain or enable the public
   `r2.dev` URL. The bucket is reached only through the Worker binding; a second
@@ -52,7 +52,7 @@ R2 → **Manage R2 API Tokens** → **Create API token**.
 
 - Token name: `computerjy-deploy-r2`
 - Permissions: **Object Read & Write**
-- Specify bucket: `computerjy-dist` — not "all buckets"
+- Specify bucket: `computerjy-bucket` — not "all buckets"
 - TTL: forever (or your rotation window)
 
 Cloudflare shows three values exactly once:
@@ -82,7 +82,7 @@ none of these land in shell history:
 
 ```bash
 gh secret set CLOUDFLARE_ACCOUNT_ID
-gh secret set R2_BUCKET               # computerjy-dist
+gh secret set R2_BUCKET               # computerjy-bucket
 gh secret set R2_ACCESS_KEY_ID
 gh secret set R2_SECRET_ACCESS_KEY
 gh secret set CLOUDFLARE_API_TOKEN
