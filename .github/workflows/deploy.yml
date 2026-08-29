@@ -1,5 +1,7 @@
 name: Deploy to AWS Lightsail
 
+run-name: Deploy — ${{ github.event.client_payload.reason || github.event.inputs.reason || 'manual trigger' }}
+
 on:
   workflow_dispatch:
     inputs:
@@ -8,10 +10,27 @@ on:
         required: false
         default: 'Manual release trigger'
         type: string
+  # Sent by the ComputerJy Rebuild Dispatch plugin (inc/computerjy-rebuild-webhook.php)
+  # when content the build consumes changes. GitHub only runs repository_dispatch
+  # against the default branch, so this always deploys main.
+  repository_dispatch:
+    types: [wp-content-updated]
 
 # Restrict default GITHUB_TOKEN permissions to least privilege
 permissions:
   contents: read
+
+# This is the debounce for publish-triggered deploys, and it lives here rather than
+# in the plugin because GitHub already implements exactly the right semantics: at
+# most one run per group is pending, and queueing another cancels the previous
+# pending one. A bulk edit that fires twenty dispatches therefore produces two
+# deploys — the one already running, plus one more that sees the final state.
+#
+# cancel-in-progress stays false on purpose: an interrupted `rsync --delete` would
+# leave the webroot half-written.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
 
 jobs:
   build-and-deploy:
