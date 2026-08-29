@@ -16,11 +16,11 @@ Publish in WordPress
 
 The plugin authenticates with a GitHub **fine-grained personal access token**:
 
-| Setting | Value |
-|---|---|
-| Repository access | Only select repositories → `ComputerJy/computerjy` |
-| Repository permission | `Contents` → **Read and write** |
-| Expiration | set one, and diarise the rotation |
+| Setting               | Value                                              |
+| --------------------- | -------------------------------------------------- |
+| Repository access     | Only select repositories → `ComputerJy/computerjy` |
+| Repository permission | `Contents` → **Read and write**                    |
+| Expiration            | set one, and diarise the rotation                  |
 
 `Contents: write` is what the `dispatches` endpoint requires. There is no narrower
 permission that can start a workflow.
@@ -69,7 +69,7 @@ collapse that, at different scales.
 **Within one request**, the hooks only record a reason; the single dispatch is sent
 on `shutdown`. This is what makes a WP-CLI import correct — the whole import runs
 inside one request, so dispatching on the first hook would deploy the state at the
-*first* post and never send another.
+_first_ post and never send another.
 
 **Across requests**, the collapsing is done by the workflow's concurrency group:
 
@@ -79,7 +79,7 @@ concurrency:
   cancel-in-progress: false
 ```
 
-GitHub allows at most one *pending* run per group, and queueing a new one cancels
+GitHub allows at most one _pending_ run per group, and queueing a new one cancels
 the previously pending run. Twenty dispatches therefore produce two deploys: the
 one already running, plus one more that sees the final state.
 
@@ -97,15 +97,15 @@ front-end traffic. `DISABLE_WP_CRON` is not set and no system cron drives
 The hook set mirrors exactly what `src/lib/wp-loader.ts` fetches. Anything else in
 WordPress leaves the built site unchanged and deliberately does not deploy.
 
-| Change | Hook |
-|---|---|
-| Post published, unpublished, edited, trashed, scheduled → live | `transition_post_status` |
-| Post permanently deleted (bypasses the transition) | `deleted_post` |
-| Comment posted and auto-approved | `comment_post` |
-| Comment approved, unapproved, spammed, trashed | `transition_comment_status` |
-| Approved comment edited or deleted | `edit_comment`, `deleted_comment` |
-| Category or tag created, renamed, re-described, deleted | `created_term`, `edited_term`, `delete_term` |
-| Media file replaced or deleted | `attachment_updated`, `delete_attachment` |
+| Change                                                         | Hook                                         |
+| -------------------------------------------------------------- | -------------------------------------------- |
+| Post published, unpublished, edited, trashed, scheduled → live | `transition_post_status`                     |
+| Post permanently deleted (bypasses the transition)             | `deleted_post`                               |
+| Comment posted and auto-approved                               | `comment_post`                               |
+| Comment approved, unapproved, spammed, trashed                 | `transition_comment_status`                  |
+| Approved comment edited or deleted                             | `edit_comment`, `deleted_comment`            |
+| Category or tag created, renamed, re-described, deleted        | `created_term`, `edited_term`, `delete_term` |
+| Media file replaced or deleted                                 | `attachment_updated`, `delete_attachment`    |
 
 Comments and term descriptions matter because the build embeds them — comments ship
 inside each post object, and term names and descriptions are rendered on archive
