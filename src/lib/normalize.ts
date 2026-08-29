@@ -47,3 +47,51 @@ export function resolveFeaturedImage(
   if (match) return match[1];
   return PLACEHOLDER_IMAGE;
 }
+
+/**
+ * Mirrors parse_wp_export.py:strip_tags - repeatedly removes tags until the
+ * string stops changing, so nested or malformed markup cannot leave fragments.
+ * Distinct from stripHtml() in src/lib/utils.ts, which also decodes entities
+ * and is used by the RSS and search-index endpoints. Do not merge them.
+ */
+export function stripTagsForCounting(html: string): string {
+  if (!html) return '';
+  let text = html;
+  let prev = '';
+  while (text !== prev) {
+    prev = text;
+    text = text.replace(/<[^>]*>/g, ' ');
+  }
+  return text.replace(/\s+/g, ' ').trim();
+}
+
+/** Mirrors parse_wp_export.py:calculate_reading_time - ceil(words / 200), min 1. */
+export function calculateReadingTime(html: string): string {
+  const text = stripTagsForCounting(html);
+  const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
+  const minutes = Math.max(1, Math.ceil(words / 200));
+  return `${minutes} min read`;
+}
+
+/** Rendered excerpt if present, else 180 chars of stripped content. */
+export function resolveExcerpt(renderedExcerpt: string, contentHtml: string): string {
+  const trimmed = (renderedExcerpt || '').trim();
+  if (trimmed) return trimmed;
+  const plain = stripTagsForCounting(contentHtml);
+  return plain.length > 180 ? plain.slice(0, 180) + '...' : plain;
+}
+
+/** Prevents mixed-content warnings. Preserved from the previous api.ts. */
+export function upgradeContentToHttps(html: string): string {
+  if (!html || !html.includes('http://')) return html;
+  return html
+    .replace(/src="http:\/\//g, 'src="https://')
+    .replace(/src='http:\/\//g, "src='https://")
+    .replace(/href="http:\/\//g, 'href="https://')
+    .replace(/href='http:\/\//g, "href='https://");
+}
+
+export function upgradeUrlToHttps(url?: string): string | undefined {
+  if (!url) return url;
+  return url.startsWith('http://') ? url.replace(/^http:\/\//, 'https://') : url;
+}
