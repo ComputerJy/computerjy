@@ -20,7 +20,8 @@ const PER_PAGE = 100;
  * is sent and behaviour is unchanged.
  */
 function buildRequestInit(): RequestInit | undefined {
-  const token = typeof process !== 'undefined' ? process.env?.WP_BUILD_TOKEN : undefined;
+  const token =
+    typeof process !== 'undefined' ? process.env?.WP_BUILD_TOKEN : undefined;
   return token ? { headers: { 'X-Build-Auth': token } } : undefined;
 }
 
@@ -36,7 +37,9 @@ function edgeDiagnostics(res: Response): string {
     .filter((pair): pair is readonly [string, string] => pair[1] !== null)
     .map(([h, v]) => `${h}=${v}`);
   const sentAuth =
-    typeof process !== 'undefined' && process.env?.WP_BUILD_TOKEN ? 'X-Build-Auth sent' : 'no X-Build-Auth';
+    typeof process !== 'undefined' && process.env?.WP_BUILD_TOKEN
+      ? 'X-Build-Auth sent'
+      : 'no X-Build-Auth';
   return `[${[...parts, sentAuth].join(', ')}]`;
 }
 
@@ -51,10 +54,14 @@ async function fetchPage(
   try {
     res = await fetchImpl(url, buildRequestInit());
   } catch (cause) {
-    throw new WpApiError(`Network failure fetching ${url}: ${(cause as Error).message}`);
+    throw new WpApiError(
+      `Network failure fetching ${url}: ${(cause as Error).message}`
+    );
   }
   if (!res.ok) {
-    throw new WpApiError(`GET ${url} returned ${res.status} ${res.statusText} ${edgeDiagnostics(res)}`);
+    throw new WpApiError(
+      `GET ${url} returned ${res.status} ${res.statusText} ${edgeDiagnostics(res)}`
+    );
   }
   return res;
 }
@@ -84,7 +91,9 @@ export async function fetchAllPaginated<T>(
   }
 
   if (items.length === 0 && !opts.allowEmpty) {
-    throw new WpApiError(`Endpoint "${endpoint}" returned no items - refusing to build.`);
+    throw new WpApiError(
+      `Endpoint "${endpoint}" returned no items - refusing to build.`
+    );
   }
   if (items.length !== total) {
     throw new WpApiError(
@@ -118,10 +127,14 @@ export async function fetchByIds<T extends { id: number }>(
   try {
     res = await fetchImpl(url, buildRequestInit());
   } catch (cause) {
-    throw new WpApiError(`Network failure fetching ${url}: ${(cause as Error).message}`);
+    throw new WpApiError(
+      `Network failure fetching ${url}: ${(cause as Error).message}`
+    );
   }
   if (!res.ok) {
-    throw new WpApiError(`GET ${url} returned ${res.status} ${res.statusText} ${edgeDiagnostics(res)}`);
+    throw new WpApiError(
+      `GET ${url} returned ${res.status} ${res.statusText} ${edgeDiagnostics(res)}`
+    );
   }
   const items = (await res.json()) as T[];
   const got = new Set(items.map((i) => i.id));

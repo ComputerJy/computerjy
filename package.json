@@ -12,7 +12,11 @@
     "check": "astro check",
     "test": "vitest run",
     "test:watch": "vitest",
-    "verify:build": "node scripts/verify-build.mjs"
+    "verify:build": "node scripts/verify-build.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint:php": "find . -maxdepth 3 -name \"*.php\" -not -path \"*/node_modules/*\" -not -path \"*/dist/*\" -not -path \"*/.astro/*\" -exec php -l {} +",
+    "lint": "npm run format:check && npm run lint:php"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",
@@ -23,6 +27,8 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "prettier": "^3.9.6",
+    "prettier-plugin-astro": "^0.14.1",
     "typescript": "^5.9.3",
     "vitest": "^3.2.7"
   }

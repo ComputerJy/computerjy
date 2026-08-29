@@ -27,8 +27,8 @@ const tags = await getTags();
 const relatedPosts = allPosts.filter((p) => p.slug !== post.slug).slice(0, 3);
 ---
 
-<BaseLayout 
-  title={`${post.title.rendered} — ComputerJy World`} 
+<BaseLayout
+  title={`${post.title.rendered} — ComputerJy World`}
   description={post.excerpt.rendered.replace(/<[^>]*>/g, '').trim()}
   image={post.featuredImageUrl}
   preloadImage={post.featuredImageUrl}
@@ -37,79 +37,108 @@ const relatedPosts = allPosts.filter((p) => p.slug !== post.slug).slice(0, 3);
   modifiedTime={post.modified || post.date}
   breadcrumbs={[
     { name: 'Home', url: '/' },
-    { name: post.primaryCategory?.name || 'Tech', url: `/category/${post.primaryCategory?.slug || 'tech'}` },
-    { name: post.title.rendered }
+    {
+      name: post.primaryCategory?.name || 'Tech',
+      url: `/category/${post.primaryCategory?.slug || 'tech'}`,
+    },
+    { name: post.title.rendered },
   ]}
 >
   <ReadingProgressBar />
 
   <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-      
       <!-- Article Column (8 cols) -->
-      <article class="lg:col-span-8 bg-white dark:bg-dark-surface border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-10 shadow-xs transition-colors duration-300">
-        
+      <article
+        class="lg:col-span-8 bg-white dark:bg-dark-surface border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-10 shadow-xs transition-colors duration-300"
+      >
         <!-- Breadcrumbs -->
-        <nav class="flex items-center gap-2 text-xs text-slate-400 mb-6" aria-label="Breadcrumb">
+        <nav
+          class="flex items-center gap-2 text-xs text-slate-400 mb-6"
+          aria-label="Breadcrumb"
+        >
           <a href="/" class="hover:text-brand-blue transition-colors">Home</a>
           <span>&bull;</span>
-          <a href={`/category/${post.primaryCategory?.slug || 'tech'}`} class="hover:text-brand-blue transition-colors">
+          <a
+            href={`/category/${post.primaryCategory?.slug || 'tech'}`}
+            class="hover:text-brand-blue transition-colors"
+          >
             {post.primaryCategory?.name || 'Tech'}
           </a>
           <span>&bull;</span>
-          <span class="text-slate-600 dark:text-slate-300 font-semibold line-clamp-1">{post.title.rendered}</span>
+          <span
+            class="text-slate-600 dark:text-slate-300 font-semibold line-clamp-1"
+            >{post.title.rendered}</span
+          >
         </nav>
 
         <!-- Category Badge -->
         <div class="mb-4">
-          <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-white bg-grad-primary shadow-sm">
+          <span
+            class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-white bg-grad-primary shadow-sm"
+          >
             {post.primaryCategory?.name || 'Tech'}
           </span>
         </div>
 
         <!-- Post Title -->
-        <h1 class="text-2xl sm:text-4xl lg:text-5xl font-heading font-black text-slate-900 dark:text-white mb-6 leading-tight">
+        <h1
+          class="text-2xl sm:text-4xl lg:text-5xl font-heading font-black text-slate-900 dark:text-white mb-6 leading-tight"
+        >
           {post.title.rendered}
         </h1>
 
         <!-- Author & Date Meta -->
-        <div class="flex items-center justify-between flex-wrap gap-4 pb-6 mb-8 border-b border-slate-100 dark:border-slate-800">
+        <div
+          class="flex items-center justify-between flex-wrap gap-4 pb-6 mb-8 border-b border-slate-100 dark:border-slate-800"
+        >
           <div class="flex items-center gap-3">
-            <img 
-              src="/logo-icon.svg" 
-              alt="Eyad Salah" 
-              width="44" 
-              height="44" 
-              class="w-11 h-11 rounded-full border border-brand-cyan object-cover" 
+            <img
+              src="/logo-icon.svg"
+              alt="Eyad Salah"
+              width="44"
+              height="44"
+              class="w-11 h-11 rounded-full border border-brand-cyan object-cover"
             />
             <div>
-              <div class="font-heading font-bold text-sm text-slate-900 dark:text-white">Eyad Salah</div>
+              <div
+                class="font-heading font-bold text-sm text-slate-900 dark:text-white"
+              >
+                Eyad Salah
+              </div>
               <div class="text-xs text-slate-400">
-                <time datetime={post.date}>{new Date(post.date).toLocaleDateString('en-GB')}</time> &bull; {post.readingTime}
+                <time datetime={post.date}
+                  >{new Date(post.date).toLocaleDateString('en-GB')}</time
+                > &bull; {post.readingTime}
               </div>
             </div>
           </div>
 
-          <a href="#comments" class="badge-glow text-xs hover:border-brand-blue transition-all">
+          <a
+            href="#comments"
+            class="badge-glow text-xs hover:border-brand-blue transition-all"
+          >
             💬 {post.comments?.length || 0} Comments
           </a>
         </div>
 
         <!-- Featured Media -->
-        {post.featuredImageUrl && (
-          <div class="aspect-video rounded-2xl overflow-hidden mb-8 shadow-md">
-            <img 
-              src={post.featuredImageUrl} 
-              alt={post.title.rendered} 
-              width="1200" 
-              height="675" 
-              loading="eager" 
-              fetchpriority="high" 
-              decoding="async" 
-              class="w-full h-full object-cover" 
-            />
-          </div>
-        )}
+        {
+          post.featuredImageUrl && (
+            <div class="aspect-video rounded-2xl overflow-hidden mb-8 shadow-md">
+              <img
+                src={post.featuredImageUrl}
+                alt={post.title.rendered}
+                width="1200"
+                height="675"
+                loading="eager"
+                fetchpriority="high"
+                decoding="async"
+                class="w-full h-full object-cover"
+              />
+            </div>
+          )
+        }
 
         <!-- Article Body -->
         <div class="prose-custom" set:html={post.content.rendered} />
@@ -118,49 +147,70 @@ const relatedPosts = allPosts.filter((p) => p.slug !== post.slug).slice(0, 3);
         <SocialShare title={post.title.rendered} />
 
         <!-- Author Box -->
-        <div class="bg-light-subtle dark:bg-dark-subtle border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 flex flex-col sm:flex-row items-center sm:items-start gap-5 my-8">
-          <img src="/logo-icon.svg" alt="Eyad Salah" class="w-16 h-16 rounded-full border-2 border-brand-cyan object-cover flex-shrink-0" />
+        <div
+          class="bg-light-subtle dark:bg-dark-subtle border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 flex flex-col sm:flex-row items-center sm:items-start gap-5 my-8"
+        >
+          <img
+            src="/logo-icon.svg"
+            alt="Eyad Salah"
+            class="w-16 h-16 rounded-full border-2 border-brand-cyan object-cover flex-shrink-0"
+          />
           <div>
-            <h3 class="font-heading font-bold text-base text-slate-900 dark:text-white mb-1">Written by Eyad Salah</h3>
-            <div class="text-xs font-bold text-brand-blue mb-2">Founder &amp; Creator of ComputerJy World</div>
-            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-              Founder of ComputerJy World, sharing tech tips, software tools, and digital insights since 2007. Passionate about modern web architecture and user experience.
+            <h3
+              class="font-heading font-bold text-base text-slate-900 dark:text-white mb-1"
+            >
+              Written by Eyad Salah
+            </h3>
+            <div class="text-xs font-bold text-brand-blue mb-2">
+              Founder &amp; Creator of ComputerJy World
+            </div>
+            <p
+              class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed"
+            >
+              Founder of ComputerJy World, sharing tech tips, software tools,
+              and digital insights since 2007. Passionate about modern web
+              architecture and user experience.
             </p>
           </div>
         </div>
 
         <!-- Related Articles -->
-        <section class="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800">
-          <h3 class="text-lg font-heading font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+        <section
+          class="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800"
+        >
+          <h3
+            class="text-lg font-heading font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2"
+          >
             <span class="w-2 h-5 rounded-sm bg-grad-primary"></span>
             Related Articles
           </h3>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {relatedPosts.map((p) => (
-              <a href={`/posts/${p.slug}`} class="block p-4 rounded-xl bg-light-subtle dark:bg-dark-subtle border border-slate-200/60 dark:border-slate-800 hover:border-brand-blue/50 transition-all group">
-                <div class="text-[11px] text-slate-400 mb-1">{new Date(p.date).toLocaleDateString('en-GB')}</div>
-                <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-brand-blue transition-colors line-clamp-2 leading-snug">
-                  {p.title.rendered}
-                </h4>
-              </a>
-            ))}
+            {
+              relatedPosts.map((p) => (
+                <a
+                  href={`/posts/${p.slug}`}
+                  class="block p-4 rounded-xl bg-light-subtle dark:bg-dark-subtle border border-slate-200/60 dark:border-slate-800 hover:border-brand-blue/50 transition-all group"
+                >
+                  <div class="text-[11px] text-slate-400 mb-1">
+                    {new Date(p.date).toLocaleDateString('en-GB')}
+                  </div>
+                  <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-brand-blue transition-colors line-clamp-2 leading-snug">
+                    {p.title.rendered}
+                  </h4>
+                </a>
+              ))
+            }
           </div>
         </section>
 
         <!-- Native WordPress Comments Section -->
         <Comments postId={post.id} comments={post.comments} />
-
       </article>
 
       <!-- Sidebar (4 cols) -->
       <aside class="lg:col-span-4">
-        <Sidebar 
-          categories={categories} 
-          tags={tags} 
-          trendingPosts={allPosts} 
-        />
+        <Sidebar categories={categories} tags={tags} trendingPosts={allPosts} />
       </aside>
-
     </div>
   </main>
 </BaseLayout>

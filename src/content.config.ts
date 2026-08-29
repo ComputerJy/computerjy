@@ -1,6 +1,10 @@
 import { defineCollection } from 'astro:content';
 import { z } from 'astro/zod';
-import { wpPostsLoader, wpCategoriesLoader, wpTagsLoader } from './lib/wp-loader';
+import {
+  wpPostsLoader,
+  wpCategoriesLoader,
+  wpTagsLoader,
+} from './lib/wp-loader';
 
 const renderedSchema = z.object({ rendered: z.string() });
 
@@ -42,7 +46,13 @@ const termCollectionSchema = z.object({
   description: z.string(),
 });
 
-const categories = defineCollection({ loader: wpCategoriesLoader(), schema: termCollectionSchema });
-const tags = defineCollection({ loader: wpTagsLoader(), schema: termCollectionSchema });
+const categories = defineCollection({
+  loader: wpCategoriesLoader(),
+  schema: termCollectionSchema,
+});
+const tags = defineCollection({
+  loader: wpTagsLoader(),
+  schema: termCollectionSchema,
+});
 
 export const collections = { posts, categories, tags };

@@ -1,0 +1,10 @@
+dist
+.astro
+node_modules
+package-lock.json
+src/data
+public/data
+*.php
+.remember
+.superpowers
+.git

@@ -12,8 +12,8 @@ A modern, high-performance, tech-savvy, and energetic theme suite built for **[C
   - **Body**: `Inter` (weights: 400, 500, 600, 700)
   - **Monospace / Code**: `JetBrains Mono`
 - **Color Palette & Gradients**:
-  - **Primary Gradient**: `linear-gradient(135deg, #00D2FF 0%, #0080FF 45%, #7209B7 100%)` *(Electric Cyan &rarr; Royal Blue &rarr; Cyber Purple)*
-  - **Energy Accent Gradient**: `linear-gradient(135deg, #FF006E 0%, #FB5607 50%, #FFD166 100%)` *(Vibrant Coral &rarr; Tangerine &rarr; Golden Amber)*
+  - **Primary Gradient**: `linear-gradient(135deg, #00D2FF 0%, #0080FF 45%, #7209B7 100%)` _(Electric Cyan &rarr; Royal Blue &rarr; Cyber Purple)_
+  - **Energy Accent Gradient**: `linear-gradient(135deg, #FF006E 0%, #FB5607 50%, #FFD166 100%)` _(Vibrant Coral &rarr; Tangerine &rarr; Golden Amber)_
   - **Dark Base / Surface**: `#0B0F19` / `#111827` (Deep Midnight Slate)
   - **Light Base / Surface**: `#F8FAFC` / `#FFFFFF` (Crisp Clean Modern Slate)
 - **Visual Style**:
@@ -87,6 +87,7 @@ npm run preview
 ### Deployment
 
 The static output directory (`dist/`) is universal and deploys directly to:
+
 - **Cloudflare Pages** (Build command: `npm run build`, Output directory: `dist`)
 - **Vercel** (Framework preset: `Astro`, Output directory: `dist`)
 - **Netlify** (Build command: `npm run build`, Publish directory: `dist`)
@@ -106,7 +107,9 @@ The project also includes a complete classic WordPress PHP theme in the root dir
 - [`screenshot.png`](screenshot.png): WordPress theme preview screenshot
 
 ### To Install on WordPress:
+
 ```bash
 zip -r computerjy-theme.zip 404.php archive.php comments.php footer.php functions.php header.php index.php page.php search.php sidebar.php single.php style.css screenshot.png template-parts/ assets/
 ```
+
 Upload `computerjy-theme.zip` in **WordPress Admin &rarr; Appearance &rarr; Themes &rarr; Add New &rarr; Upload Theme**.

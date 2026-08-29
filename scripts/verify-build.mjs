@@ -53,7 +53,11 @@ export function percentEncodedSlugs(names) {
 export function comparePostSets(expected, actual, sidebarMax) {
   const missing = expected.filter((s) => !actual.has(s));
   const extra = [...actual].filter((s) => !expected.includes(s));
-  return { missing, extra, ok: missing.length === 0 && extra.length <= sidebarMax };
+  return {
+    missing,
+    extra,
+    ok: missing.length === 0 && extra.length <= sidebarMax,
+  };
 }
 
 /** Known slugs must still resolve. New slugs are reported, never a failure. */
@@ -85,7 +89,9 @@ function htmlFiles(dir, acc = []) {
 
 function postLinks(html) {
   return new Set(
-    [...html.matchAll(/href="\/posts\/([^"]+)"/g)].map((m) => m[1]).filter((s) => !s.includes('${'))
+    [...html.matchAll(/href="\/posts\/([^"]+)"/g)]
+      .map((m) => m[1])
+      .filter((s) => !s.includes('${'))
   );
 }
 
@@ -101,9 +107,14 @@ async function apiJson(path) {
       .filter(([, v]) => v)
       .map(([h, v]) => `${h}=${v}`)
       .join(', ');
-    throw new Error(`GET ${API_BASE}/${path} returned ${res.status}${edge ? ` [${edge}]` : ''}`);
+    throw new Error(
+      `GET ${API_BASE}/${path} returned ${res.status}${edge ? ` [${edge}]` : ''}`
+    );
   }
-  return { body: await res.json(), total: Number(res.headers.get('X-WP-Total') ?? '0') };
+  return {
+    body: await res.json(),
+    total: Number(res.headers.get('X-WP-Total') ?? '0'),
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -113,13 +124,17 @@ async function apiJson(path) {
 function layer1(files) {
   const checks = [
     ['Jetpack Photon URLs', /https?:\/\/i[0-9]\.wp\.com\//g],
-    ['double-encoded HTML entities', /&amp;(#\d+|#x[0-9a-fA-F]+|hellip|nbsp|amp|lt|gt|quot);/g],
+    [
+      'double-encoded HTML entities',
+      /&amp;(#\d+|#x[0-9a-fA-F]+|hellip|nbsp|amp|lt|gt|quot);/g,
+    ],
   ];
   for (const [label, pattern] of checks) {
     const offenders = [];
     for (const f of files) {
       const hits = findForbiddenMatches(readFileSync(f, 'utf8'), pattern);
-      if (hits.length) offenders.push(`${f} (${hits.length}x, e.g. ${hits[0]})`);
+      if (hits.length)
+        offenders.push(`${f} (${hits.length}x, e.g. ${hits[0]})`);
     }
     if (offenders.length) {
       fail(`${label}: found in ${offenders.length} file(s)`);
@@ -134,13 +149,16 @@ function layer1(files) {
     .map((d) => d.name);
   const encoded = percentEncodedSlugs(slugDirs);
   if (encoded.length) {
-    fail(`percent-encoded post slugs: ${encoded.length} (live URLs would change)`);
+    fail(
+      `percent-encoded post slugs: ${encoded.length} (live URLs would change)`
+    );
     encoded.slice(0, 5).forEach((s) => console.error(`   ${s}`));
   } else {
     pass(`no percent-encoded slugs across ${slugDirs.length} posts`);
   }
 
-  if (existsSync(join(DIST, 'data', 'posts.json'))) fail('dist/data/posts.json is being shipped again');
+  if (existsSync(join(DIST, 'data', 'posts.json')))
+    fail('dist/data/posts.json is being shipped again');
   else pass('bulk content dump not shipped');
 
   const rss = readFileSync(join(DIST, 'rss.xml'), 'utf8');
@@ -149,7 +167,8 @@ function layer1(files) {
   else pass(`rss.xml has ${itemCount} items`);
 
   const idx = JSON.parse(readFileSync(join(DIST, 'search-index.json'), 'utf8'));
-  if (!Array.isArray(idx) || idx.length === 0) fail('search-index.json is empty');
+  if (!Array.isArray(idx) || idx.length === 0)
+    fail('search-index.json is empty');
   else pass(`search-index.json has ${idx.length} entries`);
 
   return slugDirs;
@@ -162,44 +181,61 @@ function layer1(files) {
 async function layer2(slugDirs) {
   const { total: postTotal } = await apiJson('posts?per_page=1&_fields=id');
   if (slugDirs.length !== postTotal) {
-    fail(`built ${slugDirs.length} post pages but the API reports ${postTotal}`);
+    fail(
+      `built ${slugDirs.length} post pages but the API reports ${postTotal}`
+    );
   } else {
     pass(`post count matches the API (${postTotal})`);
   }
 
   const bySlug = new Map();
   for (let page = 1; ; page++) {
-    const { body } = await apiJson(`posts?per_page=100&page=${page}&_fields=slug,categories,tags`);
+    const { body } = await apiJson(
+      `posts?per_page=100&page=${page}&_fields=slug,categories,tags`
+    );
     if (!body.length) break;
     for (const p of body) bySlug.set(decodeURIComponent(p.slug), p);
     if (body.length < 100) break;
   }
 
   for (const taxonomy of ['categories', 'tags']) {
-    const { body: terms } = await apiJson(`${taxonomy}?per_page=100&_fields=id,slug,count`);
+    const { body: terms } = await apiJson(
+      `${taxonomy}?per_page=100&_fields=id,slug,count`
+    );
     const dir = taxonomy === 'categories' ? 'category' : 'tag';
     let bad = 0;
     for (const term of terms.filter((t) => t.count > 0)) {
       const file = join(DIST, dir, term.slug, 'index.html');
       if (!existsSync(file)) {
-        fail(`${dir}/${term.slug}: page missing (API reports ${term.count} posts)`);
+        fail(
+          `${dir}/${term.slug}: page missing (API reports ${term.count} posts)`
+        );
         bad++;
         continue;
       }
       const expected = [...bySlug.entries()]
         .filter(([, p]) => p[taxonomy].includes(term.id))
         .map(([slug]) => slug);
-      const r = comparePostSets(expected, postLinks(readFileSync(file, 'utf8')), SIDEBAR_MAX);
+      const r = comparePostSets(
+        expected,
+        postLinks(readFileSync(file, 'utf8')),
+        SIDEBAR_MAX
+      );
       if (!r.ok) {
         fail(
           `${dir}/${term.slug}: ${r.missing.length} of ${expected.length} expected posts missing` +
-            (r.extra.length > SIDEBAR_MAX ? `, ${r.extra.length} unexpected` : '')
+            (r.extra.length > SIDEBAR_MAX
+              ? `, ${r.extra.length} unexpected`
+              : '')
         );
         r.missing.slice(0, 3).forEach((s) => console.error(`   missing: ${s}`));
         bad++;
       }
     }
-    if (bad === 0) pass(`${taxonomy}: every page contains exactly the posts the API assigns`);
+    if (bad === 0)
+      pass(
+        `${taxonomy}: every page contains exactly the posts the API assigns`
+      );
   }
 }
 
@@ -210,7 +246,10 @@ async function layer2(slugDirs) {
 function layer3(slugDirs, update) {
   const built = new Set(slugDirs);
   if (update || !existsSync(SLUG_FIXTURE)) {
-    writeFileSync(SLUG_FIXTURE, JSON.stringify([...built].sort(), null, 2) + '\n');
+    writeFileSync(
+      SLUG_FIXTURE,
+      JSON.stringify([...built].sort(), null, 2) + '\n'
+    );
     pass(`slug fixture written with ${built.size} slugs`);
     return;
   }
@@ -219,9 +258,14 @@ function layer3(slugDirs, update) {
   if (!r.ok) {
     fail(`${r.missing.length} previously published slug(s) no longer build`);
     r.missing.slice(0, 5).forEach((s) => console.error(`   missing: ${s}`));
-    console.error('   If a post was deliberately removed: npm run verify:build -- --update');
+    console.error(
+      '   If a post was deliberately removed: npm run verify:build -- --update'
+    );
   } else {
-    pass(`all ${known.length} known slugs still build` + (r.added.length ? `, ${r.added.length} new` : ''));
+    pass(
+      `all ${known.length} known slugs still build` +
+        (r.added.length ? `, ${r.added.length} new` : '')
+    );
   }
 }
 
@@ -233,7 +277,11 @@ async function main() {
   const slugDirs = layer1(files);
   await layer2(slugDirs);
   layer3(slugDirs, update);
-  console.log(failures === 0 ? '\nBUILD VERIFIED' : `\nBUILD VERIFICATION FAILED (${failures})`);
+  console.log(
+    failures === 0
+      ? '\nBUILD VERIFIED'
+      : `\nBUILD VERIFICATION FAILED (${failures})`
+  );
   process.exit(failures === 0 ? 0 : 1);
 }
 

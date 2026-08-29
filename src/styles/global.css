@@ -1,27 +1,27 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
-  --color-brand-cyan: #00D2FF;
-  --color-brand-blue: #0080FF;
-  --color-brand-deep-blue: #1D4ED8;
-  --color-brand-indigo: #3A0CA3;
-  --color-brand-purple: #7209B7;
-  --color-brand-pink: #FF4D6D;
-  --color-brand-coral: #FF006E;
-  --color-brand-orange: #FB5607;
-  --color-brand-amber: #FF9F1C;
-  --color-brand-yellow: #FFD166;
-  --color-brand-green: #10B981;
+  --color-brand-cyan: #00d2ff;
+  --color-brand-blue: #0080ff;
+  --color-brand-deep-blue: #1d4ed8;
+  --color-brand-indigo: #3a0ca3;
+  --color-brand-purple: #7209b7;
+  --color-brand-pink: #ff4d6d;
+  --color-brand-coral: #ff006e;
+  --color-brand-orange: #fb5607;
+  --color-brand-amber: #ff9f1c;
+  --color-brand-yellow: #ffd166;
+  --color-brand-green: #10b981;
 
-  --color-dark-base: #0B0F19;
+  --color-dark-base: #0b0f19;
   --color-dark-surface: #111827;
-  --color-dark-elevated: #1F2937;
+  --color-dark-elevated: #1f2937;
   --color-dark-subtle: #182234;
 
-  --color-light-base: #F8FAFC;
-  --color-light-surface: #FFFFFF;
-  --color-light-elevated: #FFFFFF;
-  --color-light-subtle: #F1F5F9;
+  --color-light-base: #f8fafc;
+  --color-light-surface: #ffffff;
+  --color-light-elevated: #ffffff;
+  --color-light-subtle: #f1f5f9;
 
   --font-heading: 'Plus Jakarta Sans', system-ui, sans-serif;
   --font-body: 'Inter', system-ui, sans-serif;
@@ -30,65 +30,87 @@
 
 /* Default Theme: Cyber Dark Midnight Theme (as in brand identity & screenshot) */
 :root {
-  --brand-cyan: #00D2FF;
-  --brand-blue: #0080FF;
-  --brand-deep-blue: #1D4ED8;
-  --brand-indigo: #3A0CA3;
-  --brand-purple: #7209B7;
-  --brand-pink: #FF4D6D;
-  --brand-coral: #FF006E;
-  --brand-orange: #FB5607;
-  --brand-amber: #FF9F1C;
-  --brand-yellow: #FFD166;
-  --brand-green: #10B981;
+  --brand-cyan: #00d2ff;
+  --brand-blue: #0080ff;
+  --brand-deep-blue: #1d4ed8;
+  --brand-indigo: #3a0ca3;
+  --brand-purple: #7209b7;
+  --brand-pink: #ff4d6d;
+  --brand-coral: #ff006e;
+  --brand-orange: #fb5607;
+  --brand-amber: #ff9f1c;
+  --brand-yellow: #ffd166;
+  --brand-green: #10b981;
 
-  --bg-base: #0B0F19;
+  --bg-base: #0b0f19;
   --bg-surface: #111827;
-  --bg-elevated: #1F2937;
+  --bg-elevated: #1f2937;
   --bg-subtle: #182234;
   --bg-glass: rgba(17, 24, 39, 0.85);
 
-  --text-primary: #F8FAFC;
-  --text-secondary: #E2E8F0;
-  --text-muted: #94A3B8;
-  --text-subtle: #64748B;
+  --text-primary: #f8fafc;
+  --text-secondary: #e2e8f0;
+  --text-muted: #94a3b8;
+  --text-subtle: #64748b;
 
   --border-color: rgba(255, 255, 255, 0.08);
   --border-hover: rgba(0, 210, 255, 0.4);
 
-  --grad-primary: linear-gradient(135deg, #00D2FF 0%, #0080FF 45%, #7209B7 100%);
-  --grad-accent: linear-gradient(135deg, #FF006E 0%, #FB5607 50%, #FFD166 100%);
-  --grad-badge: linear-gradient(135deg, rgba(0, 210, 255, 0.2) 0%, rgba(114, 9, 183, 0.25) 100%);
+  --grad-primary: linear-gradient(
+    135deg,
+    #00d2ff 0%,
+    #0080ff 45%,
+    #7209b7 100%
+  );
+  --grad-accent: linear-gradient(135deg, #ff006e 0%, #fb5607 50%, #ffd166 100%);
+  --grad-badge: linear-gradient(
+    135deg,
+    rgba(0, 210, 255, 0.2) 0%,
+    rgba(114, 9, 183, 0.25) 100%
+  );
 }
 
 /* Explicit Light Mode Override */
-[data-theme="light"], html.light {
-  --bg-base: #F8FAFC;
-  --bg-surface: #FFFFFF;
-  --bg-elevated: #FFFFFF;
-  --bg-subtle: #F1F5F9;
+[data-theme='light'],
+html.light {
+  --bg-base: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-elevated: #ffffff;
+  --bg-subtle: #f1f5f9;
   --bg-glass: rgba(255, 255, 255, 0.85);
 
-  --text-primary: #0F172A;
+  --text-primary: #0f172a;
   --text-secondary: #334155;
-  --text-muted: #64748B;
-  --text-subtle: #94A3B8;
+  --text-muted: #64748b;
+  --text-subtle: #94a3b8;
 
   --border-color: rgba(15, 23, 42, 0.08);
   --border-hover: rgba(0, 128, 255, 0.35);
 
-  --grad-badge: linear-gradient(135deg, rgba(0, 210, 255, 0.15) 0%, rgba(114, 9, 183, 0.15) 100%);
+  --grad-badge: linear-gradient(
+    135deg,
+    rgba(0, 210, 255, 0.15) 0%,
+    rgba(114, 9, 183, 0.15) 100%
+  );
 }
 
 html {
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
   background-color: var(--bg-base);
   color: var(--text-primary);
   scroll-behavior: smooth;
   color-scheme: dark;
 }
 
-[data-theme="light"], html.light {
+[data-theme='light'],
+html.light {
   color-scheme: light;
 }
 
@@ -97,17 +119,42 @@ body {
   display: flex;
   flex-direction: column;
   background-color: var(--bg-base);
-  background-image: 
-    radial-gradient(circle at 10% 20%, rgba(0, 210, 255, 0.04) 0%, transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(255, 0, 110, 0.03) 0%, transparent 40%),
+  background-image:
+    radial-gradient(
+      circle at 10% 20%,
+      rgba(0, 210, 255, 0.04) 0%,
+      transparent 40%
+    ),
+    radial-gradient(
+      circle at 90% 80%,
+      rgba(255, 0, 110, 0.03) 0%,
+      transparent 40%
+    ),
     url('/circuit-pattern.svg');
   background-repeat: no-repeat, no-repeat, repeat;
-  background-size: auto, auto, 240px 240px;
-  transition: background-color 0.28s ease, color 0.28s ease;
+  background-size:
+    auto,
+    auto,
+    240px 240px;
+  transition:
+    background-color 0.28s ease,
+    color 0.28s ease;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family:
+    'Plus Jakarta Sans',
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
   font-weight: 800;
   letter-spacing: -0.025em;
 }
@@ -140,7 +187,7 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--brand-cyan);
 }
 
-[data-theme="light"] .badge-glow {
+[data-theme='light'] .badge-glow {
   color: var(--brand-blue);
 }
 
@@ -217,8 +264,8 @@ h1, h2, h3, h4, h5, h6 {
 .prose-custom pre {
   margin: 1.75rem 0;
   padding: 1.25rem;
-  background: #0B0F19;
-  color: #F8FAFC;
+  background: #0b0f19;
+  color: #f8fafc;
   border-radius: 16px;
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.92rem;

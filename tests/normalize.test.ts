@@ -4,18 +4,24 @@ import { sanitizeSlug } from '../src/lib/normalize';
 describe('sanitizeSlug', () => {
   it('decodes percent-encoded Arabic slugs to match existing URLs', () => {
     expect(
-      sanitizeSlug('%d8%a7%d8%a8%d9%84%d9%8a%d8%b3-%d9%88%d8%a7%d9%84%d8%b9%d8%b1%d8%a8')
+      sanitizeSlug(
+        '%d8%a7%d8%a8%d9%84%d9%8a%d8%b3-%d9%88%d8%a7%d9%84%d8%b9%d8%b1%d8%a8'
+      )
     ).toBe('ابليس-والعرب');
   });
 
   it('keeps the Arabic question mark but strips the ASCII one', () => {
     // %d8%9f is U+061F ARABIC QUESTION MARK - it must survive
-    expect(sanitizeSlug('%d9%85%d9%8a%d9%86-%d9%85%d8%b3%d9%84%d9%85%d8%9f')).toBe('مين-مسلم؟');
+    expect(
+      sanitizeSlug('%d9%85%d9%8a%d9%86-%d9%85%d8%b3%d9%84%d9%85%d8%9f')
+    ).toBe('مين-مسلم؟');
     expect(sanitizeSlug('what-is-this?')).toBe('what-is-this');
   });
 
   it('leaves plain ASCII slugs untouched', () => {
-    expect(sanitizeSlug('101-greatest-george-carlin-quotes')).toBe('101-greatest-george-carlin-quotes');
+    expect(sanitizeSlug('101-greatest-george-carlin-quotes')).toBe(
+      '101-greatest-george-carlin-quotes'
+    );
   });
 
   it('strips the characters parse_wp_export.py stripped', () => {
@@ -36,30 +42,44 @@ import { resolveFeaturedImage, PLACEHOLDER_IMAGE } from '../src/lib/normalize';
 describe('resolveFeaturedImage', () => {
   it('prefers the real WordPress featured media URL', () => {
     expect(
-      resolveFeaturedImage('https://x.com/real.jpg', '<img src="https://x.com/inline.jpg">')
+      resolveFeaturedImage(
+        'https://x.com/real.jpg',
+        '<img src="https://x.com/inline.jpg">'
+      )
     ).toBe('https://x.com/real.jpg');
   });
 
   it('falls back to the first inline img when there is no featured media', () => {
     expect(
-      resolveFeaturedImage(undefined, '<p>hi</p><img src="https://x.com/inline.jpg"><img src="https://x.com/second.jpg">')
+      resolveFeaturedImage(
+        undefined,
+        '<p>hi</p><img src="https://x.com/inline.jpg"><img src="https://x.com/second.jpg">'
+      )
     ).toBe('https://x.com/inline.jpg');
   });
 
   it('accepts single-quoted src attributes', () => {
-    expect(resolveFeaturedImage(undefined, "<img src='https://x.com/q.jpg'>")).toBe('https://x.com/q.jpg');
+    expect(
+      resolveFeaturedImage(undefined, "<img src='https://x.com/q.jpg'>")
+    ).toBe('https://x.com/q.jpg');
   });
 
   it('ignores non-http srcs such as data URIs', () => {
-    expect(resolveFeaturedImage(undefined, '<img src="data:image/png;base64,AAAA">')).toBe(PLACEHOLDER_IMAGE);
+    expect(
+      resolveFeaturedImage(undefined, '<img src="data:image/png;base64,AAAA">')
+    ).toBe(PLACEHOLDER_IMAGE);
   });
 
   it('falls back to the Unsplash placeholder when there is no image at all', () => {
-    expect(resolveFeaturedImage(undefined, '<p>no images here</p>')).toBe(PLACEHOLDER_IMAGE);
+    expect(resolveFeaturedImage(undefined, '<p>no images here</p>')).toBe(
+      PLACEHOLDER_IMAGE
+    );
   });
 
   it('ignores uppercase IMG tags, matching the case-sensitive Python regex', () => {
-    expect(resolveFeaturedImage(undefined, '<IMG SRC="https://x.com/upper.jpg">')).toBe(PLACEHOLDER_IMAGE);
+    expect(
+      resolveFeaturedImage(undefined, '<IMG SRC="https://x.com/upper.jpg">')
+    ).toBe(PLACEHOLDER_IMAGE);
   });
 });
 
@@ -89,9 +109,15 @@ describe('stripTagsForCounting', () => {
 
 describe('calculateReadingTime', () => {
   it('rounds up to whole minutes at 200 wpm', () => {
-    expect(calculateReadingTime('<p>' + 'word '.repeat(200) + '</p>')).toBe('1 min read');
-    expect(calculateReadingTime('<p>' + 'word '.repeat(201) + '</p>')).toBe('2 min read');
-    expect(calculateReadingTime('<p>' + 'word '.repeat(400) + '</p>')).toBe('2 min read');
+    expect(calculateReadingTime('<p>' + 'word '.repeat(200) + '</p>')).toBe(
+      '1 min read'
+    );
+    expect(calculateReadingTime('<p>' + 'word '.repeat(201) + '</p>')).toBe(
+      '2 min read'
+    );
+    expect(calculateReadingTime('<p>' + 'word '.repeat(400) + '</p>')).toBe(
+      '2 min read'
+    );
   });
 
   it('never returns less than one minute', () => {
@@ -102,7 +128,9 @@ describe('calculateReadingTime', () => {
 
 describe('resolveExcerpt', () => {
   it('uses the rendered excerpt when present', () => {
-    expect(resolveExcerpt('<p>Real excerpt</p>', '<p>body</p>')).toBe('<p>Real excerpt</p>');
+    expect(resolveExcerpt('<p>Real excerpt</p>', '<p>body</p>')).toBe(
+      '<p>Real excerpt</p>'
+    );
   });
 
   it('falls back to 180 chars of stripped content plus ellipsis', () => {
@@ -118,15 +146,22 @@ describe('resolveExcerpt', () => {
 
 describe('https upgrades', () => {
   it('upgrades src and href in content, both quote styles', () => {
-    expect(upgradeContentToHttps('<img src="http://a/b.jpg"><a href=\'http://c\'>x</a>'))
-      .toBe('<img src="https://a/b.jpg"><a href=\'https://c\'>x</a>');
+    expect(
+      upgradeContentToHttps(
+        '<img src="http://a/b.jpg"><a href=\'http://c\'>x</a>'
+      )
+    ).toBe('<img src="https://a/b.jpg"><a href=\'https://c\'>x</a>');
   });
 
   it('leaves https and protocol-relative URLs alone', () => {
-    expect(upgradeContentToHttps('<img src="https://a/b.jpg">')).toBe('<img src="https://a/b.jpg">');
+    expect(upgradeContentToHttps('<img src="https://a/b.jpg">')).toBe(
+      '<img src="https://a/b.jpg">'
+    );
     // upgradeContentToHttps only matches the literal string "http://", so a
     // genuinely protocol-relative URL ("//host/...") must pass through unchanged.
-    expect(upgradeContentToHttps('<img src="//a/b.jpg">')).toBe('<img src="//a/b.jpg">');
+    expect(upgradeContentToHttps('<img src="//a/b.jpg">')).toBe(
+      '<img src="//a/b.jpg">'
+    );
   });
 
   it('upgrades a bare URL', () => {
@@ -139,25 +174,33 @@ import { decodeEntities } from '../src/lib/normalize';
 
 describe('decodeEntities', () => {
   it('decodes a numeric decimal entity', () => {
-    expect(decodeEntities('Nuggets of Wisdom&#8217;s')).toBe('Nuggets of Wisdom’s');
+    expect(decodeEntities('Nuggets of Wisdom&#8217;s')).toBe(
+      'Nuggets of Wisdom’s'
+    );
   });
 
   it('decodes a numeric hex entity', () => {
-    expect(decodeEntities('Nuggets of Wisdom&#x2019;s')).toBe('Nuggets of Wisdom’s');
+    expect(decodeEntities('Nuggets of Wisdom&#x2019;s')).toBe(
+      'Nuggets of Wisdom’s'
+    );
   });
 
   it('fully resolves a double-encoded ampersand, &amp;#038;', () => {
-    expect(decodeEntities('GED Examination Q&amp;#038;A')).toBe('GED Examination Q&A');
+    expect(decodeEntities('GED Examination Q&amp;#038;A')).toBe(
+      'GED Examination Q&A'
+    );
   });
 
   it('decodes &hellip;', () => {
-    expect(decodeEntities('Nuggets of Wisdom&hellip;')).toBe('Nuggets of Wisdom…');
+    expect(decodeEntities('Nuggets of Wisdom&hellip;')).toBe(
+      'Nuggets of Wisdom…'
+    );
   });
 
   it('decodes curly quote entities &#8220; and &#8221;', () => {
-    expect(decodeEntities('Celebrating the &#8220;Stupid question day&#8221;')).toBe(
-      'Celebrating the “Stupid question day”'
-    );
+    expect(
+      decodeEntities('Celebrating the &#8220;Stupid question day&#8221;')
+    ).toBe('Celebrating the “Stupid question day”');
   });
 
   it('decodes &amp;lt; to the literal string "&lt;", not "<" - amp must not be decoded before lt', () => {
@@ -168,7 +211,9 @@ describe('decodeEntities', () => {
   });
 
   it('leaves a string with no entities unchanged', () => {
-    expect(decodeEntities('plain text, no entities here')).toBe('plain text, no entities here');
+    expect(decodeEntities('plain text, no entities here')).toBe(
+      'plain text, no entities here'
+    );
   });
 });
 
@@ -184,13 +229,17 @@ describe('unwrapPhotonUrl', () => {
   });
 
   it('unwraps an external-host Photon URL', () => {
-    expect(unwrapPhotonUrl('https://i0.wp.com/1.bp.blogspot.com/x/y.jpeg?w=840'))
-      .toBe('https://1.bp.blogspot.com/x/y.jpeg');
+    expect(
+      unwrapPhotonUrl('https://i0.wp.com/1.bp.blogspot.com/x/y.jpeg?w=840')
+    ).toBe('https://1.bp.blogspot.com/x/y.jpeg');
   });
 
   it('leaves a non-Photon URL untouched', () => {
-    expect(unwrapPhotonUrl('https://www.computerjy.com/wp-content/uploads/2013/09/MacPC.jpg'))
-      .toBe('https://www.computerjy.com/wp-content/uploads/2013/09/MacPC.jpg');
+    expect(
+      unwrapPhotonUrl(
+        'https://www.computerjy.com/wp-content/uploads/2013/09/MacPC.jpg'
+      )
+    ).toBe('https://www.computerjy.com/wp-content/uploads/2013/09/MacPC.jpg');
   });
 });
 
@@ -204,7 +253,8 @@ describe('unwrapPhotonInContent', () => {
   });
 
   it('leaves content with no Photon URLs unchanged', () => {
-    const html = '<img src="https://www.computerjy.com/wp-content/uploads/2013/09/MacPC.jpg">';
+    const html =
+      '<img src="https://www.computerjy.com/wp-content/uploads/2013/09/MacPC.jpg">';
     expect(unwrapPhotonInContent(html)).toBe(html);
   });
 });
@@ -232,7 +282,9 @@ const terms = new Map([
 
 describe('normalizePost', () => {
   it('uses the decoded slug so existing URLs are preserved', () => {
-    expect(normalizePost(raw, new Map(), terms, new Map()).slug).toBe('ابليس-والعرب');
+    expect(normalizePost(raw, new Map(), terms, new Map()).slug).toBe(
+      'ابليس-والعرب'
+    );
   });
 
   it('maps category and tag ids to slug strings', () => {
@@ -242,7 +294,12 @@ describe('normalizePost', () => {
   });
 
   it('drops a term id that is absent from termsById instead of producing undefined', () => {
-    const p = normalizePost({ ...raw, categories: [7, 999], tags: [999] }, new Map(), terms, new Map());
+    const p = normalizePost(
+      { ...raw, categories: [7, 999], tags: [999] },
+      new Map(),
+      terms,
+      new Map()
+    );
     expect(p.categories).toEqual(['g33ky']);
     expect(p.categories).not.toContain(undefined);
     expect(p.tags).toEqual([]);
@@ -250,41 +307,75 @@ describe('normalizePost', () => {
   });
 
   it('uses the first category as primaryCategory', () => {
-    expect(normalizePost(raw, new Map(), terms, new Map()).primaryCategory)
-      .toEqual({ name: 'Geeky', slug: 'g33ky' });
+    expect(
+      normalizePost(raw, new Map(), terms, new Map()).primaryCategory
+    ).toEqual({ name: 'Geeky', slug: 'g33ky' });
   });
 
   it('falls back to the Tech default when a post has no categories', () => {
-    const p = normalizePost({ ...raw, categories: [] }, new Map(), terms, new Map());
+    const p = normalizePost(
+      { ...raw, categories: [] },
+      new Map(),
+      terms,
+      new Map()
+    );
     expect(p.primaryCategory).toEqual(DEFAULT_CATEGORY);
     expect(DEFAULT_CATEGORY).toEqual({ name: 'Tech', slug: 'tech' });
   });
 
   it('resolves featured media by id when present', () => {
     const media = new Map([[5, 'https://x.com/feat.jpg']]);
-    const p = normalizePost({ ...raw, featured_media: 5 }, media, terms, new Map());
+    const p = normalizePost(
+      { ...raw, featured_media: 5 },
+      media,
+      terms,
+      new Map()
+    );
     expect(p.featuredImageUrl).toBe('https://x.com/feat.jpg');
   });
 
   it('computes reading time from the content', () => {
-    expect(normalizePost(raw, new Map(), terms, new Map()).readingTime).toBe('2 min read');
+    expect(normalizePost(raw, new Map(), terms, new Map()).readingTime).toBe(
+      '2 min read'
+    );
   });
 
   it('attaches comments for its own post id only', () => {
-    const c: NormalizedComment = { id: 1, post_id: 42, author: 'A', date: 'd', content: 'c', parent: 0 };
-    const other: NormalizedComment = { id: 2, post_id: 99, author: 'B', date: 'd', content: 'c', parent: 0 };
-    const byPost = new Map([[42, [c]], [99, [other]]]);
+    const c: NormalizedComment = {
+      id: 1,
+      post_id: 42,
+      author: 'A',
+      date: 'd',
+      content: 'c',
+      parent: 0,
+    };
+    const other: NormalizedComment = {
+      id: 2,
+      post_id: 99,
+      author: 'B',
+      date: 'd',
+      content: 'c',
+      parent: 0,
+    };
+    const byPost = new Map([
+      [42, [c]],
+      [99, [other]],
+    ]);
     expect(normalizePost(raw, new Map(), terms, byPost).comments).toEqual([c]);
   });
 
   it('defaults to an empty comments array', () => {
-    expect(normalizePost(raw, new Map(), terms, new Map()).comments).toEqual([]);
+    expect(normalizePost(raw, new Map(), terms, new Map()).comments).toEqual(
+      []
+    );
   });
 
   it('upgrades http URLs inside content', () => {
     const p = normalizePost(
       { ...raw, content: { rendered: '<img src="http://a/b.jpg">' } },
-      new Map(), terms, new Map()
+      new Map(),
+      terms,
+      new Map()
     );
     expect(p.content.rendered).toBe('<img src="https://a/b.jpg">');
   });
@@ -297,7 +388,9 @@ describe('normalizePost', () => {
         excerpt: { rendered: '<p>Nuggets of Wisdom&#8230;</p>' },
         content: { rendered: '<p>&amp;#038; stays encoded here</p>' },
       },
-      new Map(), terms, new Map()
+      new Map(),
+      terms,
+      new Map()
     );
     expect(p.title.rendered).toBe('GED Examination Q&A');
     expect(p.excerpt.rendered).toBe('<p>Nuggets of Wisdom…</p>');
@@ -306,7 +399,12 @@ describe('normalizePost', () => {
 
   it('decodes HTML entities in comment content', () => {
     const c: NormalizedComment = {
-      id: 1, post_id: 42, author: 'A', date: 'd', content: 'Q&amp;#038;A', parent: 0,
+      id: 1,
+      post_id: 42,
+      author: 'A',
+      date: 'd',
+      content: 'Q&amp;#038;A',
+      parent: 0,
     };
     const p = normalizePost(raw, new Map(), terms, new Map([[42, [c]]]));
     expect(p.comments[0].content).toBe('Q&A');

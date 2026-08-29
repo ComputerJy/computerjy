@@ -11,7 +11,9 @@
 
   function initTheme() {
     const savedTheme = localStorage.getItem(THEME_KEY);
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const prefersDark = window.matchMedia(
+      '(prefers-color-scheme: dark)'
+    ).matches;
     const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
 
     document.documentElement.setAttribute('data-theme', initialTheme);
@@ -19,7 +21,8 @@
   }
 
   function toggleTheme() {
-    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    const currentTheme =
+      document.documentElement.getAttribute('data-theme') || 'light';
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
 
     document.documentElement.setAttribute('data-theme', newTheme);
@@ -46,25 +49,31 @@
     const progressBar = document.querySelector('.reading-progress-bar');
     const header = document.querySelector('.site-header');
 
-    window.addEventListener('scroll', function () {
-      const scrollY = window.scrollY || window.pageYOffset;
+    window.addEventListener(
+      'scroll',
+      function () {
+        const scrollY = window.scrollY || window.pageYOffset;
 
-      if (header) {
-        if (scrollY > 20) {
-          header.classList.add('scrolled');
-        } else {
-          header.classList.remove('scrolled');
+        if (header) {
+          if (scrollY > 20) {
+            header.classList.add('scrolled');
+          } else {
+            header.classList.remove('scrolled');
+          }
         }
-      }
 
-      if (progressBar) {
-        const totalHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        if (totalHeight > 0) {
-          const progress = (scrollY / totalHeight) * 100;
-          progressBar.style.width = `${Math.min(100, Math.max(0, progress))}%`;
+        if (progressBar) {
+          const totalHeight =
+            document.documentElement.scrollHeight -
+            document.documentElement.clientHeight;
+          if (totalHeight > 0) {
+            const progress = (scrollY / totalHeight) * 100;
+            progressBar.style.width = `${Math.min(100, Math.max(0, progress))}%`;
+          }
         }
-      }
-    }, { passive: true });
+      },
+      { passive: true }
+    );
   }
 
   // 3. Mobile Navigation Drawer
@@ -103,7 +112,9 @@
 
   // 4. Search Modal Overlay
   function initSearchModal() {
-    const triggerBtns = document.querySelectorAll('.search-trigger-btn, .search-toggle-link');
+    const triggerBtns = document.querySelectorAll(
+      '.search-trigger-btn, .search-toggle-link'
+    );
     const modal = document.querySelector('.search-modal-backdrop');
     const closeBtn = document.querySelector('.search-close-btn');
     const searchInput = document.querySelector('.search-modal-input');
@@ -123,10 +134,12 @@
       document.body.style.overflow = '';
     }
 
-    triggerBtns.forEach(btn => btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      openSearch();
-    }));
+    triggerBtns.forEach((btn) =>
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        openSearch();
+      })
+    );
 
     if (closeBtn) closeBtn.addEventListener('click', closeSearch);
 
@@ -178,17 +191,22 @@
       `;
 
       copyBtn.addEventListener('click', function () {
-        const code = pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText;
-        navigator.clipboard.writeText(code).then(() => {
-          copyBtn.textContent = 'Copied! ✓';
-          copyBtn.style.background = '#10B981';
-          setTimeout(() => {
-            copyBtn.textContent = 'Copy';
-            copyBtn.style.background = 'rgba(255, 255, 255, 0.15)';
-          }, 2000);
-        }).catch(() => {
-          copyBtn.textContent = 'Error';
-        });
+        const code = pre.querySelector('code')
+          ? pre.querySelector('code').innerText
+          : pre.innerText;
+        navigator.clipboard
+          .writeText(code)
+          .then(() => {
+            copyBtn.textContent = 'Copied! ✓';
+            copyBtn.style.background = '#10B981';
+            setTimeout(() => {
+              copyBtn.textContent = 'Copy';
+              copyBtn.style.background = 'rgba(255, 255, 255, 0.15)';
+            }, 2000);
+          })
+          .catch(() => {
+            copyBtn.textContent = 'Error';
+          });
       });
 
       pre.appendChild(copyBtn);
@@ -252,11 +270,13 @@
   });
 
   // Watch system color scheme changes if user has no saved preference
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-    if (!localStorage.getItem(THEME_KEY)) {
-      const newTheme = e.matches ? 'dark' : 'light';
-      document.documentElement.setAttribute('data-theme', newTheme);
-      updateThemeIcon(newTheme);
-    }
-  });
+  window
+    .matchMedia('(prefers-color-scheme: dark)')
+    .addEventListener('change', (e) => {
+      if (!localStorage.getItem(THEME_KEY)) {
+        const newTheme = e.matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        updateThemeIcon(newTheme);
+      }
+    });
 })();

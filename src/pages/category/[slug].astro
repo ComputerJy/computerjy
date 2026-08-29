@@ -26,49 +26,54 @@ const tags = await getTags();
 // so the old primaryCategory comparison and the always-false id check both go.
 const categoryPosts = posts.filter((p) => p.categories.includes(category.slug));
 if (categoryPosts.length === 0) {
-  throw new Error(`Category "${category.slug}" produced zero posts - the filter is broken.`);
+  throw new Error(
+    `Category "${category.slug}" produced zero posts - the filter is broken.`
+  );
 }
 const displayPosts = categoryPosts;
 ---
 
-<BaseLayout 
-  title={`${category.name} — ComputerJy World`} 
-  description={category.description || `Browse articles, tutorials, and tech insights filed under ${category.name} on ComputerJy World.`}
-  breadcrumbs={[
-    { name: 'Home', url: '/' },
-    { name: category.name }
-  ]}
+<BaseLayout
+  title={`${category.name} — ComputerJy World`}
+  description={category.description ||
+    `Browse articles, tutorials, and tech insights filed under ${category.name} on ComputerJy World.`}
+  breadcrumbs={[{ name: 'Home', url: '/' }, { name: category.name }]}
 >
   <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-    
     <!-- Archive Header Banner -->
-    <header class="bg-white dark:bg-dark-surface border border-slate-200/80 dark:border-slate-800 rounded-3xl p-8 sm:p-10 mb-10 shadow-xs relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:bottom-0 before:w-1.5 before:bg-grad-primary">
-      <div class="text-xs uppercase tracking-wider font-extrabold text-brand-blue mb-1">Category Archive</div>
-      <h1 class="text-3xl sm:text-4xl font-heading font-black text-slate-900 dark:text-white mb-2">
+    <header
+      class="bg-white dark:bg-dark-surface border border-slate-200/80 dark:border-slate-800 rounded-3xl p-8 sm:p-10 mb-10 shadow-xs relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:bottom-0 before:w-1.5 before:bg-grad-primary"
+    >
+      <div
+        class="text-xs uppercase tracking-wider font-extrabold text-brand-blue mb-1"
+      >
+        Category Archive
+      </div>
+      <h1
+        class="text-3xl sm:text-4xl font-heading font-black text-slate-900 dark:text-white mb-2"
+      >
         {category.name}
       </h1>
-      <p class="text-sm sm:text-base text-slate-500 dark:text-slate-400 max-w-xl">
-        {category.description || `Browsing all articles and insights filed under ${category.name}.`}
+      <p
+        class="text-sm sm:text-base text-slate-500 dark:text-slate-400 max-w-xl"
+      >
+        {
+          category.description ||
+            `Browsing all articles and insights filed under ${category.name}.`
+        }
       </p>
     </header>
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
       <div class="lg:col-span-8">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
-          {displayPosts.map((post) => (
-            <PostCard post={post} />
-          ))}
+          {displayPosts.map((post) => <PostCard post={post} />)}
         </div>
       </div>
 
       <aside class="lg:col-span-4">
-        <Sidebar 
-          categories={categories} 
-          tags={tags} 
-          trendingPosts={posts} 
-        />
+        <Sidebar categories={categories} tags={tags} trendingPosts={posts} />
       </aside>
     </div>
-
   </main>
 </BaseLayout>

@@ -15,17 +15,20 @@ This service is designed for autonomous AI agents, crawlers, and developer integ
 ## Supported Authentication Methods
 
 ### 1. Anonymous Agent Token
+
 - **Identity Type**: anonymous
 - **Credential Type**: bearer_token
 - **Claim URL**: https://www.computerjy.com/oauth/claim
 
 ### 2. Identity Assertion (ID-JAG / Verified Email)
+
 - **Identity Type**: identity_assertion
 - **Assertion Types**: verified_email, urn:ietf:params:oauth:token-type:id-jag
 - **Credential Type**: bearer_token
 - **Revocation URL**: https://www.computerjy.com/oauth/revoke
 
 ### 3. OpenID Connect / OAuth 2.0 Discovery
+
 - **Issuer**: https://www.computerjy.com
 - **Discovery**: https://www.computerjy.com/.well-known/openid-configuration
 - **OAuth Authorization Server**: https://www.computerjy.com/.well-known/oauth-authorization-server
@@ -34,5 +37,6 @@ This service is designed for autonomous AI agents, crawlers, and developer integ
 - **Token Endpoint**: https://www.computerjy.com/oauth/token
 
 ### 4. WordPress Application Passwords
+
 - **Header**: Authorization: Basic <base64(username:application_password)>
 - **Scope**: WordPress REST API (https://www.computerjy.com/wp-json/wp/v2/)

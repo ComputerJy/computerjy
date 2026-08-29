@@ -29,7 +29,7 @@ export default {
           surface: '#FFFFFF',
           elevated: '#FFFFFF',
           subtle: '#F1F5F9',
-        }
+        },
       },
       fontFamily: {
         heading: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
@@ -42,12 +42,14 @@ export default {
         'glow-purple': '0 8px 28px -4px rgba(114, 9, 183, 0.25)',
       },
       backgroundImage: {
-        'grad-primary': 'linear-gradient(135deg, #00D2FF 0%, #0080FF 45%, #7209B7 100%)',
-        'grad-accent': 'linear-gradient(135deg, #FF006E 0%, #FB5607 50%, #FFD166 100%)',
+        'grad-primary':
+          'linear-gradient(135deg, #00D2FF 0%, #0080FF 45%, #7209B7 100%)',
+        'grad-accent':
+          'linear-gradient(135deg, #FF006E 0%, #FB5607 50%, #FFD166 100%)',
         'grad-cyan-blue': 'linear-gradient(135deg, #00D2FF 0%, #0066FF 100%)',
         'grad-purple-pink': 'linear-gradient(135deg, #7209B7 0%, #FF006E 100%)',
         'grad-sunset': 'linear-gradient(135deg, #FB5607 0%, #FFD166 100%)',
-      }
+      },
     },
   },
   plugins: [],
