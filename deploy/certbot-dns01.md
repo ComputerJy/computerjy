@@ -26,8 +26,27 @@ owned by root). The token is scoped as narrowly as Cloudflare allows:
 |---|---|
 | Permission | `Zone` → `DNS` → `Edit` |
 | Zone resources | Include → Specific zone → `computerjy.com` |
-| Client IP filtering | the origin's public IP only |
+| Client IP filtering | the origin's public IPv4 **and** IPv6 addresses |
 | TTL | none (long-lived) |
+
+### Both address families are required
+
+The origin has IPv6 connectivity and `getaddrinfo` prefers it, so requests to the
+Cloudflare API leave over IPv6. A token pinned to the IPv4 address alone is rejected
+with `code 9109 — Cannot use the access token from location: <IPv6>`, which reads like
+a bad token but is purely the location check.
+
+Confirm both addresses as the API actually sees them before editing the filter:
+
+```bash
+curl -4 -s https://api.cloudflare.com/cdn-cgi/trace | sed -n 's/^ip=//p'
+curl -6 -s https://api.cloudflare.com/cdn-cgi/trace | sed -n 's/^ip=//p'
+```
+
+The IPv6 address is DHCPv6-assigned to the instance's ENI (`use_tempaddr=0`, so it is
+not a rotating privacy address); its short lease lifetime is AWS's renewal cadence, not
+address rotation. If AWS ever does reassign it, renewal starts failing — the expiry
+monitor is what turns that into an alert instead of an outage.
 
 **This token is the main cost of DNS-01.** It can edit DNS for the zone, so a
 compromise of the origin becomes a compromise of the domain. The zone scope and the
@@ -49,6 +68,42 @@ is rejected by Cloudflare's **Full (Strict)** SSL mode with a 526.
 `--cert-name computerjy.com` is pinned so the lineage keeps its existing paths under
 `/etc/letsencrypt/live/computerjy.com/`, which the vhost references directly. Reissuing
 without it would create a new `-0001` lineage and leave the vhost on the old files.
+
+## Two settings that are load-bearing
+
+Both are recorded in `/etc/letsencrypt/renewal/computerjy.com.conf`. Neither is a
+default, and losing either breaks renewal in a way that still looks healthy.
+
+### `dns_cloudflare_propagation_seconds = 90`
+
+Certbot's default wait is 10 seconds. Measured against Cloudflare's authoritative
+nameservers during the migration, the two challenge records do not appear together:
+
+| record | visible at |
+|---|---|
+| `_acme-challenge.computerjy.com` | ~10s |
+| `_acme-challenge.www.computerjy.com` | ~35s |
+
+At the default, validation is requested while the `www` record still does not exist,
+and renewal fails with `No TXT record found at _acme-challenge.www.computerjy.com`.
+The apex passes, so the failure looks like a problem specific to `www` rather than a
+timing problem. 90s leaves roughly 2.5x margin over the observed worst case.
+
+### `renew_hook = systemctl reload apache2`
+
+Under the old `authenticator = apache`, certbot's Apache *installer* reloaded the
+service after renewal. `certonly` has no installer, so nothing reloads Apache and it
+goes on serving the previous certificate from memory until something restarts it.
+
+This failure is invisible to `certbot certificates`, which reads the files on disk.
+Verify what is actually on the wire instead:
+
+```bash
+echo | openssl s_client -connect 127.0.0.1:443 -servername www.computerjy.com 2>/dev/null \
+  | openssl x509 -noout -serial -dates
+```
+
+The serial must match `/etc/letsencrypt/live/computerjy.com/cert.pem`.
 
 ## Why the monitor exists
 
