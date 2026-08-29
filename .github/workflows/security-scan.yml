@@ -69,8 +69,18 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      - name: Run Unit Tests
+        run: npm test
+
+      # `astro check` runs the content loaders, so it needs the live WordPress API.
+      # Cloudflare Bot Fight Mode used to managed-challenge GitHub runners here
+      # (ruleId bot_fight_mode, triggered by the "node" User-Agent from an Azure ASN);
+      # it is now disabled. WP_BUILD_TOKEN is sent as X-Build-Auth and is the hook for
+      # a WAF skip rule should Super Bot Fight Mode ever be enabled.
       - name: Astro Type & A11y Verification
         run: npx astro check
+        env:
+          WP_BUILD_TOKEN: ${{ secrets.WP_BUILD_TOKEN }}
 
       - name: Run NPM Security Audit
         run: npm audit --audit-level=high

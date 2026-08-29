@@ -1,67 +1,17 @@
-export interface WPPost {
-  id: number;
-  slug: string;
-  title: {
-    rendered: string;
-  };
-  content: {
-    rendered: string;
-  };
-  excerpt: {
-    rendered: string;
-  };
-  date: string;
-  modified: string;
-  categories: number[];
-  tags: number[];
-  featured_media?: number;
-  _embedded?: {
-    'wp:featuredmedia'?: Array<{
-      source_url: string;
-      alt_text?: string;
-    }>;
-    'wp:term'?: Array<Array<{
-      id: number;
-      name: string;
-      slug: string;
-      taxonomy: string;
-    }>>;
-    author?: Array<{
-      id: number;
-      name: string;
-      description?: string;
-      avatar_urls?: {
-        [key: string]: string;
-      };
-    }>;
-  };
-  // Processed helper fields
-  readingTime?: string;
-  primaryCategory?: {
-    name: string;
-    slug: string;
-  };
-  featuredImageUrl?: string;
-  comments?: Array<{
-    id: number;
-    author: string;
-    date: string;
-    content: string;
-    parent?: number;
-  }>;
-}
+import type { CollectionEntry } from 'astro:content';
 
-export interface WPCategory {
-  id: number;
-  name: string;
-  slug: string;
-  count: number;
-  description: string;
-}
-
-export interface WPTag {
-  id: number;
-  name: string;
-  slug: string;
-  count: number;
-}
+/**
+ * Types are derived from the Zod schemas in src/content.config.ts, so they can
+ * no longer drift from the data.
+ *
+ * The hand-written interfaces this replaces still claimed `categories: number[]`
+ * and `tags: number[]` while the data held slug strings - the exact lie behind the
+ * broken tag filter fixed in Task 8. They also carried `_embedded` and
+ * `featured_media`, which no code reads and the loader never produces.
+ * (`comments` and `modified` were declared by a later commit; the array-of-number
+ * claims were not.)
+ */
+export type WPPost = CollectionEntry<'posts'>['data'];
+export type WPCategory = CollectionEntry<'categories'>['data'];
+export type WPTag = CollectionEntry<'tags'>['data'];
+export type WPComment = WPPost['comments'][number];
