@@ -115,6 +115,60 @@ export function unwrapPhotonInContent(html: string): string {
   return html.replace(/https?:\/\/i[0-9]\.wp\.com\/[^"'\s)]+/g, (m) => unwrapPhotonUrl(m));
 }
 
+/**
+ * The named entities WordPress emits in *.rendered plain-text fields, applied
+ * in order with &amp; last - decoding &amp; any earlier would turn a literal
+ * "&amp;lt;" into "&lt;" and then (on a later pass) into "<", which is wrong:
+ * "&amp;lt;" must decode to the literal string "&lt;".
+ */
+const NAMED_ENTITIES: Array<[RegExp, string]> = [
+  [/&lt;/g, '<'],
+  [/&gt;/g, '>'],
+  [/&quot;/g, '"'],
+  [/&apos;/g, "'"],
+  [/&nbsp;/g, ' '],
+  [/&hellip;/g, '…'],
+  [/&ldquo;/g, '“'],
+  [/&rdquo;/g, '”'],
+  [/&lsquo;/g, '‘'],
+  [/&rsquo;/g, '’'],
+  [/&mdash;/g, '—'],
+  [/&ndash;/g, '–'],
+  [/&amp;/g, '&'],
+];
+
+function decodeNumericEntities(text: string): string {
+  return text
+    .replace(/&#(\d+);/g, (_, dec: string) => String.fromCodePoint(Number(dec)))
+    .replace(/&#[xX]([0-9a-fA-F]+);/g, (_, hex: string) => String.fromCodePoint(parseInt(hex, 16)));
+}
+
+/**
+ * Decodes the HTML entities the WordPress REST API leaves in *.rendered
+ * plain-text fields (title, excerpt, term name/description, comment content).
+ * The old XML-export parser yielded decoded text; the REST API does not, and
+ * these fields are consumed as plain text (e.g. {post.title.rendered}), so
+ * Astro escapes the "&" and the entity would otherwise render literally.
+ *
+ * Do NOT apply this to content.rendered - post bodies render via set:html
+ * and are already correct HTML.
+ *
+ * Numeric entities are decoded once before the named pass and once after.
+ * The second numeric pass is required, not redundant: WordPress can
+ * double-encode an ampersand as "&amp;#038;", where the literal "&#038;"
+ * numeric entity is only revealed once the leading "&amp;" has been unescaped
+ * by the named pass. Collapsing this into a decode-until-stable loop instead
+ * would incorrectly re-decode the "&lt;" produced by "&amp;lt;" into "<".
+ */
+export function decodeEntities(input: string): string {
+  if (!input) return '';
+  let text = decodeNumericEntities(input);
+  for (const [pattern, replacement] of NAMED_ENTITIES) {
+    text = text.replace(pattern, replacement);
+  }
+  return decodeNumericEntities(text);
+}
+
 export interface RawWpPost {
   id: number;
   slug: string;
@@ -136,6 +190,9 @@ export interface NormalizedComment {
   parent: number;
 }
 export interface Term { name: string; slug: string }
+// `type`, not `interface`: an interface has no implicit index signature and
+// fails the `Record<string, unknown>` constraint parseData() expects. Do not
+// "tidy" this back into an interface - it has broken the build once already.
 export type NormalizedPost = {
   id: number;
   slug: string;
@@ -177,8 +234,11 @@ export function normalizePost(
   return {
     id: raw.id,
     slug: sanitizeSlug(raw.slug),
-    title: { rendered: raw.title?.rendered ?? '' },
-    excerpt: { rendered: resolveExcerpt(raw.excerpt?.rendered ?? '', content) },
+    title: { rendered: decodeEntities(raw.title?.rendered ?? '') },
+    // Entities are decoded after resolveExcerpt() has already done any
+    // tag-stripping - decoding first could turn an entity-encoded pseudo-tag
+    // (e.g. "&lt;script&gt;") into a real one before the stripper sees it.
+    excerpt: { rendered: decodeEntities(resolveExcerpt(raw.excerpt?.rendered ?? '', content)) },
     content: { rendered: content },
     date: raw.date,
     modified: raw.modified || raw.date,
@@ -187,6 +247,9 @@ export function normalizePost(
     primaryCategory: categories[0] ?? DEFAULT_CATEGORY,
     featuredImageUrl: resolveFeaturedImage(mediaUrl, content),
     readingTime: calculateReadingTime(content),
-    comments: commentsByPostId.get(raw.id) ?? [],
+    comments: (commentsByPostId.get(raw.id) ?? []).map((c) => ({
+      ...c,
+      content: decodeEntities(c.content),
+    })),
   };
 }

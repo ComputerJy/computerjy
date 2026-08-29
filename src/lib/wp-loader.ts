@@ -1,6 +1,6 @@
 import type { Loader, LoaderContext } from 'astro/loaders';
-import { fetchAllPaginated, fetchByIds } from './wp-client';
-import { normalizePost } from './normalize';
+import { fetchAllPaginated, fetchByIds, WpApiError } from './wp-client';
+import { normalizePost, decodeEntities } from './normalize';
 import type { RawWpPost, NormalizedComment, Term } from './normalize';
 
 const POST_FIELDS = 'id,slug,title,excerpt,content,date,modified,categories,tags,featured_media';
@@ -25,7 +25,10 @@ export function wpPostsLoader(): Loader {
         fetchAllPaginated<RawWpPost>('posts', POST_FIELDS),
         fetchAllPaginated<RawTerm>('categories', TERM_FIELDS),
         fetchAllPaginated<RawTerm>('tags', TERM_FIELDS),
-        fetchAllPaginated<RawComment>('comments', COMMENT_FIELDS),
+        // Comments are optional content (unlike posts/categories/tags/media):
+        // a spam purge can legitimately leave zero, and that must not fail
+        // the build.
+        fetchAllPaginated<RawComment>('comments', COMMENT_FIELDS, fetch, { allowEmpty: true }),
       ]);
 
       // Posts reference only a handful of media ids; fetch exactly those rather
@@ -36,7 +39,7 @@ export function wpPostsLoader(): Loader {
 
       const termsById = new Map<number, Term>();
       for (const t of [...rawCategories, ...rawTags]) {
-        termsById.set(t.id, { name: t.name, slug: t.slug });
+        termsById.set(t.id, { name: decodeEntities(t.name), slug: t.slug });
       }
 
       const mediaById = new Map<number, string>(rawMedia.map((m) => [m.id, m.source_url]));
@@ -66,6 +69,14 @@ export function wpPostsLoader(): Loader {
         const data = await parseData({ id: post.slug, data: post });
         store.set({ id: post.slug, data });
       }
+      // store.set() silently overwrites on a slug collision, which would
+      // otherwise drop a post without a warning or a build failure.
+      if (store.keys().length !== posts.length) {
+        throw new WpApiError(
+          `wp-posts loader: stored ${store.keys().length} entries but normalized ${posts.length} posts - ` +
+            `likely a slug collision silently dropped a post.`
+        );
+      }
       logger.info(`Loaded ${posts.length} posts`);
     },
   };
@@ -80,19 +91,35 @@ function termLoader(name: string, endpoint: string): Loader {
       const active = terms
         .filter((t) => t.count > 0)
         .sort((a, b) => b.count - a.count);
+      // fetchAllPaginated's own empty-check runs on the raw (unfiltered) list, so
+      // it cannot catch every term's count having desynced to 0 - a real failure
+      // mode after bulk edits/imports. Without this, the build would succeed with
+      // an empty collection and a deploy would rsync --delete every live archive
+      // page for this endpoint off the server.
+      if (active.length === 0) {
+        throw new WpApiError(
+          `wp-loader: endpoint "${endpoint}" has zero terms with count > 0 after filtering - refusing to build.`
+        );
+      }
       store.clear();
       for (const t of active) {
         const data = await parseData({
           id: t.slug,
           data: {
             id: t.id,
-            name: t.name,
+            name: decodeEntities(t.name),
             slug: t.slug,
             count: t.count,
-            description: t.description ?? '',
+            description: decodeEntities(t.description ?? ''),
           },
         });
         store.set({ id: t.slug, data });
+      }
+      if (store.keys().length !== active.length) {
+        throw new WpApiError(
+          `wp-loader: endpoint "${endpoint}" stored ${store.keys().length} entries but expected ${active.length} - ` +
+            `likely a slug collision silently dropped a term.`
+        );
       }
       logger.info(`Loaded ${active.length} ${endpoint}`);
     },

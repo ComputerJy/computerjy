@@ -124,11 +124,51 @@ describe('https upgrades', () => {
 
   it('leaves https and protocol-relative URLs alone', () => {
     expect(upgradeContentToHttps('<img src="https://a/b.jpg">')).toBe('<img src="https://a/b.jpg">');
+    // upgradeContentToHttps only matches the literal string "http://", so a
+    // genuinely protocol-relative URL ("//host/...") must pass through unchanged.
+    expect(upgradeContentToHttps('<img src="//a/b.jpg">')).toBe('<img src="//a/b.jpg">');
   });
 
   it('upgrades a bare URL', () => {
     expect(upgradeUrlToHttps('http://a/b.jpg')).toBe('https://a/b.jpg');
     expect(upgradeUrlToHttps(undefined)).toBeUndefined();
+  });
+});
+
+import { decodeEntities } from '../src/lib/normalize';
+
+describe('decodeEntities', () => {
+  it('decodes a numeric decimal entity', () => {
+    expect(decodeEntities('Nuggets of Wisdom&#8217;s')).toBe('Nuggets of Wisdom’s');
+  });
+
+  it('decodes a numeric hex entity', () => {
+    expect(decodeEntities('Nuggets of Wisdom&#x2019;s')).toBe('Nuggets of Wisdom’s');
+  });
+
+  it('fully resolves a double-encoded ampersand, &amp;#038;', () => {
+    expect(decodeEntities('GED Examination Q&amp;#038;A')).toBe('GED Examination Q&A');
+  });
+
+  it('decodes &hellip;', () => {
+    expect(decodeEntities('Nuggets of Wisdom&hellip;')).toBe('Nuggets of Wisdom…');
+  });
+
+  it('decodes curly quote entities &#8220; and &#8221;', () => {
+    expect(decodeEntities('Celebrating the &#8220;Stupid question day&#8221;')).toBe(
+      'Celebrating the “Stupid question day”'
+    );
+  });
+
+  it('decodes &amp;lt; to the literal string "&lt;", not "<" - amp must not be decoded before lt', () => {
+    // If &amp; were unescaped before &lt;, the revealed "&lt;" would be
+    // (wrongly) decoded again into "<". WordPress-escaped markup samples
+    // ("&amp;lt;script&amp;gt;") must stay inert text, not become real tags.
+    expect(decodeEntities('&amp;lt;')).toBe('&lt;');
+  });
+
+  it('leaves a string with no entities unchanged', () => {
+    expect(decodeEntities('plain text, no entities here')).toBe('plain text, no entities here');
   });
 });
 
@@ -201,6 +241,14 @@ describe('normalizePost', () => {
     expect(p.tags).toEqual(['humor']);
   });
 
+  it('drops a term id that is absent from termsById instead of producing undefined', () => {
+    const p = normalizePost({ ...raw, categories: [7, 999], tags: [999] }, new Map(), terms, new Map());
+    expect(p.categories).toEqual(['g33ky']);
+    expect(p.categories).not.toContain(undefined);
+    expect(p.tags).toEqual([]);
+    expect(p.tags).not.toContain(undefined);
+  });
+
   it('uses the first category as primaryCategory', () => {
     expect(normalizePost(raw, new Map(), terms, new Map()).primaryCategory)
       .toEqual({ name: 'Geeky', slug: 'g33ky' });
@@ -239,5 +287,28 @@ describe('normalizePost', () => {
       new Map(), terms, new Map()
     );
     expect(p.content.rendered).toBe('<img src="https://a/b.jpg">');
+  });
+
+  it('decodes HTML entities in the title and excerpt, but not in content', () => {
+    const p = normalizePost(
+      {
+        ...raw,
+        title: { rendered: 'GED Examination Q&amp;#038;A' },
+        excerpt: { rendered: '<p>Nuggets of Wisdom&#8230;</p>' },
+        content: { rendered: '<p>&amp;#038; stays encoded here</p>' },
+      },
+      new Map(), terms, new Map()
+    );
+    expect(p.title.rendered).toBe('GED Examination Q&A');
+    expect(p.excerpt.rendered).toBe('<p>Nuggets of Wisdom…</p>');
+    expect(p.content.rendered).toBe('<p>&amp;#038; stays encoded here</p>');
+  });
+
+  it('decodes HTML entities in comment content', () => {
+    const c: NormalizedComment = {
+      id: 1, post_id: 42, author: 'A', date: 'd', content: 'Q&amp;#038;A', parent: 0,
+    };
+    const p = normalizePost(raw, new Map(), terms, new Map([[42, [c]]]));
+    expect(p.comments[0].content).toBe('Q&A');
   });
 });

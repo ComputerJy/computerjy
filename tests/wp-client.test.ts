@@ -25,6 +25,9 @@ describe('fetchAllPaginated', () => {
     // header claims 99 but only 3 items exist - a silently truncated response
     const f = mockFetch([[{ id: 1 }, { id: 2 }], [{ id: 3 }]], 99);
     await expect(fetchAllPaginated('posts', 'id', f as typeof fetch)).rejects.toThrow(WpApiError);
+    await expect(fetchAllPaginated('posts', 'id', f as typeof fetch)).rejects.toThrow(
+      /returned 3 items but X-WP-Total reported 99/
+    );
   });
 
   it('throws on a non-2xx response', async () => {
@@ -37,11 +40,21 @@ describe('fetchAllPaginated', () => {
       throw new Error('ECONNREFUSED');
     };
     await expect(fetchAllPaginated('posts', 'id', f as typeof fetch)).rejects.toThrow(WpApiError);
+    await expect(fetchAllPaginated('posts', 'id', f as typeof fetch)).rejects.toThrow(
+      /Network failure fetching .*ECONNREFUSED/
+    );
   });
 
   it('throws when the endpoint returns zero items', async () => {
     const f = mockFetch([[]], 0);
     await expect(fetchAllPaginated('posts', 'id', f as typeof fetch)).rejects.toThrow(/returned no items/);
+  });
+
+  it('does not throw on zero items when allowEmpty is set', async () => {
+    const f = mockFetch([[]], 0);
+    await expect(
+      fetchAllPaginated('comments', 'id', f as typeof fetch, { allowEmpty: true })
+    ).resolves.toEqual([]);
   });
 });
 
