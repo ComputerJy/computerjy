@@ -63,3 +63,42 @@ export async function fetchAllPaginated<T>(
   }
   return items;
 }
+
+/**
+ * Fetches specific records by id. Asserts that every requested id resolved —
+ * a stronger guarantee than X-WP-Total, because it verifies the records we
+ * actually need rather than a global count. Used for media, whose X-WP-Total
+ * on this site disagrees with what pagination returns.
+ */
+export async function fetchByIds<T extends { id: number }>(
+  endpoint: string,
+  fields: string,
+  ids: number[],
+  fetchImpl: typeof fetch = fetch
+): Promise<T[]> {
+  if (ids.length === 0) return [];
+  if (ids.length > 100) {
+    throw new WpApiError(
+      `fetchByIds("${endpoint}") received ${ids.length} ids; per_page caps at 100. Chunking is not implemented.`
+    );
+  }
+  const url = `${API_BASE}/${endpoint}?include=${ids.join(',')}&per_page=100&_fields=${fields}`;
+  let res: Response;
+  try {
+    res = await fetchImpl(url);
+  } catch (cause) {
+    throw new WpApiError(`Network failure fetching ${url}: ${(cause as Error).message}`);
+  }
+  if (!res.ok) {
+    throw new WpApiError(`GET ${url} returned ${res.status} ${res.statusText}`);
+  }
+  const items = (await res.json()) as T[];
+  const got = new Set(items.map((i) => i.id));
+  const missing = ids.filter((id) => !got.has(id));
+  if (missing.length > 0) {
+    throw new WpApiError(
+      `Endpoint "${endpoint}": requested ${ids.length} ids but ${missing.length} did not resolve: ${missing.join(', ')}`
+    );
+  }
+  return items;
+}
