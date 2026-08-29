@@ -37,6 +37,14 @@ jobs:
     name: Build & Sync to Lightsail
     runs-on: ubuntu-latest
 
+    # The `secrets` context cannot be read from a step-level `if`, so the two
+    # Cloudflare feature gates are resolved once here. Until the R2 secrets are
+    # added, every step below behaves exactly as it did before: build, verify,
+    # rsync to Lightsail. See deploy/cloudflare-r2.md.
+    env:
+      R2_ENABLED: ${{ secrets.R2_ACCESS_KEY_ID != '' && secrets.R2_SECRET_ACCESS_KEY != '' && secrets.CLOUDFLARE_ACCOUNT_ID != '' && secrets.R2_BUCKET != '' }}
+      CF_PURGE_ENABLED: ${{ secrets.CLOUDFLARE_API_TOKEN != '' && secrets.CLOUDFLARE_ZONE_ID != '' }}
+
     steps:
       - name: Harden GitHub Actions Runner
         uses: step-security/harden-runner@v2
@@ -74,6 +82,56 @@ jobs:
         env:
           WP_BUILD_TOKEN: ${{ secrets.WP_BUILD_TOKEN }}
 
+      # ------------------------------------------------------------------------
+      # Cloudflare R2 mirror of the static build
+      # ------------------------------------------------------------------------
+      # Runs before the rsync so the bucket is never behind the origin. The
+      # ordering inside the step matters: content-hashed chunks are uploaded
+      # first, so no freshly published page can reference a chunk that has not
+      # landed yet. The second pass carries --delete, which prunes exactly what
+      # `rsync --delete` prunes on Lightsail.
+      #
+      # markdown.php is excluded: it is PHP source that only the origin executes,
+      # and an object store would hand it out as text.
+      - name: Sync Static Build to Cloudflare R2
+        if: env.R2_ENABLED == 'true'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+          AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
+          AWS_ENDPOINT_URL: https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          set -euo pipefail
+
+          aws s3 sync dist "s3://$R2_BUCKET" \
+            --no-progress \
+            --exclude "*" --include "_astro/*" \
+            --cache-control "public, max-age=31536000, immutable"
+
+          aws s3 sync dist "s3://$R2_BUCKET" \
+            --no-progress \
+            --delete \
+            --exclude "markdown.php" \
+            --cache-control "public, max-age=0, must-revalidate"
+
+          # The discovery documents have no file extension, so the CLI stores
+          # them as binary/octet-stream. The Worker forces the right type on the
+          # way out, but a correct object makes the bucket usable on its own.
+          aws s3 cp dist/.well-known/api-catalog "s3://$R2_BUCKET/.well-known/api-catalog" \
+            --no-progress \
+            --content-type 'application/linkset+json; profile="https://www.rfc-editor.org/info/rfc9727"' \
+            --cache-control "public, max-age=86400"
+
+          for doc in openid-configuration oauth-authorization-server oauth-protected-resource; do
+            aws s3 cp "dist/.well-known/$doc" "s3://$R2_BUCKET/.well-known/$doc" \
+              --no-progress \
+              --content-type "application/json" \
+              --cache-control "public, max-age=86400"
+          done
+
       - name: Setup SSH Credentials
         run: |
           mkdir -p ~/.ssh
@@ -86,6 +144,24 @@ jobs:
           ssh -i ~/.ssh/id_rsa ${{ secrets.LIGHTSAIL_USER }}@${{ secrets.LIGHTSAIL_HOST }} "sudo mkdir -p /var/www/computerjy_dist && sudo chown -R ${{ secrets.LIGHTSAIL_USER }}:${{ secrets.LIGHTSAIL_USER }} /var/www/computerjy_dist"
           rsync -avz --delete -e "ssh -i ~/.ssh/id_rsa" dist/ ${{ secrets.LIGHTSAIL_USER }}@${{ secrets.LIGHTSAIL_HOST }}:/var/www/computerjy_dist/
           ssh -i ~/.ssh/id_rsa ${{ secrets.LIGHTSAIL_USER }}@${{ secrets.LIGHTSAIL_HOST }} "sudo chown -R www-data:www-data /var/www/computerjy_dist && sudo chmod -R 755 /var/www/computerjy_dist"
+
+      # HTML and the feeds are served with s-maxage, so the edge would otherwise
+      # keep the previous build for an hour after a publish. A failed purge is a
+      # failed deploy: the alternative is silently serving stale pages.
+      - name: Purge Cloudflare Edge Cache
+        if: env.CF_PURGE_ENABLED == 'true'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+        run: |
+          set -euo pipefail
+          response=$(curl -sS --fail-with-body -X POST \
+            "https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE_ID/purge_cache" \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data '{"purge_everything":true}')
+          echo "$response"
+          echo "$response" | grep -q '"success":true'
 
       - name: Success Notification
         run: echo "🎉 Successfully deployed to https://www.computerjy.com/"

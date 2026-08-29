@@ -70,6 +70,13 @@ Consequences:
 - The zone is on Cloudflare **Full (Strict)**, so the origin certificate must cover every proxied hostname.
   Don't infer the SSL mode from external probes: Cloudflare flattens proxied CNAMEs to A records, so `dig` cannot
   distinguish a CNAME (validated against its target) from an A record, and a 200 proves nothing either way.
+- `workers/edge-router/` is a Cloudflare Worker that serves `dist/` from an R2 bucket and passes WordPress,
+  `*.php` and `Accept: text/markdown` through to Lightsail. It is **not live**: `wrangler.toml` ships with its
+  routes commented out, and the R2 sync and cache-purge steps in `deploy.yml` are gated on secrets that do not
+  exist yet, so the rsync to `/var/www/computerjy_dist` remains the only deploy path. `src/router.ts` is a port of
+  `deploy/lightsail-apache.conf` — change them together; `tests/edge-router.test.ts` reads the vhost at test time
+  and fails if the `Link` or security headers drift apart. Cutover, rollback and the token scopes are in
+  `deploy/cloudflare-r2.md`.
 
 ## Repo-local rules (`.agents/rules/*.md`, always-on)
 
