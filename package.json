@@ -10,7 +10,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "verify:parity": "node scripts/verify-parity.mjs"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",
