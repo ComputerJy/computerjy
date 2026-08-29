@@ -10,7 +10,7 @@
 
 name = "computerjy-edge"
 main = "src/index.ts"
-compatibility_date = "2026-08-30"
+compatibility_date = "2026-08-29"
 
 # No *.workers.dev hostname: a second public origin serving the same pages
 # would compete with the canonical URLs. Smoke-test with `wrangler dev --remote`.
