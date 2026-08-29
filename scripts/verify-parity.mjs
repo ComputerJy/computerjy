@@ -94,7 +94,8 @@ if (imageMismatches) {
 // own counts exactly (entertainment 327, g33ky 101, uncategorized 17). The old site filtered by
 // primaryCategory alone and under-listed g33ky by 32 posts, so asserting on primary counts would
 // enshrine that bug. Extra links on the page are the sidebar's trending posts.
-const SIDEBAR_MAX = 5;
+// Sidebar.astro renders trendingPosts.slice(0, 4), so the overhang can never exceed 4.
+const SIDEBAR_MAX = 4;
 const allCategorySlugs = new Set(golden.flatMap((p) => p.categories));
 for (const slug of allCategorySlugs) {
   const file = `dist/category/${slug}/index.html`;
@@ -139,7 +140,11 @@ const allTagSlugs = new Set(golden.flatMap((p) => p.tags));
 let tagFailures = 0;
 for (const slug of allTagSlugs) {
   const file = `dist/tag/${slug}/index.html`;
-  if (!existsSync(file)) continue; // terms with count 0 legitimately have no page
+  if (!existsSync(file)) {
+    fail(`tag page missing: ${slug} (${golden.filter((p) => p.tags.includes(slug)).length} posts expected)`);
+    tagFailures++;
+    continue;
+  }
   const html = readFileSync(file, 'utf8');
   const onPage = new Set(
     [...html.matchAll(/href="\/posts\/([^"]+)"/g)].map((m) => m[1]).filter((s) => !s.includes('${'))
