@@ -32,7 +32,7 @@ const posts = defineCollection({
     categories: z.array(z.string()),
     tags: z.array(z.string()),
     primaryCategory: termSchema,
-    featuredImageUrl: z.string().url(),
+    featuredImageUrl: z.url(),
     readingTime: z.string(),
     comments: z.array(commentSchema),
   }),

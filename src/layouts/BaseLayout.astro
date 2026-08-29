@@ -334,11 +334,25 @@ const schemaData = {
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"
     />
     <link
+      id="googleFontsStylesheet"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
       media="print"
-      onload="this.media='all'"
     />
+    <script is:inline>
+      (function () {
+        var fontLink = document.getElementById('googleFontsStylesheet');
+        if (!fontLink || fontLink.media === 'all') return;
+        var activate = function () {
+          fontLink.media = 'all';
+        };
+        if (fontLink.sheet) {
+          activate();
+        } else {
+          fontLink.addEventListener('load', activate, { once: true });
+        }
+      })();
+    </script>
     <noscript>
       <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"

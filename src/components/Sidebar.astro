@@ -172,10 +172,7 @@ const { categories, tags, trendingPosts } = Astro.props;
     <p class="text-xs text-slate-600 dark:text-slate-400 mb-4">
       Get fresh tech tips, software discoveries &amp; insights weekly.
     </p>
-    <form
-      class="flex flex-col gap-2"
-      onsubmit="event.preventDefault(); alert('Subscribed to ComputerJy World!');"
-    >
+    <form id="sidebarNewsletterForm" class="flex flex-col gap-2">
       <input
         type="email"
         placeholder="Your email address"
@@ -191,3 +188,20 @@ const { categories, tags, trendingPosts } = Astro.props;
     </form>
   </section>
 </div>
+
+<script>
+  function setupSidebarNewsletter() {
+    const form = document.getElementById(
+      'sidebarNewsletterForm'
+    ) as HTMLFormElement | null;
+    if (!form) return;
+
+    form.onsubmit = (e) => {
+      e.preventDefault();
+      alert('Subscribed to ComputerJy World!');
+      form.reset();
+    };
+  }
+
+  document.addEventListener('astro:page-load', setupSidebarNewsletter);
+</script>

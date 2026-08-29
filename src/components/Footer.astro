@@ -174,10 +174,7 @@ const currentYear = new Date().getFullYear();
           Get weekly tech tips and software curiosities delivered directly to
           your inbox.
         </p>
-        <form
-          class="flex flex-col gap-2"
-          onsubmit="event.preventDefault(); alert('Thank you for subscribing to ComputerJy World! 🚀');"
-        >
+        <form id="footerNewsletterForm" class="flex flex-col gap-2">
           <input
             type="email"
             placeholder="Your email address"
@@ -223,3 +220,20 @@ const currentYear = new Date().getFullYear();
     </div>
   </div>
 </footer>
+
+<script>
+  function setupFooterNewsletter() {
+    const form = document.getElementById(
+      'footerNewsletterForm'
+    ) as HTMLFormElement | null;
+    if (!form) return;
+
+    form.onsubmit = (e) => {
+      e.preventDefault();
+      alert('Thank you for subscribing to ComputerJy World! 🚀');
+      form.reset();
+    };
+  }
+
+  document.addEventListener('astro:page-load', setupFooterNewsletter);
+</script>
