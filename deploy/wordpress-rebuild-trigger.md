@@ -87,10 +87,12 @@ one already running, plus one more that sees the final state.
 leave the webroot half-written.
 
 The obvious alternative — `wp_schedule_single_event` a minute out — was rejected
-because **WP-Cron cannot be relied on here**. It fires on page loads, and this
-install is headless: visitors go to the static site, so WordPress sees almost no
-front-end traffic. `DISABLE_WP_CRON` is not set and no system cron drives
-`wp-cron.php`, so a scheduled event can sit unfired indefinitely.
+because **WP-Cron is not prompt here**. It fires on page loads, and this install
+is headless: visitors go to the static site, so WordPress sees almost no
+front-end traffic. Events are therefore driven by
+`/etc/cron.d/computerjy-wp-cron` on a 5-minute tick rather than by page loads, so
+a scheduled event would land up to five minutes late instead of dispatching
+immediately.
 
 ## Which changes trigger a deploy
 
