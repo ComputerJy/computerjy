@@ -62,8 +62,21 @@ Consequences:
 ## Origin server & Cloudflare edge
 
 - WordPress is at `/var/www/wordpress`; wp-cli is installed — `sudo -u www-data wp <cmd> --path=/var/www/wordpress`.
-- WP-Cron is **unreliable here**: `DISABLE_WP_CRON` is unset, no system cron drives `wp-cron.php`, and the install
-  is headless, so scheduled events can sit unfired. Never build on `wp_schedule_single_event`.
+- WP-Cron is driven by **system cron**: `/etc/cron.d/computerjy-wp-cron` runs `wp cron event run --due-now` every
+  5 minutes as `www-data`, logging to `/var/log/wp-cron.log` (rotated weekly). That is the authoritative driver —
+  the static site sends WordPress almost no front-end traffic, so page-load spawning alone leaves events unfired.
+  `DISABLE_WP_CRON` is deliberately **not** set and `/wp-cron.php` is aliased into `/var/www/wordpress`, so
+  `wp cron test`, Site Health's loopback check and W3TC's spawn probe all pass; setting the constant makes W3TC
+  report cron broken regardless of reality, since `Util_Environment::is_wpcron_working()` returns false on the
+  constant alone. Events run within 5 minutes, never instantly — don't build on `wp_schedule_single_event` for
+  anything latency-sensitive.
+- **WordPress entry points at the site root must be routed explicitly, or they silently return the homepage.**
+  DocumentRoot is the static build, so an unaliased root path resolves against `dist/` and answers 200 with HTML
+  instead of erroring — which makes these failures look like plugin bugs. Two are routed in the vhost ahead of
+  every static rule: `/wp-cron.php` (cron spawn + Site Health loopback) and `?for=jetpack` / `?_for=jetpack`
+  (Jetpack's server-to-server channel — WordPress.com POSTs `/?for=jetpack&jetpack=comms` to the **root**, and
+  receiving the 95 KB homepage is what it reports as "site is not connected"). Both are mirrored in `router.ts`
+  and asserted by `tests/edge-router.test.ts`. Anything WordPress.com or a plugin calls at `/` needs a route.
 - The rebuild plugin is installed by hand — the deploy only rsyncs the static webroot, so edits to
   `inc/computerjy-rebuild-webhook.php` must be copied to the origin separately.
 - `grep -r` skips symlinks; use `grep -R` under `/etc/apache2/sites-enabled/`.

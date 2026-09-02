@@ -106,11 +106,28 @@ export type RouteDecision =
   | { kind: 'redirect'; location: string; verifyKey: string };
 
 export type OriginReason =
-  'wordpress' | 'php' | 'markdown' | 'method' | 'unmapped';
+  'wordpress' | 'php' | 'jetpack' | 'markdown' | 'method' | 'unmapped';
 
 /** Case-insensitive `Accept: text/markdown`, matching Apache's `[NC]` flag. */
 export function wantsMarkdown(accept: string | null): boolean {
   return accept !== null && /text\/markdown/i.test(accept);
+}
+
+/**
+ * Jetpack's server-to-server channel arrives at the site *root* carrying
+ * `for=jetpack` (its alternate XML-RPC) or `_for=jetpack` (signed REST),
+ * never at one of the aliased WordPress paths. Mirrors the vhost's
+ * `RewriteCond %{QUERY_STRING} (^|&)_?for=jetpack(&|$)` on `^/?$`.
+ *
+ * Case-sensitive on purpose: the handler in jetpack-connection's
+ * class-manager.php compares `$_GET['for'] === 'jetpack'` exactly.
+ */
+export function isJetpackCallback(url: URL, pathname: string): boolean {
+  if (pathname !== '/' && pathname !== '') return false;
+  return (
+    url.searchParams.get('for') === 'jetpack' ||
+    url.searchParams.get('_for') === 'jetpack'
+  );
 }
 
 function isWordPressPath(pathname: string): boolean {
@@ -171,13 +188,21 @@ export function route(
   //    source text out of the bucket.
   if (pathname.endsWith('.php')) return { kind: 'origin', reason: 'php' };
 
-  // 4. R2 only answers reads; everything else (comment POSTs, admin forms) is
+  // 4. Jetpack's callback to the site root. The vhost rewrites this to
+  //    WordPress ahead of every static rule; without the mirror a GET would be
+  //    answered out of the bucket and WordPress.com would read the static
+  //    homepage as "site is not connected".
+  if (isJetpackCallback(url, pathname)) {
+    return { kind: 'origin', reason: 'jetpack' };
+  }
+
+  // 5. R2 only answers reads; everything else (comment POSTs, admin forms) is
   //    the origin's business.
   if (method !== 'GET' && method !== 'HEAD') {
     return { kind: 'origin', reason: 'method' };
   }
 
-  // 5. Legacy WordPress permalinks. Ahead of markdown negotiation so an agent
+  // 6. Legacy WordPress permalinks. Ahead of markdown negotiation so an agent
   //    asking for text/markdown is pointed at the canonical URL rather than
   //    handed a 404 by the origin.
   const legacy = LEGACY_PERMALINK.exec(pathname);
@@ -206,16 +231,16 @@ export function route(
     }
   }
 
-  // 6. Markdown content negotiation. The origin's rewrite already checks for a
+  // 7. Markdown content negotiation. The origin's rewrite already checks for a
   //    real file before delegating to markdown.php, so forwarding the original
   //    URL preserves both the `-f` guard and markdown.php's `REQUEST_URI`.
   if (wantsMarkdown(accept)) return { kind: 'origin', reason: 'markdown' };
 
-  // 7. Single-file aliases.
+  // 8. Single-file aliases.
   const alias = PATH_ALIASES[pathname];
   if (alias !== undefined) return { kind: 'asset', candidates: [alias] };
 
-  // 8. Static build, served from R2.
+  // 9. Static build, served from R2.
   const candidates = assetCandidates(pathname);
   if (candidates === null) return { kind: 'origin', reason: 'unmapped' };
   return { kind: 'asset', candidates };

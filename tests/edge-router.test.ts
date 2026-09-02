@@ -8,6 +8,7 @@ import {
   cacheControlForKey,
   contentTypeForKey,
   forcedContentType,
+  isJetpackCallback,
   route,
   wantsMarkdown,
 } from '../workers/edge-router/src/router';
@@ -257,6 +258,44 @@ describe('cache policy', () => {
   });
 });
 
+describe("Jetpack's server-to-server channel", () => {
+  // WordPress.com calls back to the site ROOT, not an aliased path. Before this
+  // rule those requests were answered from the bucket, so WordPress.com read the
+  // static homepage as a reply and reported "site is not connected".
+  it.each([
+    '/?for=jetpack&jetpack=comms&token=abc&signature=def',
+    '/?rest_route=%2Fjetpack%2Fv4%2Fsync%2Fstatus&_for=jetpack&token=abc',
+  ])('sends %s to the origin on GET', (path) => {
+    const decision = decide(path);
+    expect(decision.kind).toBe('origin');
+    expect(decision.kind === 'origin' && decision.reason).toBe('jetpack');
+  });
+
+  it('sends the comms POST to the origin', () => {
+    expect(decide('/?for=jetpack&jetpack=comms', 'POST').kind).toBe('origin');
+  });
+
+  // The handler compares $_GET['for'] === 'jetpack' exactly, so the edge must
+  // not be laxer than the thing it fronts.
+  it.each([
+    '/?for=Jetpack',
+    '/?for=jetpackx',
+    '/?forr=jetpack',
+    '/?notfor=jetpack',
+  ])('does not divert %s', (path) => {
+    expect(isJetpackCallback(new URL(path, BASE), '/')).toBe(false);
+  });
+
+  // Only the root carries this channel; a slug with the same query is content.
+  it('only applies at the site root', () => {
+    expect(decide('/posts/some-slug?for=jetpack').kind).toBe('asset');
+  });
+
+  it('still serves the plain homepage from the bucket', () => {
+    expect(decide('/').kind).toBe('asset');
+  });
+});
+
 describe('parity with the production vhost', () => {
   const vhost = readFileSync('deploy/lightsail-apache.conf', 'utf8');
 
@@ -275,6 +314,24 @@ describe('parity with the production vhost', () => {
       expect(vhost).toContain(`Header always set ${name} "${value}"`);
     }
   );
+
+  // Both of these route a WordPress entry point that lives at the site root.
+  // Drop either from the vhost and the Worker would keep sending traffic to an
+  // origin that no longer answers it.
+  it('keeps the Jetpack root rewrite the Worker mirrors', () => {
+    expect(vhost).toContain(
+      'RewriteCond %{QUERY_STRING} (^|&)_?for=jetpack(&|$)'
+    );
+    expect(vhost).toMatch(
+      /RewriteRule \^\/\?\$ \/var\/www\/wordpress\/index\.php \[L,QSA\]/
+    );
+  });
+
+  it('keeps wp-cron.php aliased into WordPress', () => {
+    expect(vhost).toContain(
+      'Alias /wp-cron.php /var/www/wordpress/wp-cron.php'
+    );
+  });
 });
 
 describe('legacy WordPress permalinks', () => {
