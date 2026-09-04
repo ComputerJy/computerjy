@@ -1,0 +1,33 @@
+name: Keepalive Monitor
+
+# GitHub disables `schedule:` triggers in repositories with no commits for 60 days,
+# which would silently stop `cert-expiry-monitor` and `cloudflare-ip-monitor`.
+# This workflow runs every 25 days and uses keepalive-workflow to keep scheduled
+# actions active.
+
+on:
+  schedule:
+    # Run at 00:00 UTC on day 1 and 25 of every month
+    - cron: '0 0 1,25 * *'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+
+jobs:
+  keepalive:
+    name: Keep Scheduled Workflows Active
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Harden GitHub Actions Runner
+        uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Run Keepalive Workflow
+        uses: gautamkrishnar/keepalive-workflow@v2
