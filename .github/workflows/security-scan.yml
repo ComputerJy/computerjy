@@ -13,10 +13,15 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   php-security-scan:
     name: PHP & WordPress Theme Security
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Harden GitHub Actions Runner
@@ -37,6 +42,18 @@ jobs:
         run: |
           find . -maxdepth 3 -name "*.php" -not -path "*/node_modules/*" -not -path "*/dist/*" -not -path "*/.astro/*" -exec php -l {} +
 
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: echo "dir=$(composer config --global cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer Global Packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-global-${{ hashFiles('phpcs.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-global-
+
       - name: Install WordPress Coding Standards
         run: |
           composer global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
@@ -50,6 +67,7 @@ jobs:
   npm-audit-scan:
     name: NPM Dependency Vulnerability Audit
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Harden GitHub Actions Runner
@@ -104,6 +122,7 @@ jobs:
   workflow-security-scan:
     name: GitHub Actions Workflow Security
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     steps:
       - name: Harden GitHub Actions Runner

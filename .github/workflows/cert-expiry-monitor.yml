@@ -35,6 +35,7 @@ jobs:
   check-expiry:
     name: Check origin certificate
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     steps:
       - name: Harden GitHub Actions Runner
