@@ -6,6 +6,7 @@ import PostCard from '../components/PostCard.astro';
 import Sidebar from '../components/Sidebar.astro';
 import Pagination from '../components/Pagination.astro';
 import { getPosts, getCategories, getTags } from '../lib/api';
+import { PAGE_SIZE, feedWindow, feedPageCount } from '../lib/feed';
 
 const posts = await getPosts();
 const categories = await getCategories();
@@ -13,8 +14,10 @@ const tags = await getTags();
 
 const featuredPost = posts[0];
 const sidePosts = posts.slice(1, 4);
-const feedPosts = posts.slice(4, 16); // 12 posts per page for optimal DOM size and fast mobile LCP
-const totalPages = Math.ceil((posts.length - 4) / 12);
+// The bento re-features the newest posts rather than consuming them: the feed
+// withholds only the hero, so it always leads with the second-newest post.
+const feedPosts = feedWindow(posts).slice(0, PAGE_SIZE);
+const totalPages = feedPageCount(posts.length);
 ---
 
 <BaseLayout currentPath="/" preloadImage={featuredPost?.featuredImageUrl}>

@@ -57,7 +57,7 @@ Consequences:
 - WordPress _pages_ are not fetched — `contact-me` and `privacy-policy` are hand-authored Astro files.
 - Every page uses `getStaticPaths` over the full post list; `output: 'static'`, `trailingSlash: 'never'`, `format: 'directory'`.
 - `src/pages/rss.xml.ts` and `src/pages/search-index.json.ts` are build-time endpoints emitting `/rss.xml` and `/search-index.json` (the latter powers the ⌘K `SearchModal`).
-- Feed pagination convention: posts 0–3 are the bento hero/side slots, posts 4+ paginate at 12/page (`index.astro`, `page/[page].astro`). Changing the page size means changing both.
+- Feed pagination convention: posts 0–3 fill the bento hero/side slots, and the chronological feed withholds only the hero — posts 1+ paginate at 12/page, so the 3 side posts intentionally repeat below the bento. `src/lib/feed.ts` owns `HERO_COUNT`/`PAGE_SIZE`/`feedWindow`/`feedPageCount`; `index.astro` and `page/[page].astro` both consume it, so change the window there rather than in either page. Withholding all 4 bento slots is what made “Latest Articles & Insights” lead with 2014 content — a post reached the feed only once it was the fifth-newest (`tests/feed.test.ts` guards this).
 
 ## Origin server & Cloudflare edge
 

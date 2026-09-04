@@ -4,12 +4,12 @@ import PostCard from '../../components/PostCard.astro';
 import Sidebar from '../../components/Sidebar.astro';
 import Pagination from '../../components/Pagination.astro';
 import { getPosts, getCategories, getTags } from '../../lib/api';
+import { PAGE_SIZE, feedWindow } from '../../lib/feed';
 import type { GetStaticPaths } from 'astro';
 
 export const getStaticPaths = (async ({ paginate }) => {
   const posts = await getPosts();
-  const feedPosts = posts.slice(4); // Exclude top 4 featured
-  return paginate(feedPosts, { pageSize: 12 });
+  return paginate(feedWindow(posts), { pageSize: PAGE_SIZE });
 }) satisfies GetStaticPaths;
 
 const { page } = Astro.props;
