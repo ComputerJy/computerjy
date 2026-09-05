@@ -13,9 +13,11 @@
  * filter opts in. The visitor sees "Sorry, you must be logged in to comment." even though the
  * form asks for a name and email, because that message is core's, not the form's.
  *
- * Nothing here weakens spam handling. REST creates still run through wp_new_comment() ->
- * wp_allow_comment(), so duplicate detection, flood control, the disallowed-comment-keys list,
- * Akismet and the moderation queue all apply exactly as they do for the classic form.
+ * Nothing here weakens spam handling. The REST controller runs wp_allow_comment() before
+ * inserting, so duplicate detection, flood control, the disallowed-comment-keys list, Akismet
+ * and the moderation queue all apply exactly as they do for the classic form. It does not go
+ * through wp_new_comment(), which is why computerjy-rebuild-webhook.php has to watch
+ * `wp_insert_comment` rather than `comment_post` to notice a visitor's comment.
  *
  * The other branch of that same core check is the `comment_registration` option, which returns
  * the identical message before this filter ever runs. It must be off as well:
