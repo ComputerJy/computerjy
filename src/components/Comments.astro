@@ -154,6 +154,26 @@ const { postId, comments = [] } = Astro.props;
 </section>
 
 <script>
+  const STATUS_CLASSES = {
+    success: ['bg-emerald-500/10', 'text-emerald-500'],
+    error: ['bg-red-500/10', 'text-red-500'],
+  };
+
+  function showStatus(
+    notice: HTMLElement | null,
+    kind: 'success' | 'error',
+    message: string
+  ) {
+    if (!notice) return;
+    notice.classList.remove(
+      'hidden',
+      ...STATUS_CLASSES.success,
+      ...STATUS_CLASSES.error
+    );
+    notice.classList.add(...STATUS_CLASSES[kind]);
+    notice.textContent = message;
+  }
+
   function setupCommentSubmission() {
     const form = document.getElementById(
       'wpCommentForm'
@@ -202,39 +222,28 @@ const { postId, comments = [] } = Astro.props;
           }
         );
 
-        if (statusNotice) {
-          statusNotice.classList.remove(
-            'hidden',
-            'bg-red-500/10',
-            'text-red-500',
-            'bg-emerald-500/10',
-            'text-emerald-500'
+        if (response.ok) {
+          showStatus(
+            statusNotice,
+            'success',
+            '🎉 Thank you! Your comment has been submitted for moderation and will appear shortly.'
           );
-          if (response.ok) {
-            statusNotice.classList.add('bg-emerald-500/10', 'text-emerald-500');
-            statusNotice.textContent =
-              '🎉 Thank you! Your comment has been submitted for moderation and will appear shortly.';
-            form.reset();
-          } else {
-            const errData = await response.json().catch(() => ({}));
-            statusNotice.classList.add(
-              'bg-amber-500/10',
-              'text-amber-600',
-              'dark:text-amber-400'
-            );
-            statusNotice.textContent =
-              errData.message ||
-              'Comment received and queued for WordPress verification.';
-          }
+          form.reset();
+        } else {
+          const errData = await response.json().catch(() => ({}));
+          showStatus(
+            statusNotice,
+            'error',
+            errData.message ||
+              `Sorry, your comment could not be posted (error ${response.status}). Please try again later.`
+          );
         }
       } catch (err) {
-        if (statusNotice) {
-          statusNotice.classList.remove('hidden');
-          statusNotice.classList.add('bg-emerald-500/10', 'text-emerald-500');
-          statusNotice.textContent =
-            '✨ Thank you! Your comment has been registered and is awaiting moderation.';
-          form.reset();
-        }
+        showStatus(
+          statusNotice,
+          'error',
+          'Sorry, your comment could not be sent. Please check your connection and try again.'
+        );
       } finally {
         if (submitBtn) {
           submitBtn.disabled = false;
