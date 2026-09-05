@@ -124,6 +124,12 @@ Serving these correctly depends on the **web server config**, which is checked i
   build consumes changes; its hook set mirrors what `src/lib/wp-loader.ts` fetches, so it covers comments and term
   edits as well as posts. The token is the `COMPUTERJY_GITHUB_DISPATCH_TOKEN` constant in `wp-config.php`, never an
   option — this host keeps database backups on disk. See `deploy/wordpress-rebuild-trigger.md`.
+- `inc/computerjy-rest-comments.php` is a second hand-installed **plugin**. It adds
+  `rest_allow_anonymous_comments`, without which core's `WP_REST_Comments_Controller` rejects every
+  unauthenticated `POST /wp-json/wp/v2/comments` — the path `src/components/Comments.astro` uses — with
+  `rest_comment_login_required` / 401 and the message "Sorry, you must be logged in to comment.". The
+  `comment_registration` option returns that identical message from the branch above the filter, so it must
+  stay off too; check with `wp option get comment_registration` (empty or `0` — both are falsy).
 - Packaging for install is the `zip -r` command in the README (root PHP files + `template-parts/` + `assets/`).
 
 ## Conventions
