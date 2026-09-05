@@ -14,4 +14,3 @@ import type { CollectionEntry } from 'astro:content';
 export type WPPost = CollectionEntry<'posts'>['data'];
 export type WPCategory = CollectionEntry<'categories'>['data'];
 export type WPTag = CollectionEntry<'tags'>['data'];
-export type WPComment = WPPost['comments'][number];

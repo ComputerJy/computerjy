@@ -290,7 +290,7 @@ describe('unwrapPhotonInContent', () => {
 });
 
 import { normalizePost, DEFAULT_CATEGORY } from '../src/lib/normalize';
-import type { RawWpPost, NormalizedComment } from '../src/lib/normalize';
+import type { RawWpPost } from '../src/lib/normalize';
 
 const raw: RawWpPost = {
   id: 42,
@@ -312,13 +312,11 @@ const terms = new Map([
 
 describe('normalizePost', () => {
   it('uses the decoded slug so existing URLs are preserved', () => {
-    expect(normalizePost(raw, new Map(), terms, new Map()).slug).toBe(
-      'ابليس-والعرب'
-    );
+    expect(normalizePost(raw, new Map(), terms).slug).toBe('ابليس-والعرب');
   });
 
   it('maps category and tag ids to slug strings', () => {
-    const p = normalizePost(raw, new Map(), terms, new Map());
+    const p = normalizePost(raw, new Map(), terms);
     expect(p.categories).toEqual(['g33ky', 'fun']);
     expect(p.tags).toEqual(['humor']);
   });
@@ -327,8 +325,7 @@ describe('normalizePost', () => {
     const p = normalizePost(
       { ...raw, categories: [7, 999], tags: [999] },
       new Map(),
-      terms,
-      new Map()
+      terms
     );
     expect(p.categories).toEqual(['g33ky']);
     expect(p.categories).not.toContain(undefined);
@@ -337,66 +334,27 @@ describe('normalizePost', () => {
   });
 
   it('uses the first category as primaryCategory', () => {
-    expect(
-      normalizePost(raw, new Map(), terms, new Map()).primaryCategory
-    ).toEqual({ name: 'Geeky', slug: 'g33ky' });
+    expect(normalizePost(raw, new Map(), terms).primaryCategory).toEqual({
+      name: 'Geeky',
+      slug: 'g33ky',
+    });
   });
 
   it('falls back to the Tech default when a post has no categories', () => {
-    const p = normalizePost(
-      { ...raw, categories: [] },
-      new Map(),
-      terms,
-      new Map()
-    );
+    const p = normalizePost({ ...raw, categories: [] }, new Map(), terms);
     expect(p.primaryCategory).toEqual(DEFAULT_CATEGORY);
     expect(DEFAULT_CATEGORY).toEqual({ name: 'Tech', slug: 'tech' });
   });
 
   it('resolves featured media by id when present', () => {
     const media = new Map([[5, 'https://x.com/feat.jpg']]);
-    const p = normalizePost(
-      { ...raw, featured_media: 5 },
-      media,
-      terms,
-      new Map()
-    );
+    const p = normalizePost({ ...raw, featured_media: 5 }, media, terms);
     expect(p.featuredImageUrl).toBe('https://x.com/feat.jpg');
   });
 
   it('computes reading time from the content', () => {
-    expect(normalizePost(raw, new Map(), terms, new Map()).readingTime).toBe(
+    expect(normalizePost(raw, new Map(), terms).readingTime).toBe(
       '2 min read'
-    );
-  });
-
-  it('attaches comments for its own post id only', () => {
-    const c: NormalizedComment = {
-      id: 1,
-      post_id: 42,
-      author: 'A',
-      date: 'd',
-      content: 'c',
-      parent: 0,
-    };
-    const other: NormalizedComment = {
-      id: 2,
-      post_id: 99,
-      author: 'B',
-      date: 'd',
-      content: 'c',
-      parent: 0,
-    };
-    const byPost = new Map([
-      [42, [c]],
-      [99, [other]],
-    ]);
-    expect(normalizePost(raw, new Map(), terms, byPost).comments).toEqual([c]);
-  });
-
-  it('defaults to an empty comments array', () => {
-    expect(normalizePost(raw, new Map(), terms, new Map()).comments).toEqual(
-      []
     );
   });
 
@@ -404,8 +362,7 @@ describe('normalizePost', () => {
     const p = normalizePost(
       { ...raw, content: { rendered: '<img src="http://a/b.jpg">' } },
       new Map(),
-      terms,
-      new Map()
+      terms
     );
     expect(p.content.rendered).toBe('<img src="https://a/b.jpg">');
   });
@@ -419,25 +376,11 @@ describe('normalizePost', () => {
         content: { rendered: '<p>&amp;#038; stays encoded here</p>' },
       },
       new Map(),
-      terms,
-      new Map()
+      terms
     );
     expect(p.title.rendered).toBe('GED Examination Q&A');
     expect(p.excerpt.rendered).toBe('<p>Nuggets of Wisdom…</p>');
     expect(p.content.rendered).toBe('<p>&amp;#038; stays encoded here</p>');
-  });
-
-  it('decodes HTML entities in comment content', () => {
-    const c: NormalizedComment = {
-      id: 1,
-      post_id: 42,
-      author: 'A',
-      date: 'd',
-      content: 'Q&amp;#038;A',
-      parent: 0,
-    };
-    const p = normalizePost(raw, new Map(), terms, new Map([[42, [c]]]));
-    expect(p.comments[0].content).toBe('Q&A');
   });
 });
 

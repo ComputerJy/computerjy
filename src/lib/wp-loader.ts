@@ -1,18 +1,12 @@
 import type { Loader, LoaderContext } from 'astro/loaders';
 import { fetchAllPaginated, fetchByIds, WpApiError } from './wp-client';
 import { normalizePost, decodeEntities, pickHeroImageUrl } from './normalize';
-import type {
-  RawWpPost,
-  NormalizedComment,
-  Term,
-  MediaDetails,
-} from './normalize';
+import type { RawWpPost, Term, MediaDetails } from './normalize';
 
 const POST_FIELDS =
   'id,slug,title,excerpt,content,date,modified,categories,tags,featured_media';
 const TERM_FIELDS = 'id,name,slug,count,description';
 const MEDIA_FIELDS = 'id,source_url,media_details';
-const COMMENT_FIELDS = 'id,post,parent,author_name,date,content';
 
 interface RawTerm {
   id: number;
@@ -26,14 +20,6 @@ interface RawMedia {
   source_url: string;
   media_details?: MediaDetails;
 }
-interface RawComment {
-  id: number;
-  post: number;
-  parent: number;
-  author_name: string;
-  date: string;
-  content: { rendered: string };
-}
 
 export function wpPostsLoader(): Loader {
   return {
@@ -41,19 +27,11 @@ export function wpPostsLoader(): Loader {
     async load({ store, parseData, logger }: LoaderContext): Promise<void> {
       logger.info('Fetching content from the WordPress REST API');
 
-      const [rawPosts, rawCategories, rawTags, rawComments] = await Promise.all(
-        [
-          fetchAllPaginated<RawWpPost>('posts', POST_FIELDS),
-          fetchAllPaginated<RawTerm>('categories', TERM_FIELDS),
-          fetchAllPaginated<RawTerm>('tags', TERM_FIELDS),
-          // Comments are optional content (unlike posts/categories/tags/media):
-          // a spam purge can legitimately leave zero, and that must not fail
-          // the build.
-          fetchAllPaginated<RawComment>('comments', COMMENT_FIELDS, fetch, {
-            allowEmpty: true,
-          }),
-        ]
-      );
+      const [rawPosts, rawCategories, rawTags] = await Promise.all([
+        fetchAllPaginated<RawWpPost>('posts', POST_FIELDS),
+        fetchAllPaginated<RawTerm>('categories', TERM_FIELDS),
+        fetchAllPaginated<RawTerm>('tags', TERM_FIELDS),
+      ]);
 
       // Posts reference only a handful of media ids; fetch exactly those rather
       // than the full media library (see wp-client.ts fetchByIds - the site's
@@ -83,24 +61,8 @@ export function wpPostsLoader(): Loader {
         ])
       );
 
-      const commentsByPostId = new Map<number, NormalizedComment[]>();
-      for (const c of rawComments) {
-        const list = commentsByPostId.get(c.post) ?? [];
-        list.push({
-          id: c.id,
-          post_id: c.post,
-          author: c.author_name,
-          date: c.date,
-          content: c.content?.rendered ?? '',
-          parent: c.parent ?? 0,
-        });
-        commentsByPostId.set(c.post, list);
-      }
-
       const posts = rawPosts
-        .map((raw) =>
-          normalizePost(raw, mediaById, termsById, commentsByPostId)
-        )
+        .map((raw) => normalizePost(raw, mediaById, termsById))
         .sort(
           (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
         );

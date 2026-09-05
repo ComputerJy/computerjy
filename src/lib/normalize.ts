@@ -279,14 +279,6 @@ export interface RawWpPost {
   tags: number[];
   featured_media: number;
 }
-export interface NormalizedComment {
-  id: number;
-  post_id: number;
-  author: string;
-  date: string;
-  content: string;
-  parent: number;
-}
 export interface Term {
   name: string;
   slug: string;
@@ -307,7 +299,6 @@ export type NormalizedPost = {
   primaryCategory: Term;
   featuredImageUrl: string;
   readingTime: string;
-  comments: NormalizedComment[];
 };
 
 /** parse_wp_export.py used this when a post had no categories. */
@@ -316,8 +307,7 @@ export const DEFAULT_CATEGORY: Term = { name: 'Tech', slug: 'tech' };
 export function normalizePost(
   raw: RawWpPost,
   mediaById: Map<number, string>,
-  termsById: Map<number, Term>,
-  commentsByPostId: Map<number, NormalizedComment[]>
+  termsById: Map<number, Term>
 ): NormalizedPost {
   const content = upgradeContentToHttps(
     unwrapPhotonInContent(raw.content?.rendered ?? '')
@@ -356,9 +346,5 @@ export function normalizePost(
     primaryCategory: categories[0] ?? DEFAULT_CATEGORY,
     featuredImageUrl: resolveFeaturedImage(mediaUrl, content),
     readingTime: calculateReadingTime(content),
-    comments: (commentsByPostId.get(raw.id) ?? []).map((c) => ({
-      ...c,
-      content: decodeEntities(c.content),
-    })),
   };
 }
