@@ -353,9 +353,7 @@ describe('normalizePost', () => {
   });
 
   it('computes reading time from the content', () => {
-    expect(normalizePost(raw, new Map(), terms).readingTime).toBe(
-      '2 min read'
-    );
+    expect(normalizePost(raw, new Map(), terms).readingTime).toBe('2 min read');
   });
 
   it('upgrades http URLs inside content', () => {

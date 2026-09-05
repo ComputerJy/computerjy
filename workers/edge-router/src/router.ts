@@ -327,7 +327,10 @@ export function isCacheableCommentsRequest(url: URL, method: string): boolean {
  * Reading anonymously makes the cached body safe to share by construction.
  */
 export function anonymousCommentsRequest(url: URL): Request {
-  return new Request(url.toString(), { method: 'GET' });
+  return new Request(url.toString(), {
+    method: 'GET',
+    headers: { Accept: 'application/json' },
+  });
 }
 
 /**

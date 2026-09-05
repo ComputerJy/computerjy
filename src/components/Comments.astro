@@ -9,6 +9,7 @@ const { postId } = Astro.props;
 <section
   class="mt-14 pt-10 border-t border-slate-200/80 dark:border-slate-800"
   id="comments"
+  data-post-id={postId}
 >
   <div class="flex items-center justify-between mb-8">
     <h3
@@ -23,13 +24,13 @@ const { postId } = Astro.props;
   </div>
 
   <!-- Comments List -->
-  <div class="flex flex-col gap-5 mb-10" id="commentsListContainer">
-    <div
-      id="commentsLoading"
-      class="flex flex-col gap-5"
-      aria-live="polite"
-      aria-busy="true"
-    >
+  <div
+    class="flex flex-col gap-5 mb-10"
+    id="commentsListContainer"
+    aria-live="polite"
+    aria-busy="true"
+  >
+    <div id="commentsLoading" class="flex flex-col gap-5">
       {
         [0, 1].map(() => (
           <div class="bg-light-subtle dark:bg-dark-subtle border border-slate-200/70 dark:border-slate-800 rounded-2xl p-5 flex gap-4 items-start animate-pulse">
@@ -43,6 +44,23 @@ const { postId } = Astro.props;
       }
     </div>
   </div>
+
+  <!-- No-JS fallback: the skeleton above never resolves without the client
+       script, so it must not be left claiming "loading" forever. This rule
+       only applies when scripts are disabled, hiding the skeleton and
+       revealing the honest message in its place. -->
+  <noscript>
+    <style>
+      #commentsLoading {
+        display: none;
+      }
+    </style>
+    <p
+      class="text-center py-8 px-4 rounded-2xl bg-light-subtle dark:bg-dark-subtle border border-dashed border-slate-200 dark:border-slate-800 text-xs text-slate-400 mb-10"
+    >
+      Comments require JavaScript to load.
+    </p>
+  </noscript>
 
   <!-- Comment Submission Form -->
   <div
@@ -179,6 +197,11 @@ const { postId } = Astro.props;
     const container = document.getElementById('commentsListContainer');
     if (!container) return;
 
+    // aria-live/aria-busy live on this container itself, never on its
+    // children: innerHTML below replaces the children wholesale on every
+    // call, which would destroy any inner wrapper carrying them instead.
+    container.setAttribute('aria-busy', 'true');
+
     try {
       const response = await fetch(commentsEndpoint(postId, bust), {
         headers: { Accept: 'application/json' },
@@ -195,17 +218,20 @@ const { postId } = Astro.props;
       // was not, and that bug is not repeated here.
       container.innerHTML = FAILED_MARKUP;
       setCount(null);
+    } finally {
+      // The list, empty state or failure state has now been written, so the
+      // region is no longer busy regardless of which branch ran.
+      container.setAttribute('aria-busy', 'false');
     }
   }
 
   function setupCommentLoading() {
-    const form = document.getElementById(
-      'wpCommentForm'
-    ) as HTMLFormElement | null;
     const section = document.getElementById('comments');
-    if (!form || !section) return;
+    if (!section) return;
 
-    const postId = Number(form.dataset.postId);
+    // Read from the section, not the form: rendering the list must not depend
+    // on the submission form existing.
+    const postId = Number(section.dataset.postId);
     if (!Number.isFinite(postId) || postId <= 0) return;
 
     // Lazy on purpose: most readers never reach the comments, and every fetch
@@ -220,6 +246,16 @@ const { postId } = Astro.props;
       { rootMargin: '200px' }
     );
     observer.observe(section);
+
+    // With <ClientRouter />, navigating away before the section ever
+    // intersects would otherwise leave this observer watching a detached
+    // node, one per visit. `once: true` because a fresh observer (and
+    // listener) is created on every astro:page-load.
+    document.addEventListener(
+      'astro:before-swap',
+      () => observer.disconnect(),
+      { once: true }
+    );
   }
 
   document.addEventListener('astro:page-load', setupCommentLoading);

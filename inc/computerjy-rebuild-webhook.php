@@ -2,7 +2,7 @@
 /**
  * Plugin Name: ComputerJy Rebuild Dispatch
  * Description: Triggers the GitHub Actions deploy workflow when content the static site is built from changes.
- * Version: 2.0.0
+ * Version: 3.0.0
  * Author: Eyad Salah
  * Requires PHP: 8.0
  *

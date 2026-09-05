@@ -65,7 +65,6 @@ describe('fetchAllPaginated', () => {
       fetchAllPaginated('posts', 'id', f as typeof fetch)
     ).rejects.toThrow(/returned no items/);
   });
-
 });
 
 describe('fetchByIds', () => {
