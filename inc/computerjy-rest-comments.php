@@ -15,9 +15,9 @@
  *
  * Nothing here weakens spam handling. The REST controller runs wp_allow_comment() before
  * inserting, so duplicate detection, flood control, the disallowed-comment-keys list, Akismet
- * and the moderation queue all apply exactly as they do for the classic form. It does not go
- * through wp_new_comment(), which is why computerjy-rebuild-webhook.php has to watch
- * `wp_insert_comment` rather than `comment_post` to notice a visitor's comment.
+ * and the moderation queue all apply exactly as they do for the classic form. Comments are
+ * read by the browser at view time (see src/components/Comments.astro), not fetched at build
+ * time, so a comment posted through this endpoint starts no deploy.
  *
  * The other branch of that same core check is the `comment_registration` option, which returns
  * the identical message before this filter ever runs. It must be off as well:

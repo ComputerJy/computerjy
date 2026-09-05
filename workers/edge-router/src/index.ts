@@ -12,10 +12,13 @@
  */
 
 import {
+  COMMENTS_CACHE_CONTROL,
   SECURITY_HEADERS,
+  anonymousCommentsRequest,
   cacheControlForKey,
   contentTypeForKey,
   forcedContentType,
+  isCacheableCommentsRequest,
   route,
 } from './router';
 
@@ -164,7 +167,25 @@ export default {
     }
 
     if (decision.kind === 'origin') {
-      return fetch(request);
+      if (!isCacheableCommentsRequest(url, request.method)) {
+        return fetch(request);
+      }
+
+      const commentsCache = edgeCache();
+      const commentsKey = anonymousCommentsRequest(url);
+      const cached = await commentsCache.match(commentsKey);
+      if (cached !== undefined) return cached;
+
+      const origin = await fetch(anonymousCommentsRequest(url));
+      // Only a good read is worth holding: caching an error would repeat it for
+      // a minute, and a Set-Cookie in a shared cache would leak between readers.
+      if (origin.status !== 200) return origin;
+
+      const response = new Response(origin.body, origin);
+      response.headers.set('Cache-Control', COMMENTS_CACHE_CONTROL);
+      response.headers.delete('Set-Cookie');
+      ctx.waitUntil(commentsCache.put(commentsKey, response.clone()));
+      return response;
     }
 
     if (decision.kind === 'redirect') {

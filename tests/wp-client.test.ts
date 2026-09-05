@@ -65,15 +65,6 @@ describe('fetchAllPaginated', () => {
       fetchAllPaginated('posts', 'id', f as typeof fetch)
     ).rejects.toThrow(/returned no items/);
   });
-
-  it('does not throw on zero items when allowEmpty is set', async () => {
-    const f = mockFetch([[]], 0);
-    await expect(
-      fetchAllPaginated('comments', 'id', f as typeof fetch, {
-        allowEmpty: true,
-      })
-    ).resolves.toEqual([]);
-  });
 });
 
 describe('fetchByIds', () => {

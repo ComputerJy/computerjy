@@ -77,8 +77,7 @@ async function fetchPage(
 export async function fetchAllPaginated<T>(
   endpoint: string,
   fields: string,
-  fetchImpl: typeof fetch = fetch,
-  opts: { allowEmpty?: boolean } = {}
+  fetchImpl: typeof fetch = fetch
 ): Promise<T[]> {
   const first = await fetchPage(endpoint, fields, 1, fetchImpl);
   const total = Number(first.headers.get('X-WP-Total') ?? '0');
@@ -90,7 +89,7 @@ export async function fetchAllPaginated<T>(
     items.push(...((await res.json()) as T[]));
   }
 
-  if (items.length === 0 && !opts.allowEmpty) {
+  if (items.length === 0) {
     throw new WpApiError(
       `Endpoint "${endpoint}" returned no items - refusing to build.`
     );

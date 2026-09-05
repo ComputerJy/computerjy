@@ -118,7 +118,7 @@ const relatedPosts = allPosts.filter((p) => p.slug !== post.slug).slice(0, 3);
             href="#comments"
             class="badge-glow text-xs hover:border-brand-blue transition-all"
           >
-            💬 {post.comments?.length || 0} Comments
+            <span id="postCommentCount">💬 Comments</span>
           </a>
         </div>
 
@@ -204,7 +204,7 @@ const relatedPosts = allPosts.filter((p) => p.slug !== post.slug).slice(0, 3);
         </section>
 
         <!-- Native WordPress Comments Section -->
-        <Comments postId={post.id} comments={post.comments} />
+        <Comments postId={post.id} />
       </article>
 
       <!-- Sidebar (4 cols) -->

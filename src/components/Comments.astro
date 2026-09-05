@@ -1,32 +1,22 @@
 ---
-import { sanitizeCommentHtml } from '../lib/utils';
-
-interface CommentItem {
-  id: number;
-  author: string;
-  date: string;
-  content: string;
-  parent?: number;
-}
-
 interface Props {
   postId: number;
-  comments?: CommentItem[];
 }
 
-const { postId, comments = [] } = Astro.props;
+const { postId } = Astro.props;
 ---
 
 <section
   class="mt-14 pt-10 border-t border-slate-200/80 dark:border-slate-800"
   id="comments"
+  data-post-id={postId}
 >
   <div class="flex items-center justify-between mb-8">
     <h3
       class="text-xl sm:text-2xl font-heading font-black text-slate-900 dark:text-white flex items-center gap-2.5"
     >
       <span class="w-2.5 h-6 rounded-sm bg-grad-primary"></span>
-      Discussion ({comments.length})
+      Discussion <span id="commentsHeadingCount"></span>
     </h3>
     <span class="text-xs text-slate-400 font-semibold"
       >Powered by WordPress</span
@@ -34,38 +24,43 @@ const { postId, comments = [] } = Astro.props;
   </div>
 
   <!-- Comments List -->
-  <div class="flex flex-col gap-5 mb-10" id="commentsListContainer">
-    {
-      comments.length > 0 ? (
-        comments.map((comm) => (
-          <div class="bg-light-subtle dark:bg-dark-subtle border border-slate-200/70 dark:border-slate-800 rounded-2xl p-5 flex gap-4 items-start">
-            <div class="w-10 h-10 rounded-full bg-grad-primary text-white font-black text-sm flex items-center justify-center flex-shrink-0 shadow-sm">
-              {comm.author.charAt(0).toUpperCase()}
-            </div>
-            <div class="flex-grow">
-              <div class="flex items-center justify-between gap-2 mb-1">
-                <span class="font-heading font-bold text-sm text-slate-900 dark:text-white">
-                  {comm.author}
-                </span>
-                <span class="text-[11px] text-slate-400">
-                  {new Date(comm.date).toLocaleDateString('en-GB')}
-                </span>
-              </div>
-              <div
-                class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed prose-sm"
-                set:html={sanitizeCommentHtml(comm.content)}
-              />
+  <div
+    class="flex flex-col gap-5 mb-10"
+    id="commentsListContainer"
+    aria-live="polite"
+    aria-busy="true"
+  >
+    <div id="commentsLoading" class="flex flex-col gap-5">
+      {
+        [0, 1].map(() => (
+          <div class="bg-light-subtle dark:bg-dark-subtle border border-slate-200/70 dark:border-slate-800 rounded-2xl p-5 flex gap-4 items-start animate-pulse">
+            <div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex-shrink-0" />
+            <div class="flex-grow flex flex-col gap-2">
+              <div class="h-3 w-32 rounded bg-slate-200 dark:bg-slate-800" />
+              <div class="h-3 w-full rounded bg-slate-200 dark:bg-slate-800" />
             </div>
           </div>
         ))
-      ) : (
-        <div class="text-center py-8 px-4 rounded-2xl bg-light-subtle dark:bg-dark-subtle border border-dashed border-slate-200 dark:border-slate-800 text-xs text-slate-400">
-          No comments yet on this article. Be the first to join the
-          conversation! 👇
-        </div>
-      )
-    }
+      }
+    </div>
   </div>
+
+  <!-- No-JS fallback: the skeleton above never resolves without the client
+       script, so it must not be left claiming "loading" forever. This rule
+       only applies when scripts are disabled, hiding the skeleton and
+       revealing the honest message in its place. -->
+  <noscript>
+    <style>
+      #commentsLoading {
+        display: none;
+      }
+    </style>
+    <p
+      class="text-center py-8 px-4 rounded-2xl bg-light-subtle dark:bg-dark-subtle border border-dashed border-slate-200 dark:border-slate-800 text-xs text-slate-400 mb-10"
+    >
+      Comments require JavaScript to load.
+    </p>
+  </noscript>
 
   <!-- Comment Submission Form -->
   <div
@@ -154,6 +149,117 @@ const { postId, comments = [] } = Astro.props;
 </section>
 
 <script>
+  import { commentsEndpoint, toCommentViews } from '../lib/comments';
+  import type { CommentView } from '../lib/comments';
+
+  function escapeText(value: string): string {
+    const el = document.createElement('span');
+    el.textContent = value;
+    return el.innerHTML;
+  }
+
+  function commentMarkup(view: CommentView): string {
+    const date = new Date(view.date).toLocaleDateString('en-GB');
+    return `
+      <div class="bg-light-subtle dark:bg-dark-subtle border border-slate-200/70 dark:border-slate-800 rounded-2xl p-5 flex gap-4 items-start">
+        <div class="w-10 h-10 rounded-full bg-grad-primary text-white font-black text-sm flex items-center justify-center flex-shrink-0 shadow-sm">${escapeText(view.initial)}</div>
+        <div class="flex-grow">
+          <div class="flex items-center justify-between gap-2 mb-1">
+            <span class="font-heading font-bold text-sm text-slate-900 dark:text-white">${escapeText(view.author)}</span>
+            <span class="text-[11px] text-slate-400">${escapeText(date)}</span>
+          </div>
+          <div class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed prose-sm">${view.html}</div>
+        </div>
+      </div>`;
+  }
+
+  const EMPTY_MARKUP = `
+    <div class="text-center py-8 px-4 rounded-2xl bg-light-subtle dark:bg-dark-subtle border border-dashed border-slate-200 dark:border-slate-800 text-xs text-slate-400">
+      No comments yet on this article. Be the first to join the conversation! 👇
+    </div>`;
+
+  const FAILED_MARKUP = `
+    <div class="text-center py-8 px-4 rounded-2xl bg-light-subtle dark:bg-dark-subtle border border-dashed border-slate-200 dark:border-slate-800 text-xs text-slate-400">
+      Comments could not be loaded right now. Please refresh to try again.
+    </div>`;
+
+  function setCount(count: number | null) {
+    const heading = document.getElementById('commentsHeadingCount');
+    if (heading) heading.textContent = count === null ? '' : `(${count})`;
+    const badge = document.getElementById('postCommentCount');
+    if (badge) {
+      badge.textContent =
+        count === null ? '💬 Comments' : `💬 ${count} Comments`;
+    }
+  }
+
+  async function loadComments(postId: number, bust = false) {
+    const container = document.getElementById('commentsListContainer');
+    if (!container) return;
+
+    // aria-live/aria-busy live on this container itself, never on its
+    // children: innerHTML below replaces the children wholesale on every
+    // call, which would destroy any inner wrapper carrying them instead.
+    container.setAttribute('aria-busy', 'true');
+
+    try {
+      const response = await fetch(commentsEndpoint(postId, bust), {
+        headers: { Accept: 'application/json' },
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+      const views = toCommentViews(await response.json());
+      container.innerHTML =
+        views.length > 0 ? views.map(commentMarkup).join('') : EMPTY_MARKUP;
+      setCount(views.length);
+    } catch {
+      // Deliberately not a success message. A read that failed must read as
+      // failed — the write path told visitors their comment was saved when it
+      // was not, and that bug is not repeated here.
+      container.innerHTML = FAILED_MARKUP;
+      setCount(null);
+    } finally {
+      // The list, empty state or failure state has now been written, so the
+      // region is no longer busy regardless of which branch ran.
+      container.setAttribute('aria-busy', 'false');
+    }
+  }
+
+  function setupCommentLoading() {
+    const section = document.getElementById('comments');
+    if (!section) return;
+
+    // Read from the section, not the form: rendering the list must not depend
+    // on the submission form existing.
+    const postId = Number(section.dataset.postId);
+    if (!Number.isFinite(postId) || postId <= 0) return;
+
+    // Lazy on purpose: most readers never reach the comments, and every fetch
+    // that does happen boots WordPress on Lightsail. The static site exists to
+    // keep front-end traffic off that host.
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        observer.disconnect();
+        void loadComments(postId);
+      },
+      { rootMargin: '200px' }
+    );
+    observer.observe(section);
+
+    // With <ClientRouter />, navigating away before the section ever
+    // intersects would otherwise leave this observer watching a detached
+    // node, one per visit. `once: true` because a fresh observer (and
+    // listener) is created on every astro:page-load.
+    document.addEventListener(
+      'astro:before-swap',
+      () => observer.disconnect(),
+      { once: true }
+    );
+  }
+
+  document.addEventListener('astro:page-load', setupCommentLoading);
+
   const STATUS_CLASSES = {
     success: ['bg-emerald-500/10', 'text-emerald-500'],
     error: ['bg-red-500/10', 'text-red-500'],
@@ -229,6 +335,7 @@ const { postId, comments = [] } = Astro.props;
             '🎉 Thank you! Your comment has been submitted for moderation and will appear shortly.'
           );
           form.reset();
+          void loadComments(Number(postId), true);
         } else {
           const errData = await response.json().catch(() => ({}));
           showStatus(

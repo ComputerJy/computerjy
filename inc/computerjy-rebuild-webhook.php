@@ -2,7 +2,7 @@
 /**
  * Plugin Name: ComputerJy Rebuild Dispatch
  * Description: Triggers the GitHub Actions deploy workflow when content the static site is built from changes.
- * Version: 2.0.0
+ * Version: 3.0.0
  * Author: Eyad Salah
  * Requires PHP: 8.0
  *
@@ -163,10 +163,15 @@ function computerjy_trigger_rebuild( $reason ) {
 
 /*
  * The hooks below mirror exactly what src/lib/wp-loader.ts fetches: published
- * posts, categories, tags, approved comments, and the media referenced as featured
- * images. Anything else in WordPress leaves the built site unchanged and must not
- * start a deploy. Pages are absent on purpose — contact-me and privacy-policy are
- * hand-authored Astro files, not WordPress content.
+ * posts, terms and featured media only. Anything else in WordPress leaves the
+ * built site unchanged and must not start a deploy. Pages are absent on purpose —
+ * contact-me and privacy-policy are hand-authored Astro files, not WordPress
+ * content.
+ *
+ * Comments are deliberately absent. They are fetched by the browser at view time
+ * (see src/components/Comments.astro), so a comment changes nothing the build
+ * produces and must not start a deploy. Rebuilding 490 pages to publish one
+ * paragraph is what this removal exists to stop.
  */
 
 /**
@@ -209,73 +214,6 @@ function computerjy_on_post_deleted( $post_id, $post = null ) {
     computerjy_queue_rebuild( sprintf( 'post %d deleted', (int) $post_id ) );
 }
 add_action( 'deleted_post', 'computerjy_on_post_deleted', 10, 2 );
-
-/**
- * Handles a newly inserted comment.
- *
- * Hooked to `wp_insert_comment` rather than `comment_post`, because the static site's
- * form posts to /wp-json/wp/v2/comments and WP_REST_Comments_Controller::create_item()
- * calls wp_insert_comment() directly — it never calls wp_new_comment(), so `comment_post`
- * never fires for a comment left by a visitor. `wp_insert_comment` fires on every path:
- * REST, the classic form (wp_new_comment() inserts through it), WP-CLI and imports.
- *
- * @param int        $comment_id New comment ID.
- * @param WP_Comment $comment    The inserted comment.
- */
-function computerjy_on_comment_inserted( $comment_id, $comment ) {
-    // A comment held for moderation is invisible to the build. Approving it later
-    // fires transition_comment_status, which is where that deploy comes from.
-    if ( ! $comment || '1' !== (string) $comment->comment_approved ) {
-        return;
-    }
-    computerjy_queue_rebuild( sprintf( 'comment %d posted', (int) $comment_id ) );
-}
-add_action( 'wp_insert_comment', 'computerjy_on_comment_inserted', 10, 2 );
-
-/**
- * Handles approval, unapproval, spam and trash of an existing comment.
- *
- * @param string     $new_status New comment status.
- * @param string     $old_status Previous comment status.
- * @param WP_Comment $comment    Comment object.
- */
-function computerjy_on_comment_transition( $new_status, $old_status, $comment ) {
-    if ( 'approved' !== $new_status && 'approved' !== $old_status ) {
-        return;
-    }
-    computerjy_queue_rebuild(
-        sprintf( 'comment %d: %s to %s', (int) $comment->comment_ID, $old_status, $new_status )
-    );
-}
-add_action( 'transition_comment_status', 'computerjy_on_comment_transition', 10, 3 );
-
-/**
- * Handles an edit to a comment's text or author.
- *
- * @param int $comment_id Edited comment ID.
- */
-function computerjy_on_comment_edited( $comment_id ) {
-    $comment = get_comment( $comment_id );
-    if ( ! $comment || '1' !== (string) $comment->comment_approved ) {
-        return;
-    }
-    computerjy_queue_rebuild( sprintf( 'comment %d edited', (int) $comment_id ) );
-}
-add_action( 'edit_comment', 'computerjy_on_comment_edited', 10, 1 );
-
-/**
- * Handles a permanently deleted comment.
- *
- * @param int             $comment_id Deleted comment ID.
- * @param WP_Comment|null $comment    Deleted comment object.
- */
-function computerjy_on_comment_deleted( $comment_id, $comment = null ) {
-    if ( $comment && '1' !== (string) $comment->comment_approved ) {
-        return;
-    }
-    computerjy_queue_rebuild( sprintf( 'comment %d deleted', (int) $comment_id ) );
-}
-add_action( 'deleted_comment', 'computerjy_on_comment_deleted', 10, 2 );
 
 /**
  * Handles category and tag creation, renaming, description edits and deletion.

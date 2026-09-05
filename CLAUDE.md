@@ -53,7 +53,10 @@ Content is fetched from `https://www.computerjy.com/wp-json/wp/v2` **at build ti
 Consequences:
 
 - A build only works while the API is reachable. `fetchAllPaginated` hard-fails on a partial or empty response rather than shipping stale content, and `npm run verify:build` gates the deploy.
-- The loader fetches posts, categories, tags, comments and featured media only. Comments ship inside each post object (`post.comments`), consumed by `Comments.astro`.
+- The loader fetches posts, categories, tags and featured media only. Comments are **not** build-time data:
+  `Comments.astro` fetches them from `/wp-json/wp/v2/comments` in the browser when the section scrolls into
+  view, and the Worker caches that endpoint for 60s. A new comment therefore needs no rebuild — which is the
+  point, since publishing one paragraph used to cost a 490-page build, an rsync, an R2 mirror and an edge purge.
 - WordPress _pages_ are not fetched — `contact-me` and `privacy-policy` are hand-authored Astro files.
 - Every page uses `getStaticPaths` over the full post list; `output: 'static'`, `trailingSlash: 'never'`, `format: 'directory'`.
 - `src/pages/rss.xml.ts` and `src/pages/search-index.json.ts` are build-time endpoints emitting `/rss.xml` and `/search-index.json` (the latter powers the ⌘K `SearchModal`).
@@ -121,11 +124,8 @@ Serving these correctly depends on the **web server config**, which is checked i
 - Theme helpers live in `functions.php`: `computerjy_reading_time`, `computerjy_get_category_badge`, `computerjy_breadcrumbs`, `computerjy_pagination`, `computerjy_comment_callback`, plus customizer and widget registration.
 - `inc/computerjy-rebuild-webhook.php` is a **WordPress plugin**, not a theme file, and is installed by hand on the
   origin (the deploy only touches the static webroot). It POSTs `repository_dispatch` to GitHub when content the
-  build consumes changes; its hook set mirrors what `src/lib/wp-loader.ts` fetches, so it covers comments and term
-  edits as well as posts. New comments are caught on `wp_insert_comment`, **not** `comment_post`: the static site's
-  form posts to the REST API, and `WP_REST_Comments_Controller::create_item()` calls `wp_insert_comment()` directly
-  without going through `wp_new_comment()`, so `comment_post` never fires for a visitor's comment. A comment that
-  reaches the database without dispatching is invisible — it is approved and in the API, but no rebuild ships it. The token is the `COMPUTERJY_GITHUB_DISPATCH_TOKEN` constant in `wp-config.php`, never an
+  build consumes changes. It hooks posts, terms and media only. The comment hooks were removed deliberately: comments are read by the
+  browser at view time, so they change nothing the build produces. The token is the `COMPUTERJY_GITHUB_DISPATCH_TOKEN` constant in `wp-config.php`, never an
   option — this host keeps database backups on disk. See `deploy/wordpress-rebuild-trigger.md`.
 - `inc/computerjy-rest-comments.php` is a second hand-installed **plugin**. It adds
   `rest_allow_anonymous_comments`, without which core's `WP_REST_Comments_Controller` rejects every

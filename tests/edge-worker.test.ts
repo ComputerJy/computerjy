@@ -214,6 +214,45 @@ describe('the origin keeps everything it owns', () => {
   });
 });
 
+describe('comments endpoint edge cache', () => {
+  // Regression guard for the cache-poisoning fix in 4bca3a9: forwarding the
+  // caller's own request (and so its Cookie) to the origin, then caching the
+  // response under a URL-only key, would serve a logged-in moderator's view —
+  // pending comments plus author_email/author_ip — to every anonymous visitor
+  // for 60 seconds. `tests/edge-router.test.ts` only checks that
+  // `anonymousCommentsRequest` builds a credential-free Request in isolation;
+  // it does not check that the Worker actually uses it for the origin fetch.
+  // Reverting the origin call to `fetch(request)` reintroduces the
+  // vulnerability while leaving that unit test green — this test is the one
+  // that must fail if that happens.
+  it('never forwards the caller credentials to the origin subrequest', async () => {
+    let originRequest: Request | undefined;
+    const fetchSpy = vi
+      .spyOn(globalThis, 'fetch')
+      .mockImplementation(async (input) => {
+        originRequest = input as Request;
+        return new Response('[]', {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      });
+    const bucket = fakeBucket(BUILD);
+
+    const res = await worker.fetch(
+      get('/wp-json/wp/v2/comments?post=1', {
+        headers: { Cookie: 'wordpress_logged_in_x=y' },
+      }),
+      { ASSETS: bucket },
+      ctx
+    );
+
+    expect(originRequest).toBeInstanceOf(Request);
+    expect(originRequest?.headers.has('cookie')).toBe(false);
+    expect(await res.text()).toBe('[]');
+    fetchSpy.mockRestore();
+  });
+});
+
 describe('legacy WordPress permalinks', () => {
   it('301s to the canonical URL once the target is confirmed', async () => {
     const bucket = fakeBucket(BUILD);

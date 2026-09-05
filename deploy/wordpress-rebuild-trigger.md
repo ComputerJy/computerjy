@@ -96,28 +96,41 @@ immediately.
 
 ## Which changes trigger a deploy
 
-The hook set mirrors exactly what `src/lib/wp-loader.ts` fetches. Anything else in
-WordPress leaves the built site unchanged and deliberately does not deploy.
+The hook set mirrors exactly what `src/lib/wp-loader.ts` fetches: posts, terms and
+featured media. Anything else in WordPress leaves the built site unchanged and
+deliberately does not deploy.
 
 | Change                                                         | Hook                                         |
 | -------------------------------------------------------------- | -------------------------------------------- |
 | Post published, unpublished, edited, trashed, scheduled → live | `transition_post_status`                     |
 | Post permanently deleted (bypasses the transition)             | `deleted_post`                               |
-| Comment posted and auto-approved                               | `comment_post`                               |
-| Comment approved, unapproved, spammed, trashed                 | `transition_comment_status`                  |
-| Approved comment edited or deleted                             | `edit_comment`, `deleted_comment`            |
 | Category or tag created, renamed, re-described, deleted        | `created_term`, `edited_term`, `delete_term` |
 | Media file replaced or deleted                                 | `attachment_updated`, `delete_attachment`    |
 
-Comments and term descriptions matter because the build embeds them — comments ship
-inside each post object, and term names and descriptions are rendered on archive
-pages. A category rename that touches no post still changes the site.
+Term descriptions matter because the build embeds them — term names and
+descriptions are rendered on archive pages, so a category rename that touches no
+post still changes the site.
 
 **Pages are absent on purpose.** `contact-me` and `privacy-policy` are hand-authored
 Astro files; WordPress pages are not fetched by the build.
 
-A comment held for moderation does not deploy. It is invisible to the build until
-approval, which is its own trigger.
+**Comments are absent on purpose, and deliberately so.** They are not build-time
+data: `src/components/Comments.astro` fetches `/wp-json/wp/v2/comments` from the
+browser when the comments section scrolls into view, and the Worker caches that
+endpoint for 60 seconds at the edge (`workers/edge-router/src/router.ts`). A new
+comment therefore needs no rebuild, no rsync, no R2 mirror and no edge purge — it
+becomes visible the next time that 60-second cache expires, not on the next deploy.
+The plugin used to hook `wp_insert_comment`, `transition_comment_status`,
+`edit_comment` and a delete hook to dispatch a rebuild for every comment; all four
+are gone as of plugin `Version: 3.0.0`. The insert hook was originally
+`comment_post`, which turned out never to fire for a comment submitted over the
+REST API — `WP_REST_Comments_Controller::create_item()` calls `wp_insert_comment()`
+directly and never calls `wp_new_comment()`, which is what `comment_post` actually
+hangs off — so visitor comments went missing until a manual rebuild (#42), and the
+hook was swapped to `wp_insert_comment` before this design removed the whole
+category. If a comment does not appear, the fault is not here — check the runtime
+fetch (browser devtools, the Worker's edge cache) rather than the dispatch log below,
+which no longer has anything to do with comments.
 
 ## Verifying
 

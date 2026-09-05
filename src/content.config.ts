@@ -8,15 +8,6 @@ import {
 
 const renderedSchema = z.object({ rendered: z.string() });
 
-const commentSchema = z.object({
-  id: z.number(),
-  post_id: z.number(),
-  author: z.string(),
-  date: z.string(),
-  content: z.string(),
-  parent: z.number(),
-});
-
 const termSchema = z.object({ name: z.string(), slug: z.string() });
 
 const posts = defineCollection({
@@ -34,7 +25,6 @@ const posts = defineCollection({
     primaryCategory: termSchema,
     featuredImageUrl: z.url(),
     readingTime: z.string(),
-    comments: z.array(commentSchema),
   }),
 });
 

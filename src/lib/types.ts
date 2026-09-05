@@ -8,10 +8,11 @@ import type { CollectionEntry } from 'astro:content';
  * and `tags: number[]` while the data held slug strings - the exact lie behind the
  * broken tag filter fixed in Task 8. They also carried `_embedded` and
  * `featured_media`, which no code reads and the loader never produces.
- * (`comments` and `modified` were declared by a later commit; the array-of-number
- * claims were not.)
+ * (`modified` was declared by a later commit; the array-of-number claims were
+ * not. `comments` was declared by that same commit and later removed — comments
+ * are fetched at view time by the browser, not by the build; see `RestComment`
+ * in `src/lib/comments.ts`.)
  */
 export type WPPost = CollectionEntry<'posts'>['data'];
 export type WPCategory = CollectionEntry<'categories'>['data'];
 export type WPTag = CollectionEntry<'tags'>['data'];
-export type WPComment = WPPost['comments'][number];
