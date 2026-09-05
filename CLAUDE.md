@@ -122,7 +122,10 @@ Serving these correctly depends on the **web server config**, which is checked i
 - `inc/computerjy-rebuild-webhook.php` is a **WordPress plugin**, not a theme file, and is installed by hand on the
   origin (the deploy only touches the static webroot). It POSTs `repository_dispatch` to GitHub when content the
   build consumes changes; its hook set mirrors what `src/lib/wp-loader.ts` fetches, so it covers comments and term
-  edits as well as posts. The token is the `COMPUTERJY_GITHUB_DISPATCH_TOKEN` constant in `wp-config.php`, never an
+  edits as well as posts. New comments are caught on `wp_insert_comment`, **not** `comment_post`: the static site's
+  form posts to the REST API, and `WP_REST_Comments_Controller::create_item()` calls `wp_insert_comment()` directly
+  without going through `wp_new_comment()`, so `comment_post` never fires for a visitor's comment. A comment that
+  reaches the database without dispatching is invisible — it is approved and in the API, but no rebuild ships it. The token is the `COMPUTERJY_GITHUB_DISPATCH_TOKEN` constant in `wp-config.php`, never an
   option — this host keeps database backups on disk. See `deploy/wordpress-rebuild-trigger.md`.
 - `inc/computerjy-rest-comments.php` is a second hand-installed **plugin**. It adds
   `rest_allow_anonymous_comments`, without which core's `WP_REST_Comments_Controller` rejects every

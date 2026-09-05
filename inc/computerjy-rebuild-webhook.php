@@ -211,20 +211,26 @@ function computerjy_on_post_deleted( $post_id, $post = null ) {
 add_action( 'deleted_post', 'computerjy_on_post_deleted', 10, 2 );
 
 /**
- * Handles a newly submitted comment.
+ * Handles a newly inserted comment.
  *
- * @param int        $comment_id       New comment ID.
- * @param int|string $comment_approved 1 when auto-approved, 0 when held, 'spam' when caught.
+ * Hooked to `wp_insert_comment` rather than `comment_post`, because the static site's
+ * form posts to /wp-json/wp/v2/comments and WP_REST_Comments_Controller::create_item()
+ * calls wp_insert_comment() directly — it never calls wp_new_comment(), so `comment_post`
+ * never fires for a comment left by a visitor. `wp_insert_comment` fires on every path:
+ * REST, the classic form (wp_new_comment() inserts through it), WP-CLI and imports.
+ *
+ * @param int        $comment_id New comment ID.
+ * @param WP_Comment $comment    The inserted comment.
  */
-function computerjy_on_comment_post( $comment_id, $comment_approved ) {
+function computerjy_on_comment_inserted( $comment_id, $comment ) {
     // A comment held for moderation is invisible to the build. Approving it later
     // fires transition_comment_status, which is where that deploy comes from.
-    if ( 1 !== (int) $comment_approved ) {
+    if ( ! $comment || '1' !== (string) $comment->comment_approved ) {
         return;
     }
     computerjy_queue_rebuild( sprintf( 'comment %d posted', (int) $comment_id ) );
 }
-add_action( 'comment_post', 'computerjy_on_comment_post', 10, 2 );
+add_action( 'wp_insert_comment', 'computerjy_on_comment_inserted', 10, 2 );
 
 /**
  * Handles approval, unapproval, spam and trash of an existing comment.
