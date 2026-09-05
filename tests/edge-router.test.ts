@@ -5,6 +5,7 @@ import {
   LINK_HEADER,
   LINKSET_CONTENT_TYPE,
   SECURITY_HEADERS,
+  anonymousCommentsRequest,
   assetCandidates,
   cacheControlForKey,
   contentTypeForKey,
@@ -428,5 +429,16 @@ describe('comments endpoint edge cache', () => {
 
   it('holds comments for a minute at the edge only', () => {
     expect(COMMENTS_CACHE_CONTROL).toBe('public, max-age=0, s-maxage=60');
+  });
+
+  it('strips credentials so the cached body is always the anonymous view', () => {
+    const url = new URL('/wp-json/wp/v2/comments?post=13213', BASE);
+    const request = anonymousCommentsRequest(url);
+
+    expect(request.method).toBe('GET');
+    expect(request.url).toBe(url.toString());
+    // Headers lookups are case-insensitive, so this also catches Cookie/COOKIE.
+    expect(request.headers.has('cookie')).toBe(false);
+    expect(request.headers.has('authorization')).toBe(false);
   });
 });

@@ -317,6 +317,20 @@ export function isCacheableCommentsRequest(url: URL, method: string): boolean {
 }
 
 /**
+ * The anonymous form of a comments request — used both as the cache key and as
+ * the origin subrequest.
+ *
+ * Forwarding the caller's request would forward its `Cookie` header, and
+ * WordPress answers a logged-in moderator with pending comments plus
+ * author_email and author_ip on each one. Cached under a URL-only key, that
+ * response would be served to every anonymous visitor for the next minute.
+ * Reading anonymously makes the cached body safe to share by construction.
+ */
+export function anonymousCommentsRequest(url: URL): Request {
+  return new Request(url.toString(), { method: 'GET' });
+}
+
+/**
  * Mirrors the vhost's `mod_expires` table, with two deliberate additions:
  * `_astro/*` is immutable (the filenames are content-hashed), and the
  * documents a rebuild replaces in place — HTML, the feeds, the sitemaps and

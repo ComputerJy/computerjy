@@ -14,6 +14,7 @@
 import {
   COMMENTS_CACHE_CONTROL,
   SECURITY_HEADERS,
+  anonymousCommentsRequest,
   cacheControlForKey,
   contentTypeForKey,
   forcedContentType,
@@ -171,11 +172,11 @@ export default {
       }
 
       const commentsCache = edgeCache();
-      const commentsKey = new Request(url.toString(), { method: 'GET' });
+      const commentsKey = anonymousCommentsRequest(url);
       const cached = await commentsCache.match(commentsKey);
       if (cached !== undefined) return cached;
 
-      const origin = await fetch(request);
+      const origin = await fetch(anonymousCommentsRequest(url));
       // Only a good read is worth holding: caching an error would repeat it for
       // a minute, and a Set-Cookie in a shared cache would leak between readers.
       if (origin.status !== 200) return origin;
