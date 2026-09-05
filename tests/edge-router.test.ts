@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import {
+  COMMENTS_CACHE_CONTROL,
   LINK_HEADER,
   LINKSET_CONTENT_TYPE,
   SECURITY_HEADERS,
@@ -8,6 +9,7 @@ import {
   cacheControlForKey,
   contentTypeForKey,
   forcedContentType,
+  isCacheableCommentsRequest,
   isJetpackCallback,
   route,
   wantsMarkdown,
@@ -387,5 +389,44 @@ describe('legacy WordPress permalinks', () => {
 
   it('refuses a slug carrying an encoded separator', () => {
     expect(decide('/2015/07/a%2F..%2Fetc/').kind).not.toBe('redirect');
+  });
+});
+
+describe('comments endpoint edge cache', () => {
+  it('caches GETs of the comments collection', () => {
+    expect(
+      isCacheableCommentsRequest(
+        new URL('/wp-json/wp/v2/comments?post=13213', BASE),
+        'GET'
+      )
+    ).toBe(true);
+  });
+
+  it('never caches a write', () => {
+    for (const method of ['POST', 'PUT', 'DELETE']) {
+      expect(
+        isCacheableCommentsRequest(
+          new URL('/wp-json/wp/v2/comments', BASE),
+          method
+        )
+      ).toBe(false);
+    }
+  });
+
+  it('leaves the rest of the REST API alone', () => {
+    for (const path of [
+      '/wp-json/wp/v2/posts',
+      '/wp-json/wp/v2/comments/816',
+      '/wp-json/',
+      '/wp-admin/',
+    ]) {
+      expect(isCacheableCommentsRequest(new URL(path, BASE), 'GET')).toBe(
+        false
+      );
+    }
+  });
+
+  it('holds comments for a minute at the edge only', () => {
+    expect(COMMENTS_CACHE_CONTROL).toBe('public, max-age=0, s-maxage=60');
   });
 });

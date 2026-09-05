@@ -296,6 +296,27 @@ export function contentTypeForKey(key: string): string {
 }
 
 /**
+ * The one origin response this Worker caches.
+ *
+ * Comments are fetched by the browser on every post view (they left the build
+ * in the runtime-comments change), so without this each view boots WordPress on
+ * Lightsail. Sixty seconds collapses a burst on a popular post to roughly one
+ * origin hit per minute while keeping a new comment visible almost immediately.
+ *
+ * `max-age=0` keeps browsers revalidating; only the edge holds it.
+ *
+ * There is deliberately no `deploy/lightsail-apache.conf` counterpart. Apache
+ * only serves this path if the Worker routes are removed, and an uncached
+ * fallback is correct behaviour rather than drift.
+ */
+export const COMMENTS_CACHE_CONTROL = 'public, max-age=0, s-maxage=60';
+
+/** True for exactly the collection read the comment list issues. */
+export function isCacheableCommentsRequest(url: URL, method: string): boolean {
+  return method === 'GET' && url.pathname === '/wp-json/wp/v2/comments';
+}
+
+/**
  * Mirrors the vhost's `mod_expires` table, with two deliberate additions:
  * `_astro/*` is immutable (the filenames are content-hashed), and the
  * documents a rebuild replaces in place — HTML, the feeds, the sitemaps and
