@@ -17,3 +17,5 @@ export { PostCard } from './components/PostCard';
 export type { PostCardProps } from './components/PostCard';
 export { HeroBanner } from './components/HeroBanner';
 export type { HeroBannerProps, HeroStat } from './components/HeroBanner';
+export { SocialShare } from './components/SocialShare';
+export type { SocialShareProps } from './components/SocialShare';
