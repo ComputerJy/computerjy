@@ -6,6 +6,9 @@ node_modules/
 dist/
 .astro/
 
+# Test artifacts
+.vitest/
+
 # Logs
 npm-debug.log*
 yarn-debug.log*
