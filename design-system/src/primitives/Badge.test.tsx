@@ -18,4 +18,16 @@ describe('Badge', () => {
     const { container } = render(<Badge>Plain</Badge>);
     expect(container.querySelectorAll('span')).toHaveLength(1);
   });
+
+  it('separates the icon from the label with a single space', () => {
+    const { container } = render(<Badge icon="✦">Welcome</Badge>);
+    expect(container.querySelector('.badge-glow')?.textContent).toBe(
+      '✦ Welcome'
+    );
+  });
+
+  it('has no leading space in textContent when no icon is given', () => {
+    const { container } = render(<Badge>Plain</Badge>);
+    expect(container.querySelector('.badge-glow')?.textContent).toBe('Plain');
+  });
 });

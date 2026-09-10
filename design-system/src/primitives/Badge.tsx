@@ -15,9 +15,11 @@ export function Badge({ children, icon }: BadgeProps) {
   return (
     <span className="badge-glow">
       {icon ? (
-        <span className="text-amber-600 dark:text-brand-amber font-bold">
-          {icon}
-        </span>
+        <>
+          <span className="text-amber-600 dark:text-brand-amber font-bold">
+            {icon}
+          </span>{' '}
+        </>
       ) : null}
       {children}
     </span>
