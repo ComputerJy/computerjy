@@ -26,22 +26,16 @@ const totalPages = feedPageCount(posts.length);
     <HeroBanner />
 
     <!-- Bento Featured Section -->
-    {
-      featuredPost && (
-        <BentoShowcase featuredPost={featuredPost} sidePosts={sidePosts} />
-      )
-    }
+    {featuredPost && (
+      <BentoShowcase featuredPost={featuredPost} sidePosts={sidePosts} />
+    )}
 
     <!-- Main Content & Sidebar Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
       <!-- Feed Stream (8 cols) -->
       <div class="lg:col-span-8">
-        <div
-          class="flex items-center justify-between pb-3 mb-6 border-b-2 border-slate-200/80 dark:border-slate-800"
-        >
-          <h2
-            class="text-xl sm:text-2xl font-heading font-black text-slate-900 dark:text-white flex items-center gap-2.5"
-          >
+        <div class="flex items-center justify-between pb-3 mb-6 border-b-2 border-slate-200/80 dark:border-slate-800">
+          <h2 class="text-xl sm:text-2xl font-heading font-black text-slate-900 dark:text-white flex items-center gap-2.5">
             <span class="w-2.5 h-6 rounded-sm bg-grad-primary"></span>
             Latest Articles &amp; Insights
           </h2>
@@ -49,7 +43,9 @@ const totalPages = feedPageCount(posts.length);
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
-          {feedPosts.map((post) => <PostCard post={post} />)}
+          {feedPosts.map((post) => (
+            <PostCard post={post} />
+          ))}
         </div>
 
         <!-- Working Responsive Pagination -->
