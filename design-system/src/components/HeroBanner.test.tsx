@@ -21,6 +21,19 @@ describe('HeroBanner', () => {
     expect(screen.getByText('18+')).toBeInTheDocument();
     expect(screen.getByText('100%')).toBeInTheDocument();
     expect(screen.getByText('Articles & Tips')).toBeInTheDocument();
+    expect(screen.getByText('Years Online')).toBeInTheDocument();
+    expect(screen.getByText('Independent')).toBeInTheDocument();
+
+    // Assert tone classes on stat values
+    expect(screen.getByText('500+')).toHaveClass('text-brand-blue');
+    expect(screen.getByText('18+')).toHaveClass(
+      'text-pink-600',
+      'dark:text-brand-pink'
+    );
+    expect(screen.getByText('100%')).toHaveClass(
+      'text-amber-600',
+      'dark:text-brand-amber'
+    );
   });
 
   it('accepts overridden copy and stats', () => {
