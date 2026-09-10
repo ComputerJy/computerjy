@@ -12,15 +12,13 @@ const { postId } = Astro.props;
   data-post-id={postId}
 >
   <div class="flex items-center justify-between mb-8">
-    <h3
-      class="text-xl sm:text-2xl font-heading font-black text-slate-900 dark:text-white flex items-center gap-2.5"
-    >
+    <h3 class="text-xl sm:text-2xl font-heading font-black text-slate-900 dark:text-white flex items-center gap-2.5">
       <span class="w-2.5 h-6 rounded-sm bg-grad-primary"></span>
       Discussion <span id="commentsHeadingCount"></span>
     </h3>
-    <span class="text-xs text-slate-400 font-semibold"
-      >Powered by WordPress</span
-    >
+    <span class="text-xs text-slate-400 font-semibold">
+      Powered by WordPress
+    </span>
   </div>
 
   <!-- Comments List -->
@@ -31,17 +29,15 @@ const { postId } = Astro.props;
     aria-busy="true"
   >
     <div id="commentsLoading" class="flex flex-col gap-5">
-      {
-        [0, 1].map(() => (
-          <div class="bg-light-subtle dark:bg-dark-subtle border border-slate-200/70 dark:border-slate-800 rounded-2xl p-5 flex gap-4 items-start animate-pulse">
-            <div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex-shrink-0" />
-            <div class="flex-grow flex flex-col gap-2">
-              <div class="h-3 w-32 rounded bg-slate-200 dark:bg-slate-800" />
-              <div class="h-3 w-full rounded bg-slate-200 dark:bg-slate-800" />
-            </div>
+      {[0, 1].map(() => (
+        <div class="bg-light-subtle dark:bg-dark-subtle border border-slate-200/70 dark:border-slate-800 rounded-2xl p-5 flex gap-4 items-start animate-pulse">
+          <div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex-shrink-0" />
+          <div class="flex-grow flex flex-col gap-2">
+            <div class="h-3 w-32 rounded bg-slate-200 dark:bg-slate-800" />
+            <div class="h-3 w-full rounded bg-slate-200 dark:bg-slate-800" />
           </div>
-        ))
-      }
+        </div>
+      ))}
     </div>
   </div>
 
@@ -55,20 +51,14 @@ const { postId } = Astro.props;
         display: none;
       }
     </style>
-    <p
-      class="text-center py-8 px-4 rounded-2xl bg-light-subtle dark:bg-dark-subtle border border-dashed border-slate-200 dark:border-slate-800 text-xs text-slate-400 mb-10"
-    >
+    <p class="text-center py-8 px-4 rounded-2xl bg-light-subtle dark:bg-dark-subtle border border-dashed border-slate-200 dark:border-slate-800 text-xs text-slate-400 mb-10">
       Comments require JavaScript to load.
     </p>
   </noscript>
 
   <!-- Comment Submission Form -->
-  <div
-    class="bg-white dark:bg-dark-surface border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xs"
-  >
-    <h4
-      class="font-heading font-bold text-base sm:text-lg text-slate-900 dark:text-white mb-2 flex items-center gap-2"
-    >
+  <div class="bg-white dark:bg-dark-surface border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xs">
+    <h4 class="font-heading font-bold text-base sm:text-lg text-slate-900 dark:text-white mb-2 flex items-center gap-2">
       <span>✍️ Leave a Thought</span>
     </h4>
     <p class="text-xs text-slate-500 dark:text-slate-400 mb-6">
@@ -81,8 +71,9 @@ const { postId } = Astro.props;
           <label
             for="commentAuthor"
             class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5"
-            >Name *</label
           >
+            Name *
+          </label>
           <input
             type="text"
             id="commentAuthor"
@@ -96,8 +87,9 @@ const { postId } = Astro.props;
           <label
             for="commentEmail"
             class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5"
-            >Email *</label
           >
+            Email *
+          </label>
           <input
             type="email"
             id="commentEmail"
@@ -113,8 +105,9 @@ const { postId } = Astro.props;
         <label
           for="commentContent"
           class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5"
-          >Comment *</label
         >
+          Comment *
+        </label>
         <textarea
           id="commentContent"
           name="content"
@@ -129,13 +122,12 @@ const { postId } = Astro.props;
       <div
         id="commentStatusNotice"
         class="hidden text-xs font-semibold p-3 rounded-xl"
-      >
-      </div>
+      ></div>
 
       <div class="flex items-center justify-between pt-2">
-        <span class="text-[11px] text-slate-400"
-          >Protected by WordPress comment moderation</span
-        >
+        <span class="text-[11px] text-slate-400">
+          Protected by WordPress comment moderation
+        </span>
         <button
           type="submit"
           id="submitCommentBtn"
