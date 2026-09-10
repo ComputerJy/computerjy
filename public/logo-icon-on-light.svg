@@ -1,20 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 220" width="100%" height="100%" fill="none" style="color: #F8FAFC">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%" fill="none" style="color: #0F172A">
   <defs>
     <!-- C gradient -->
-    <linearGradient id="cGradStack" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="cGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#00D2FF" />
       <stop offset="50%" stop-color="#0080FF" />
       <stop offset="100%" stop-color="#3A0CA3" />
     </linearGradient>
 
     <!-- Play button gradient -->
-    <linearGradient id="playGradStack" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="playGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#00C0FA" />
       <stop offset="100%" stop-color="#7209B7" />
     </linearGradient>
 
     <!-- J gradient -->
-    <linearGradient id="jGradStack" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="jGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#FF70A6" />
       <stop offset="30%" stop-color="#9B5DE5" />
       <stop offset="60%" stop-color="#F15BB5" />
@@ -23,34 +23,29 @@
     </linearGradient>
 
     <!-- Star / Sparkle gradient -->
-    <linearGradient id="starGradStack" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="starGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#FFF275" />
       <stop offset="50%" stop-color="#FF9F1C" />
       <stop offset="100%" stop-color="#FF4040" />
     </linearGradient>
 
-    <filter id="glowStack" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="2" result="blur" />
+    <!-- Glow filter -->
+    <filter id="sparkleGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
       <feComposite in="SourceGraphic" in2="blur" operator="over" />
     </filter>
   </defs>
 
-  <style>
-    /* currentColor cannot inherit when this file is referenced as an image,
-       so the root svg element carries a light-on-dark fallback and the
-       wordmark is never invisible. Inline the SVG to have it follow the
-       surrounding surface instead. */
-    .brand-stack-title { font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; font-weight: 800; font-size: 22px; fill: currentColor; text-anchor: middle; }
-    .brand-stack-sub { font-family: 'Inter', system-ui, -apple-system, sans-serif; font-weight: 500; font-size: 13px; fill: #64748B; text-anchor: middle; letter-spacing: 0.04em; }
-  </style>
-
-  <!-- Mascot Center Scaled (0.65 scale) -->
-  <g transform="translate(48, 12) scale(0.68)">
+  <!-- Mascot C Outer Shape with Pixelated Left Details -->
+  <!-- Main C Body -->
+  <g transform="translate(15, 20)">
+    <!-- Pixel decorative steps on left -->
     <rect x="-6" y="24" width="14" height="14" fill="#00D2FF" rx="2" />
     <rect x="8" y="38" width="12" height="12" fill="#00C0FA" rx="2" />
     <rect x="-6" y="60" width="14" height="16" fill="#0080FF" rx="2" />
     <rect x="-6" y="78" width="14" height="16" fill="#1D4ED8" rx="2" />
 
+    <!-- Main C curve -->
     <path d="M 55 12
              C 82 12, 102 26, 106 44
              L 88 48
@@ -62,23 +57,34 @@
              C 102 114, 82 128, 55 128
              C 24 128, 0 102, 0 70
              C 0 38, 24 12, 55 12 Z"
-          fill="url(#cGradStack)" />
+          fill="url(#cGrad)" />
 
+    <!-- Cute Smiling Face Inside C -->
     <g transform="translate(42, 50)">
+      <!-- Facial features follow currentColor, like the wordmark: the C is an
+           open ring with a transparent interior, so these sit directly on the
+           page. Hardcoded dark ink made them invisible on dark surfaces. -->
+      <!-- Left eye -->
       <ellipse cx="6" cy="6" rx="3.5" ry="5.5" fill="currentColor" />
+      <!-- Right eye -->
       <ellipse cx="24" cy="6" rx="3.5" ry="5.5" fill="currentColor" />
+      <!-- Smiling Open Mouth -->
       <path d="M 6 18 Q 15 29, 24 18 Z" fill="currentColor" />
       <path d="M 9 21 Q 15 27, 21 21 Z" fill="#FF4D6D" />
     </g>
 
-    <path d="M 78 56 L 98 70 L 78 84 Z" fill="url(#playGradStack)" />
+    <!-- Play Button ▶ Inside / Right of C -->
+    <path d="M 78 56 L 98 70 L 78 84 Z" fill="url(#playGrad)" />
     
+    <!-- Letter J -->
     <g transform="translate(108, 26)">
-      <g transform="translate(14, -14)" filter="url(#glowStack)">
-        <path d="M 0 -14 Q 0 0, 14 0 Q 0 0, 0 14 Q 0 0, -14 0 Q 0 0, 0 -14 Z" fill="url(#starGradStack)" />
+      <!-- 4-point Star Sparkle on top of J -->
+      <g transform="translate(14, -14)" filter="url(#sparkleGlow)">
+        <path d="M 0 -14 Q 0 0, 14 0 Q 0 0, 0 14 Q 0 0, -14 0 Q 0 0, 0 -14 Z" fill="url(#starGrad)" />
         <circle cx="10" cy="-8" r="2.5" fill="#FFD166" />
       </g>
 
+      <!-- J shape -->
       <path d="M 12 10
                L 26 10
                L 26 70
@@ -88,12 +94,7 @@
                C -20 78, -14 82, -6 82
                C 6 82, 12 76, 12 64
                Z"
-            fill="url(#jGradStack)" />
+            fill="url(#jGrad)" />
     </g>
   </g>
-
-  <!-- Centered Typography -->
-  <text x="120" y="165" class="brand-stack-title">ComputerJy</text>
-  <text x="120" y="188" class="brand-stack-title">World</text>
-  <text x="120" y="210" class="brand-stack-sub">computerjy.com</text>
 </svg>
