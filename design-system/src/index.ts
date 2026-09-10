@@ -19,3 +19,5 @@ export { HeroBanner } from './components/HeroBanner';
 export type { HeroBannerProps, HeroStat } from './components/HeroBanner';
 export { SocialShare } from './components/SocialShare';
 export type { SocialShareProps } from './components/SocialShare';
+export { Pagination, getPageRange } from './components/Pagination';
+export type { PaginationProps } from './components/Pagination';
