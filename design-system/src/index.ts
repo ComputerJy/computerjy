@@ -21,3 +21,5 @@ export { SocialShare } from './components/SocialShare';
 export type { SocialShareProps } from './components/SocialShare';
 export { Pagination, getPageRange } from './components/Pagination';
 export type { PaginationProps } from './components/Pagination';
+export { BentoShowcase } from './components/BentoShowcase';
+export type { BentoShowcaseProps } from './components/BentoShowcase';
