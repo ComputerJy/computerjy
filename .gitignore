@@ -34,3 +34,10 @@ Thumbs.db
 
 # Subagent-driven-development scratch workspace
 .superpowers/
+
+# design-sync converter scratch (staged scripts and generated output)
+.ds-sync/
+ds-bundle/
+.design-sync/.cache/
+.design-sync/learnings/
+.design-sync/node_modules

@@ -1,0 +1,16 @@
+{
+  "projectId": "3fa484f4-e8db-4d86-8dfc-49ede8e46206",
+  "shape": "package",
+  "pkg": "@computerjy/design-system",
+  "globalName": "ComputerjyDS",
+  "buildCmd": "npm run build",
+  "cssEntry": "./dist/styles.css",
+  "tsconfig": "./tsconfig.json",
+  "runtimeFontPrefixes": ["Inter", "Plus Jakarta Sans", "JetBrains Mono"],
+  "overrides": {
+    "BentoShowcase": {
+      "cardMode": "column"
+    }
+  },
+  "readmeHeader": ".design-sync/conventions.md"
+}
