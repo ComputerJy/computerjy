@@ -41,4 +41,26 @@ describe('SocialShare', () => {
     await userEvent.click(screen.getByRole('button', { name: /Copy Link/ }));
     expect(onCopy).toHaveBeenCalledWith(props.url);
   });
+
+  it('calls navigator.clipboard.writeText when the copy button is clicked', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    const originalClipboard = navigator.clipboard;
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      writable: true,
+      configurable: true,
+    });
+
+    try {
+      render(<SocialShare {...props} />);
+      await userEvent.click(screen.getByRole('button', { name: /Copy Link/ }));
+      expect(writeText).toHaveBeenCalledWith(props.url);
+    } finally {
+      Object.defineProperty(navigator, 'clipboard', {
+        value: originalClipboard,
+        writable: true,
+        configurable: true,
+      });
+    }
+  });
 });

@@ -3,7 +3,7 @@ export interface SocialShareProps {
   title: string;
   /** Canonical article URL. Shared as-is. */
   url: string;
-  /** Called with the url after a successful copy. */
+  /** Called with the url when copy is attempted (fires optimistically on click, before clipboard result). */
   onCopy?: (url: string) => void;
 }
 
@@ -20,7 +20,9 @@ export function SocialShare({ title, url, onCopy }: SocialShareProps) {
   )}`;
 
   const handleCopy = () => {
-    void navigator.clipboard?.writeText(url);
+    navigator.clipboard?.writeText(url).catch(() => {
+      // Clipboard API not available or permission denied; fail silently.
+    });
     onCopy?.(url);
   };
 
