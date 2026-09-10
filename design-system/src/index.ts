@@ -13,3 +13,5 @@ export type {
   TermSummary,
   TrendingItem,
 } from './types';
+export { PostCard } from './components/PostCard';
+export type { PostCardProps } from './components/PostCard';
