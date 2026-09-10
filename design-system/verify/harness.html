@@ -1,0 +1,97 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>Design system verification harness</title>
+<link rel="stylesheet" href="../dist/styles.css" />
+<style>
+  body {
+    background: #0b0f16;
+  }
+  section {
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+    padding-bottom: 2rem;
+  }
+  section h2 {
+    color: #64748b;
+  }
+</style>
+<div id="root" class="p-8 flex flex-col gap-12"></div>
+<script type="module">
+  import React from 'https://esm.sh/react@19';
+  import { createRoot } from 'https://esm.sh/react-dom@19/client';
+  import * as DS from '../dist/index.js';
+
+  const post = {
+    title:
+      'Reclaiming the Web: Why Brave, Firefox, and the New Wave of Privacy Browsers Matter More Than Ever',
+    href: '/posts/reclaiming-the-web-why-brave-firefox-and-the-new-wave-of-privacy-browsers-matter-more-than-ever',
+    imageUrl:
+      'https://www.computerjy.com/wp-content/uploads/2026/09/Gemini_Generated_Image_icq5enicq5enicq5-scaled.webp',
+    excerpt:
+      'Every day, the modern web becomes more interconnected, capable, and complex. Yet alongside the incredible conveniences of web apps and instant communication lies a persistent challenge of ubiquitous commercial surveillance that internet users are increasingly pushing back against.',
+    date: '2026-09-05T02:26:46',
+    readingTime: '6 min read',
+    category: 'Reviews',
+  };
+  const avatar = 'https://www.computerjy.com/logo-icon.svg';
+  const h = React.createElement;
+
+  const sections = [
+    ['HeroBanner', h(DS.HeroBanner)],
+    [
+      'BentoShowcase',
+      h(DS.BentoShowcase, {
+        featured: post,
+        side: [post, post, post],
+        authorAvatarUrl: avatar,
+      }),
+    ],
+    ['PostCard', h(DS.PostCard, { ...post, authorAvatarUrl: avatar })],
+    ['Pagination', h(DS.Pagination, { currentPage: 3, totalPages: 12 })],
+    [
+      'SocialShare',
+      h(DS.SocialShare, {
+        title: post.title,
+        url: 'https://www.computerjy.com' + post.href,
+      }),
+    ],
+    [
+      'Sidebar',
+      h(DS.Sidebar, {
+        categories: [
+          { name: 'Reviews', slug: 'reviews', count: 42 },
+          { name: 'Guides', slug: 'guides', count: 18 },
+          { name: 'Opinion', slug: 'opinion', count: 11 },
+        ],
+        tags: [
+          { name: 'linux', slug: 'linux', count: 9 },
+          { name: 'windows', slug: 'windows', count: 7 },
+          { name: 'privacy', slug: 'privacy', count: 5 },
+        ],
+        trendingPosts: [1, 2, 3, 4].map((n) => ({
+          title: `Trending article number ${n}: a headline long enough to test wrapping behaviour`,
+          href: `/posts/trending-${n}`,
+          date: '2026-03-01T00:00:00',
+        })),
+        author: {
+          name: 'Eyad Salah',
+          tagline: 'ComputerJy World • Since 2007',
+          bio: 'Technologist, software enthusiast, and creator sharing independent tech reviews, fun digital curiosities, and practical guides.',
+          avatarUrl: avatar,
+        },
+      }),
+    ],
+  ];
+
+  createRoot(document.getElementById('root')).render(
+    sections.map(([name, el]) =>
+      h('section', { key: name }, [
+        h(
+          'h2',
+          { key: 'h', className: 'text-xs uppercase tracking-wider mb-3' },
+          name
+        ),
+        h('div', { key: 'c' }, el),
+      ])
+    )
+  );
+</script>
