@@ -87,9 +87,9 @@
 
     <!-- Cute Smiling Face Inside C -->
     <g transform="translate(42, 50)">
-      <ellipse cx="6" cy="6" rx="3.5" ry="5.5" fill="#0F172A" />
-      <ellipse cx="24" cy="6" rx="3.5" ry="5.5" fill="#0F172A" />
-      <path d="M 6 18 Q 15 29, 24 18 Z" fill="#0F172A" />
+      <ellipse cx="6" cy="6" rx="3.5" ry="5.5" fill="currentColor" />
+      <ellipse cx="24" cy="6" rx="3.5" ry="5.5" fill="currentColor" />
+      <path d="M 6 18 Q 15 29, 24 18 Z" fill="currentColor" />
       <path d="M 9 21 Q 15 27, 21 21 Z" fill="#FF4D6D" />
     </g>
 
