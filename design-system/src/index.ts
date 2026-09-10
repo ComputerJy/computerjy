@@ -15,3 +15,5 @@ export type {
 } from './types';
 export { PostCard } from './components/PostCard';
 export type { PostCardProps } from './components/PostCard';
+export { HeroBanner } from './components/HeroBanner';
+export type { HeroBannerProps, HeroStat } from './components/HeroBanner';
