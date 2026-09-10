@@ -34,6 +34,7 @@ Thumbs.db
 
 # Subagent-driven-development scratch workspace
 .superpowers/
+docs/superpowers/
 
 # design-sync converter scratch (staged scripts and generated output)
 .ds-sync/

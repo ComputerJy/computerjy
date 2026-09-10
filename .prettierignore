@@ -7,4 +7,5 @@ public/data
 *.php
 .remember
 .superpowers
+docs/superpowers
 .git

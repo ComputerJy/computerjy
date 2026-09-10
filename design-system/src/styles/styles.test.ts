@@ -58,7 +58,15 @@ describe('compiled stylesheet', () => {
 
   it('keeps dark as the default theme in :root, not behind a .dark class', () => {
     const css = readFileSync(CSS, 'utf8');
-    expect(css).toContain("[data-theme='light']");
+    // `[data-theme='light']` alone is too weak a substring to pin this: the
+    // @custom-variant dark declaration also produces it, inside
+    // `:where(html:not([data-theme='light']) *)` selectors — that string
+    // would still be present even if the light-theme token override below
+    // were deleted entirely. Assert the actual light-theme token block
+    // instead, by its selector plus a token value it defines.
+    expect(css).toMatch(
+      /\[data-theme='light'\][^{]*\{[^}]*--bg-base:\s*#f8fafc/
+    );
     expect(css).toMatch(/:root\s*\{[^}]*--bg-base:\s*#0b0f19/);
   });
 

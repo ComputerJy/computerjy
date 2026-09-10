@@ -14,13 +14,13 @@ cd design-system && python3 -m http.server 4321   # serves the harness
 Open `http://localhost:4321/verify/harness.html`. The live site itself is the
 reference — it does not need a local Astro build.
 
-**Two independent switches must both be exercised**, because this design system
-has two theming mechanisms that are not wired together:
-
-1. `data-theme` on `<html>` drives the CSS custom properties (`--bg-base`, …).
-2. `prefers-color-scheme` drives every Tailwind `dark:` utility, because no
-   `@custom-variant dark` is declared. Emulate it in devtools
-   (Rendering → Emulate CSS media feature `prefers-color-scheme`).
+**One switch drives everything.** `data-theme` on `<html>` drives both the CSS
+custom properties (`--bg-base`, …) and every Tailwind `dark:` utility — a
+`@custom-variant dark` in `global.css` binds `dark:` to
+`html:not([data-theme='light']) *`, the same condition the `:root` /
+`[data-theme='light']` token override uses. There is no separate OS switch to
+emulate: toggle `data-theme` on `<html>` (default absent = dark,
+`data-theme="light"` = light) and both mechanisms move together.
 
 Check surface colour and border, corner radius, font family and weight, spacing
 rhythm, gradient direction, and hover state. Prefer reading computed styles over
@@ -29,29 +29,38 @@ judging by eye — several of the checks below are exact values.
 ## Findings
 
 Verified 2026-09-10 by reading computed styles in Chrome, not by eye alone.
-"Dark" and "Light" below name the **OS** colour-scheme state.
+"Dark" and "Light" below name the page's `data-theme` state. **This run
+predates commit `0a895b3`** (same day, later), which added the
+`@custom-variant dark` declaration described above — see footnote ¹ for what
+changed.
 
 | Component     | Dark | Light | Notes                                                                                                             |
 | ------------- | ---- | ----- | ----------------------------------------------------------------------------------------------------------------- |
-| HeroBanner    | pass | see ¹ | `h1` resolves to Plus Jakarta Sans; stat tones render blue / pink / amber; badge is `display:flex` with `gap:6px` |
-| BentoShowcase | pass | see ¹ | featured card `border-radius: 24px` = `rounded-3xl`, so the `CARD_BASE` + override composition resolves correctly |
-| PostCard      | pass | see ¹ | background `rgb(17,24,39)` = `--bg-surface`                                                                       |
+| HeroBanner    | pass | pass  | `h1` resolves to Plus Jakarta Sans; stat tones render blue / pink / amber; badge is `display:flex` with `gap:6px` |
+| BentoShowcase | pass | pass  | featured card `border-radius: 24px` = `rounded-3xl`, so the `CARD_BASE` + override composition resolves correctly |
+| PostCard      | pass | pass  | background `rgb(17,24,39)` = `--bg-surface`                                                                       |
 | Pagination    | pass | pass  | active page renders as `<span aria-current="page">`, not a link                                                   |
 | SocialShare   | pass | pass  | no `dark:`-dependent surfaces                                                                                     |
-| Sidebar       | pass | see ¹ | exactly 4 trending entries — `.slice(0, 4)` holds                                                                 |
+| Sidebar       | pass | pass  | exactly 4 trending entries — `.slice(0, 4)` holds                                                                 |
 
 Tokens confirmed exact: `--bg-base #0b0f19`, `--bg-surface #111827`,
 `--text-primary #f8fafc`, `--brand-cyan #00d2ff`; `<html>` background
 `rgb(11,15,25)`.
 
-¹ **Not a porting defect — reproduced on the live site.** With the OS in light
-mode while the page theme stays dark, the page background stays dark
-(`rgb(11,15,25)`, from `:root`) while every card flips to white
-(`rgb(255,255,255)`) — `dark:bg-dark-surface` switches off and `bg-white`
-remains. Verified identically on https://www.computerjy.com/ (`<html
-class="dark" data-theme="dark">`, page `rgb(11,15,25)`, first article card
-`rgb(255,255,255)`). The mirror reproduces this faithfully, as the fidelity rule
-requires. Tracked as issue #47.
+¹ **A previously-reproduced defect, now deliberately fixed in the mirror.**
+This verification run predates `0a895b3` and originally found, with the OS in
+light mode while the page theme stayed dark, that the page background stayed
+dark (`rgb(11,15,25)`, from `:root`) while every card flipped to white
+(`rgb(255,255,255)`) — `dark:bg-dark-surface` switched off (gated on
+`prefers-color-scheme` at the time) while `bg-white` remained. That was
+verified identically on https://www.computerjy.com/ (`<html class="dark"
+data-theme="dark">`, page `rgb(11,15,25)`, first article card
+`rgb(255,255,255)`), and at the time the mirror reproduced it faithfully, as
+the fidelity rule requires. `0a895b3` deliberately **stopped** reproducing it:
+`dark:` now tracks `data-theme` instead of the OS, so `dark:bg-dark-surface`
+stays active whenever the page itself is dark, regardless of the OS setting —
+this is a documented mirror-only divergence (`.design-sync/NOTES.md`). The
+live site does not carry this fix; it is still tracked as issue #47.
 
 ## Expected differences (not bugs)
 

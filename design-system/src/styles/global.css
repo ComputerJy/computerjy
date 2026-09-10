@@ -316,13 +316,17 @@ h6 {
 @source inline("{flex-col,flex-row,flex-wrap,flex-grow,flex-shrink-0}");
 @source inline("{items,justify}-{start,end,center,between,around}");
 @source inline("grid-cols-{1,2,3,4,5,6,12}");
+@source inline("md:grid-cols-{1,2,3,4,5,6,12}");
 @source inline("lg:grid-cols-{1,2,3,4,5,6,12}");
 @source inline("{col,row}-span-{1,2,3,4,5,6,7,8,12}");
+@source inline("md:col-span-{1,2,3,4,5,6,7,8,12}");
 @source inline("lg:col-span-{1,2,3,4,5,6,7,8,12}");
+@source inline("{sm,md,lg}:{flex,grid,block,hidden}");
 @source inline("gap-{0,1,1.5,2,2.5,3,4,5,6,8,10,12}");
 @source inline("{p,px,py,pt,pr,pb,pl}-{0,1,1.5,2,2.5,3,4,5,6,8,10,12,16}");
 @source inline("{m,mx,my,mt,mr,mb,ml}-{0,1,2,3,4,5,6,8,10,12,auto}");
 @source inline("{w,h}-{full,auto,screen,4,6,8,10,12,16,20,24}");
+@source inline("min-h-screen");
 @source inline("max-w-{xs,sm,md,lg,xl,2xl,3xl,4xl,5xl,6xl,7xl,full,prose}");
 @source inline("text-{xs,sm,base,lg,xl,2xl,3xl,4xl,5xl}");
 @source inline("font-{normal,medium,semibold,bold,extrabold,black}");
