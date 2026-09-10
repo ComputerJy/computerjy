@@ -66,7 +66,13 @@
   --text-primary: #f8fafc;
   --text-secondary: #e2e8f0;
   --text-muted: #94a3b8;
-  --text-subtle: #64748b;
+  /*
+   * MIRROR-ONLY DIVERGENCE (contrast). #64748b measured 3.08:1 on
+   * --bg-elevated and 3.73:1 on --bg-surface, under the 4.5:1 AA floor.
+   * conventions.md advertises this token to the design agent, so it has to be
+   * usable; #8593a8 measures 4.71:1 / 5.69:1. Live site keeps #64748b (#52).
+   */
+  --text-subtle: #8593a8;
 
   --border-color: rgba(255, 255, 255, 0.08);
   --border-hover: rgba(0, 210, 255, 0.4);
@@ -96,11 +102,32 @@ html.light {
 
   --text-primary: #0f172a;
   --text-secondary: #334155;
-  --text-muted: #64748b;
-  --text-subtle: #94a3b8;
+  /*
+   * MIRROR-ONLY DIVERGENCE (contrast), same reasoning as the dark block.
+   * --text-muted #64748b measured 4.34:1 on --bg-subtle (just under AA);
+   * #5f6d80 measures 4.81:1. --text-subtle #94a3b8 measured 2.34-2.56:1,
+   * failing even the 3:1 large-text floor; #5b6878 measures 5.19-5.68:1.
+   */
+  --text-muted: #5f6d80;
+  --text-subtle: #5b6878;
 
   --border-color: rgba(15, 23, 42, 0.08);
   --border-hover: rgba(0, 128, 255, 0.35);
+
+  /*
+   * MIRROR-ONLY DIVERGENCE (contrast). #0080ff as body text on a light
+   * surface measures 3.80:1 — below the 4.5:1 WCAG AA floor — and it is the
+   * light-theme link colour in 13 places (PostCard "Read →", BentoShowcase
+   * "Read Full Story", the Sidebar tagline, the HeroBanner badge). #1d4ed8
+   * measures 6.70:1, and also fixes hover:bg-brand-blue behind white text,
+   * which was failing at the same 3.80:1.
+   *
+   * Dark theme keeps #0080ff (4.67:1 on --bg-surface, already passing), and
+   * the gradients are unaffected because they hardcode their own stops.
+   * The live site does NOT carry this override — see issue #52.
+   */
+  --brand-blue: #1d4ed8;
+  --color-brand-blue: #1d4ed8;
 
   --grad-badge: linear-gradient(
     135deg,
@@ -204,6 +231,25 @@ h6 {
 
 [data-theme='light'] .badge-glow {
   color: var(--brand-blue);
+}
+
+/*
+ * MIRROR-ONLY DIVERGENCE (contrast), same rationale as --brand-blue above.
+ * amber-600 (#e17100) as label text on white measures 3.20:1; amber-700
+ * (#b45309) measures 5.02:1. Applies only in the light theme — the dark
+ * theme uses --brand-amber at 8.64:1 and is untouched.
+ */
+[data-theme='light'] .text-amber-600 {
+  color: #b45309;
+}
+
+/*
+ * MIRROR-ONLY DIVERGENCE (contrast). Inline code uses --brand-pink, which on
+ * the light subtle surface measures 2.93:1. #be123c measures 5.74:1 and keeps
+ * the same rose family. Dark theme is untouched (5.52:1, already passing).
+ */
+[data-theme='light'] .prose-custom code {
+  color: #be123c;
 }
 
 .bg-grad-primary {

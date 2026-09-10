@@ -47,12 +47,35 @@ npx playwright install chromium` inside `.ds-sync/`. Without it the render
    issue #48.
 3. **`Sidebar` takes `onSubscribe` instead of calling `alert()`.** A modal
    dialog blocks the design-preview runtime.
+4. **Colour-contrast overrides in the light theme.** The site's palette fails
+   WCAG AA as body text on light surfaces; the mirror overrides the offending
+   values so every design the agent builds is accessible. All measured:
+
+   | Token / rule                                 | Site           | Mirror    | Was → Now   |
+   | -------------------------------------------- | -------------- | --------- | ----------- |
+   | `--brand-blue`, `--color-brand-blue` (light) | `#0080ff`      | `#1d4ed8` | 3.80 → 6.70 |
+   | `.text-amber-600` (light)                    | `#e17100`      | `#b45309` | 3.20 → 5.02 |
+   | `.prose-custom code` (light)                 | `--brand-pink` | `#be123c` | 2.93 → 5.74 |
+   | `--text-subtle` (dark)                       | `#64748b`      | `#8593a8` | 3.08 → 4.71 |
+   | `--text-subtle` (light)                      | `#94a3b8`      | `#5b6878` | 2.34 → 5.19 |
+   | `--text-muted` (light)                       | `#64748b`      | `#5f6d80` | 4.34 → 4.81 |
+
+   Gradients are untouched — they hardcode their own stops. Dark theme's brand
+   colours already passed (blue 4.67, pink 5.52, amber 8.64) and are unchanged.
+   Guarded by contrast tests in `src/styles/styles.test.ts`. Live site: issue #52.
 
 ## Faithfully reproduced defects (leave alone)
 
 - `shadow-glow-blue` generates no CSS — no `--shadow-glow-blue` token exists in
   the site's `@theme`. Dead in both surfaces. Issue #49.
 - The sidebar newsletter email input has no accessible name. Issue #50.
+- White text on `bg-grad-primary`'s cyan end measures 1.8:1 (category chips,
+  active pagination pill, the newsletter button). Left alone deliberately —
+  changing the signature gradient is a brand decision, not a defect fix. It is
+  documented as a caveat in `conventions.md`. Issue #52.
+- Pagination's disabled Prev/Next measure 2.33:1 (dark) / 2.40:1 (light). WCAG
+  2.1 explicitly exempts inactive controls from contrast minimums, so this is
+  compliant; left as-is to match the site.
 
 ## Re-sync risks — what can silently go stale
 

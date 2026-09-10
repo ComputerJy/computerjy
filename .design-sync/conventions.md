@@ -36,6 +36,16 @@ Use `var(--*)` rather than fixed utilities like `bg-dark-surface` when you want
 the value to follow the theme — the fixed ones do not flip under
 `data-theme="light"`.
 
+### One contrast caveat
+
+`bg-grad-primary` runs cyan → blue → purple. White text over its **cyan end**
+measures 1.8:1, so avoid white body text on that gradient — it is safe over the
+purple end only. The system uses it for small bold uppercase chips; treat it as
+decorative, and put real content on `var(--bg-surface)` instead.
+
+Everything else in the token layer clears WCAG AA (4.5:1) as body text on any
+surface in this system, in both themes.
+
 ### Styling idiom: Tailwind v4 utilities + CSS custom properties
 
 Tokens (theme-aware, prefer these for colour):
