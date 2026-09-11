@@ -144,13 +144,15 @@ function computerjy2_eyebrow_strip() {
  * Byline links row. $position: 'top' | 'bottom'.
  */
 function computerjy2_byline_links( $position = 'top' ) {
-    $url   = rawurlencode( get_permalink() );
-    $title = rawurlencode( get_the_title() );
-    $class = 'bottom' === $position ? 'byline-links post-links-group' : 'byline-links';
+    $url    = rawurlencode( get_permalink() );
+    $title  = rawurlencode( get_the_title() );
+    $x_url  = 'https://twitter.com/intent/tweet?url=' . $url . '&text=' . $title;
+    $fb_url = 'https://www.facebook.com/sharer/sharer.php?u=' . $url;
+    $class  = 'bottom' === $position ? 'byline-links post-links-group' : 'byline-links';
     ?>
     <div class="<?php echo esc_attr( $class ); ?>">
-        <a class="<?php echo 'bottom' === $position ? 'link-primary' : ''; ?>" href="https://twitter.com/intent/tweet?url=<?php echo $url; ?>&text=<?php echo $title; ?>" target="_blank" rel="noopener noreferrer"><?php echo 'bottom' === $position ? esc_html__( 'Share X', 'computerjy2' ) : 'X'; ?></a>
-        <a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo $url; ?>" target="_blank" rel="noopener noreferrer">FB</a>
+        <a class="<?php echo 'bottom' === $position ? 'link-primary' : ''; ?>" href="<?php echo esc_url( $x_url ); ?>" target="_blank" rel="noopener noreferrer"><?php echo 'bottom' === $position ? esc_html__( 'Share X', 'computerjy2' ) : 'X'; ?></a>
+        <a href="<?php echo esc_url( $fb_url ); ?>" target="_blank" rel="noopener noreferrer">FB</a>
         <button type="button" data-copy-link="<?php echo esc_url( get_permalink() ); ?>"><?php esc_html_e( 'Copy link', 'computerjy2' ); ?></button>
     </div>
     <?php

@@ -28,7 +28,7 @@ $cjy_author = get_queried_object();
                         <?php
                         $cjy_count = (int) count_user_posts( $cjy_author->ID, 'post' );
                         /* translators: %d: post count */
-                        printf( esc_html( _n( '%d POST', '%d POSTS', $cjy_count, 'computerjy2' ) ), $cjy_count );
+                        echo esc_html( sprintf( _n( '%d POST', '%d POSTS', $cjy_count, 'computerjy2' ), $cjy_count ) );
                         ?>
                         <?php if ( get_the_author_meta( 'user_url', $cjy_author->ID ) ) : ?>
                             &middot; <a href="<?php echo esc_url( get_the_author_meta( 'user_url', $cjy_author->ID ) ); ?>" rel="noopener"><?php esc_html_e( 'WEBSITE', 'computerjy2' ); ?></a>

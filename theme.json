@@ -90,18 +90,12 @@
         {
           "slug": "cyan-dark",
           "name": "Cyan / dark",
-          "colors": [
-            "#080B12",
-            "#00D2FF"
-          ]
+          "colors": ["#080B12", "#00D2FF"]
         },
         {
           "slug": "purple-dark",
           "name": "Purple / dark",
-          "colors": [
-            "#080B12",
-            "#7209B7"
-          ]
+          "colors": ["#080B12", "#7209B7"]
         }
       ]
     },
@@ -155,13 +149,7 @@
       ]
     },
     "spacing": {
-      "units": [
-        "px",
-        "em",
-        "rem",
-        "%",
-        "vw"
-      ],
+      "units": ["px", "em", "rem", "%", "vw"],
       "spacingSizes": [
         {
           "slug": "20",

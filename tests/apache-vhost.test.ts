@@ -17,12 +17,18 @@ describe('deploy/lightsail-apache.conf serves WordPress', () => {
   });
 
   it('redirects both Astro sitemap URLs to one WordPress sitemap', () => {
-    expect(vhost).toMatch(/RewriteRule \^\/sitemap\(-index\)\?\\\.xml\$ \/\S+ \[R=301,L\]/);
+    expect(vhost).toMatch(
+      /RewriteRule \^\/sitemap\(-index\)\?\\\.xml\$ \/\S+ \[R=301,L\]/
+    );
   });
 
   it('keeps markdown negotiation behind the real-file guard', () => {
-    const guard = vhost.indexOf('RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -f');
-    const markdown = vhost.indexOf('RewriteCond %{HTTP:Accept} text/markdown [NC]');
+    const guard = vhost.indexOf(
+      'RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -f'
+    );
+    const markdown = vhost.indexOf(
+      'RewriteCond %{HTTP:Accept} text/markdown [NC]'
+    );
     expect(guard).toBeGreaterThan(-1);
     expect(markdown).toBeGreaterThan(guard);
   });
@@ -43,7 +49,9 @@ describe('deploy/lightsail-apache.conf serves WordPress', () => {
   });
 
   it('never lets mod_expires touch generated HTML or JSON', () => {
-    expect(vhost).not.toMatch(/ExpiresByType (text\/html|application\/json|text\/markdown)/);
+    expect(vhost).not.toMatch(
+      /ExpiresByType (text\/html|application\/json|text\/markdown)/
+    );
   });
 
   it('does not fall back to a static 404 page', () => {
@@ -52,7 +60,9 @@ describe('deploy/lightsail-apache.conf serves WordPress', () => {
 });
 
 describe('legacy /YYYY/MM/<slug> redirect (moved from the Worker)', () => {
-  const match = vhost.match(/RewriteRule (\^\/\\d\{4\}\S+) \/posts\/\$1 \[R=301,L\]/);
+  const match = vhost.match(
+    /RewriteRule (\^\/\\d\{4\}\S+) \/posts\/\$1 \[R=301,L\]/
+  );
   const pattern = new RegExp(match?.[1] ?? '$^');
 
   it('exists', () => {
@@ -69,10 +79,13 @@ describe('legacy /YYYY/MM/<slug> redirect (moved from the Worker)', () => {
     expect(m?.[1]).toBe(slug);
   });
 
-  it.each(['/posts/2008-review', '/20081/01/x', '/2008/1/x', '/2008/01', '/category/2008/01/x'])(
-    'leaves %s alone',
-    (path) => {
-      expect(pattern.test(path)).toBe(false);
-    }
-  );
+  it.each([
+    '/posts/2008-review',
+    '/20081/01/x',
+    '/2008/1/x',
+    '/2008/01',
+    '/category/2008/01/x',
+  ])('leaves %s alone', (path) => {
+    expect(pattern.test(path)).toBe(false);
+  });
 });
