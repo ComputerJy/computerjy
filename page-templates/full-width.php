@@ -1,6 +1,7 @@
 <?php
 /**
- * Single page (narrow reading shell).
+ * Template Name: Full width (no sidebar)
+ * Template Post Type: page
  *
  * @package ComputerJy2
  */
@@ -10,7 +11,7 @@ get_header();
 
 <main id="primary-content" role="main">
     <div class="container"><?php computerjy2_breadcrumbs(); ?></div>
-    <div class="page-shell">
+    <div class="page-shell page-shell-wide">
         <?php
         while ( have_posts() ) :
             the_post();

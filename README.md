@@ -1,115 +1,79 @@
-# 🚀 ComputerJy World — Modern Headless Astro Frontend & WordPress Theme
+# ComputerJy 2.0
 
-A modern, high-performance, tech-savvy, and energetic theme suite built for **[ComputerJy World](https://www.computerjy.com/)** based on the updated brand identity guidelines.
+A hybrid classic WordPress theme for computerjy.com: PHP templates plus a full
+`theme.json` so the block editor matches the front end.
 
----
+Direction: **Terminal** — hard-edged tiles separated by hairline grid gaps,
+featured images tinted toward brand cyan, solid color category chips, monospace
+furniture around humanist body copy.
 
-## 🎨 Brand Identity Specifications
-
-- **Brand Voice**: Friendly, Tech-savvy, Energetic, Insightful.
-- **Typography**:
-  - **Headings**: `Plus Jakarta Sans` (weights: 600, 700, 800, 900)
-  - **Body**: `Inter` (weights: 400, 500, 600, 700)
-  - **Monospace / Code**: `JetBrains Mono`
-- **Color Palette & Gradients**:
-  - **Primary Gradient**: `linear-gradient(135deg, #00D2FF 0%, #0080FF 45%, #7209B7 100%)` _(Electric Cyan &rarr; Royal Blue &rarr; Cyber Purple)_
-  - **Energy Accent Gradient**: `linear-gradient(135deg, #FF006E 0%, #FB5607 50%, #FFD166 100%)` _(Vibrant Coral &rarr; Tangerine &rarr; Golden Amber)_
-  - **Dark Base / Surface**: `#0B0F19` / `#111827` (Deep Midnight Slate)
-  - **Light Base / Surface**: `#F8FAFC` / `#FFFFFF` (Crisp Clean Modern Slate)
-- **Visual Style**:
-  - Pixelated mascot icon & play button badge (`logo-icon.svg`)
-  - Golden star sparkles (`✦`)
-  - Subtle circuit board background patterns
-  - Bento grid cards with smooth hover lift & glowing border accents
-  - Glassmorphic sticky header (`backdrop-filter: blur(16px)`)
-
----
-
-## ⚡ 1. Modern Headless Frontend (Astro 7 + Tailwind)
-
-The primary frontend is built with **Astro 7** and **Tailwind CSS**, fetching all content from
-the live **WordPress REST API** (`https://www.computerjy.com/wp-json/wp/v2/`) at build time via
-the Astro Content Layer (`src/content.config.ts`, `src/lib/wp-loader.ts`).
-
-There is no bundled content snapshot and no offline fallback: if the API is unreachable the
-build fails rather than shipping stale content. Publishing in WordPress therefore requires a
-rebuild for changes to appear on the static site.
-
-### Project Structure
-
-```text
-src/
-├── content.config.ts             # Astro Content Layer collections (posts, categories, tags)
-├── components/
-│   ├── AuthorCard.astro          # Eyad Salah bio & social widget
-│   ├── BentoShowcase.astro       # Hero featured article + 3 side cards
-│   ├── Footer.astro              # Multi-column footer & back-to-top
-│   ├── Header.astro              # Glass navbar with dark/light switcher & search
-│   ├── HeroBanner.astro          # Site stats (500+ Articles, 18+ Years Online)
-│   ├── PostCard.astro            # Responsive post card with category badges
-│   ├── ReadingProgressBar.astro  # Fixed top scroll progress indicator
-│   ├── SearchModal.astro         # ⌘K interactive search overlay
-│   ├── Sidebar.astro             # Author, trending ranks, categories & tags
-│   └── SocialShare.astro         # Social share buttons & 1-click link copy
-├── layouts/
-│   └── BaseLayout.astro          # ViewTransitions router & zero-FOUC script
-├── lib/
-│   ├── api.ts                    # WP REST API client with in-memory caching
-│   ├── wp-client.ts              # WordPress REST API HTTP client
-│   ├── wp-loader.ts              # Content Layer loader that fetches WP data at build time
-│   ├── normalize.ts              # Normalizes raw WP API responses into content schema
-│   ├── types.ts                  # TypeScript definitions
-│   └── utils.ts                  # HTML escaping/stripping helpers for RSS & search index
-├── pages/
-│   ├── 404.astro                 # Custom 404 error page
-│   ├── category/[slug].astro     # Dynamic category archives
-│   ├── index.astro               # Homepage bento feed
-│   ├── posts/[slug].astro        # Single article view with reading suite
-│   ├── privacy-policy.astro      # Static pages
-│   └── tag/[slug].astro          # Dynamic tag archives
-└── styles/
-    └── global.css                # Tailwind @theme tokens & circuit background
-```
-
-### Running Locally
+## Install
 
 ```bash
-# Start local development server
-npm run dev
-
-# Build static site to dist/
-npm run build
-
-# Preview production build locally
-npm run preview
+cd theme && zip -r ../computerjy-2.zip . -x ".*"
 ```
 
-### Deployment
+Upload in **Appearance → Themes → Add New → Upload Theme**, then:
 
-The static output directory (`dist/`) is universal and deploys directly to:
+1. **Appearance → Menus** — assign *Primary Navigation* (Home, Tech Tips,
+   Entertainment, Contact) and optionally *Footer Links*.
+2. **Appearance → Customize → ComputerJy: Brand & Social** — eyebrow tagline
+   and social URLs.
+3. **Appearance → Customize → ComputerJy: Sponsor Slots** — paste AdSense or
+   sponsor markup per slot.
+4. **Settings → Reading** — posts per page (the theme defaults to 15).
+5. Copy `logo-icon.svg` into `assets/images/` or set a custom logo.
 
-- **Cloudflare Pages** (Build command: `npm run build`, Output directory: `dist`)
-- **Vercel** (Framework preset: `Astro`, Output directory: `dist`)
-- **Netlify** (Build command: `npm run build`, Publish directory: `dist`)
-- **GitHub Pages / Traditional Web Servers** (Nginx, Apache, Caddy)
+## Templates
 
----
+| File | Covers |
+| --- | --- |
+| `index.php` | Home / blog feed: lead block + Latest grid |
+| `front-page.php` | Static front page, else the feed |
+| `single.php` + `template-parts/content-single.php` | Single post |
+| `page.php` | Page (narrow reading shell) |
+| `page-templates/full-width.php` | Full-width page template |
+| `page-templates/landing.php` | Edge-to-edge landing page template |
+| `archive.php` | Generic archive |
+| `category.php` | Category archive with hero band |
+| `tag.php`, `date.php` | Delegate to `archive.php` |
+| `author.php` | Author profile page |
+| `search.php`, `searchform.php` | Search results and form |
+| `404.php` | Not found + latest posts |
+| `comments.php` | Chat-bubble comment thread |
+| `sidebar.php` | Author, trending, categories, tags, sticky slot, widgets |
 
-## 📦 2. Traditional WordPress Theme (PHP)
+## Layout slots
 
-The project also includes a complete classic WordPress PHP theme in the root directory:
+`computerjy2_slot( $id )` renders a height-reserved container so filling it
+never shifts layout. Slots: `leaderboard`, `infeed`, `inarticle`, `sidebar`.
 
-- [`style.css`](style.css): Theme metadata header
-- [`functions.php`](functions.php): Theme setup, menus, sidebars, reading time, customizer
-- [`header.php`](header.php) & [`footer.php`](footer.php): Glass navbar and footer
-- [`index.php`](index.php), [`single.php`](single.php), [`page.php`](page.php), [`archive.php`](archive.php), [`search.php`](search.php), [`404.php`](404.php)
-- [`assets/css/theme.css`](assets/css/theme.css) & [`assets/js/theme.js`](assets/js/theme.js)
-- [`screenshot.png`](screenshot.png): WordPress theme preview screenshot
+Fill a slot three ways:
 
-### To Install on WordPress:
+- paste markup in the Customizer,
+- `add_action( 'computerjy2_slot_inarticle', $callback )`,
+- let a plugin inject into the container.
 
-```bash
-zip -r computerjy-theme.zip 404.php archive.php comments.php footer.php functions.php header.php index.php page.php search.php sidebar.php single.php style.css screenshot.png template-parts/ assets/
-```
+Filters: `computerjy2_infeed_interval`, `computerjy2_inarticle_after_paragraph`,
+`computerjy2_posts_per_page`, `computerjy2_content_width`.
 
-Upload `computerjy-theme.zip` in **WordPress Admin &rarr; Appearance &rarr; Themes &rarr; Add New &rarr; Upload Theme**.
+## Plugin support
+
+- **Gutenberg** — `theme.json` (palette, gradients, duotones, type scale,
+  spacing, block styles) plus `assets/css/editor-style.css`; two block patterns.
+- **Yoast SEO / Rank Math** — breadcrumbs defer to whichever is active;
+  primary-term selection is honoured by the category chip.
+- **Contact Form 7** — themed inputs; CF7's CSS/JS is dequeued on pages with no
+  form; `wpcf7_autop` disabled.
+- **Jetpack** — infinite scroll (click-to-load on `#primary-feed`), responsive
+  videos, content options, related-posts de-duplication.
+- **AdSense / sponsor plugins** — the reserved slots above.
+- **Caching plugins** — related and trending queries are transient-backed and
+  purge on publish, on comment, and on the common cache-flush hooks.
+- **AMP** — the JS bundle is dequeued on AMP requests; all layout is CSS-only.
+
+## Theme modes
+
+Dark is the default token set. `data-theme="light"` flips every token. On first
+visit the theme follows the OS setting; the header toggle persists an explicit
+choice in `localStorage`.

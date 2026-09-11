@@ -1,90 +1,59 @@
 <?php
 /**
- * ComputerJy World - Comments Template
+ * Comments: chat-style bubbles with one level of reply nesting.
  *
- * @package ComputerJy
+ * @package ComputerJy2
  */
+
+if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 if ( post_password_required() ) {
     return;
 }
 ?>
 
-<div id="comments" class="comments-section">
+<div id="comments" class="comments-area">
 
     <?php if ( have_comments() ) : ?>
-        <h3 class="comments-title">
-            <span>💬 <?php comments_number( 'Discussion (0)', 'Discussion (1)', 'Discussion (%)' ); ?></span>
-        </h3>
+        <h2 class="comments-title">
+            <?php
+            $cjy_count = (int) get_comments_number();
+            /* translators: %d: comment count */
+            printf( esc_html( _n( 'COMMENTS [%d]', 'COMMENTS [%d]', $cjy_count, 'computerjy2' ) ), $cjy_count );
+            ?>
+        </h2>
 
         <ol class="comment-list">
             <?php
             wp_list_comments( array(
-                'style'       => 'ol',
-                'short_ping'  => true,
-                'avatar_size' => 48,
-                'callback'    => 'computerjy_comment_callback',
+                'style'    => 'ol',
+                'callback' => 'computerjy2_comment',
+                'max_depth' => 2,
             ) );
             ?>
         </ol>
 
         <?php
         the_comments_navigation( array(
-            'prev_text' => '&larr; ' . esc_html__( 'Older Comments', 'computerjy' ),
-            'next_text' => esc_html__( 'Newer Comments', 'computerjy' ) . ' &rarr;',
+            'prev_text' => esc_html__( '← OLDER', 'computerjy2' ),
+            'next_text' => esc_html__( 'NEWER →', 'computerjy2' ),
         ) );
         ?>
 
         <?php if ( ! comments_open() ) : ?>
-            <p style="color: var(--text-muted); font-style: italic;"><?php esc_html_e( 'Comments are closed for this article.', 'computerjy' ); ?></p>
+            <p class="entry-meta-mono"><?php esc_html_e( 'COMMENTS ARE CLOSED.', 'computerjy2' ); ?></p>
         <?php endif; ?>
-
     <?php endif; ?>
 
     <?php
-    $commenter     = wp_get_current_commenter();
-    $req           = get_option( 'require_name_email' );
-    $aria_req      = ( $req ? " aria-required='true'" : '' );
-    $html_req      = ( $req ? " required='required'" : '' );
-
-    $fields = array(
-        'author' => sprintf(
-            '<div class="form-field"><label class="form-label" for="author">%s%s</label><input id="author" name="author" type="text" class="form-input" value="%s" size="30"%s%s /></div>',
-            esc_html__( 'Name', 'computerjy' ),
-            ( $req ? ' <span class="required">*</span>' : '' ),
-            esc_attr( $commenter['comment_author'] ),
-            $aria_req,
-            $html_req
-        ),
-        'email'  => sprintf(
-            '<div class="form-field"><label class="form-label" for="email">%s%s</label><input id="email" name="email" type="email" class="form-input" value="%s" size="30"%s%s /></div>',
-            esc_html__( 'Email', 'computerjy' ),
-            ( $req ? ' <span class="required">*</span>' : '' ),
-            esc_attr( $commenter['comment_author_email'] ),
-            $aria_req,
-            $html_req
-        ),
-        'url'    => sprintf(
-            '<div class="form-field"><label class="form-label" for="url">%s</label><input id="url" name="url" type="url" class="form-input" value="%s" size="30" /></div>',
-            esc_html__( 'Website', 'computerjy' ),
-            esc_attr( $commenter['comment_author_url'] )
-        ),
-    );
-
     comment_form( array(
-        'fields'               => $fields,
-        'comment_field'        => sprintf(
-            '<div class="form-field" style="margin-bottom: 1.25rem;"><label class="form-label" for="comment">%s <span class="required">*</span></label><textarea id="comment" name="comment" class="form-textarea" cols="45" rows="5" required="required"></textarea></div>',
-            esc_html__( 'Your Comment', 'computerjy' )
-        ),
-        'class_form'           => 'comment-form-wrap',
-        'class_submit'         => 'btn-primary btn-accent',
-        'title_reply'          => '✍️ ' . esc_html__( 'Leave a Thought', 'computerjy' ),
-        'title_reply_before'   => '<h3 id="reply-title" class="widget-title" style="margin-bottom: 1.5rem;">',
+        'class_form'           => 'comment-form',
+        'title_reply'          => esc_html__( 'Leave a comment', 'computerjy2' ),
+        'title_reply_before'   => '<h3 class="comments-title">',
         'title_reply_after'    => '</h3>',
-        'submit_button'        => '<button name="%1$s" type="submit" id="%2$s" class="%3$s">%4$s 🚀</button>',
-        'submit_field'         => '<div class="form-submit">%1$s %2$s</div>',
+        'comment_notes_before' => '<p class="entry-meta-mono">' . esc_html__( 'YOUR EMAIL IS NOT PUBLISHED.', 'computerjy2' ) . '</p>',
+        'label_submit'         => esc_html__( 'Post comment', 'computerjy2' ),
+        'comment_field'        => '<p class="comment-form-comment"><label for="comment">' . esc_html__( 'Comment', 'computerjy2' ) . '</label><textarea id="comment" name="comment" rows="5" required></textarea></p>',
     ) );
     ?>
-
 </div>

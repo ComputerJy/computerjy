@@ -1,0 +1,295 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 2,
+  "settings": {
+    "appearanceTools": true,
+    "layout": {
+      "contentSize": "760px",
+      "wideSize": "1010px"
+    },
+    "color": {
+      "defaultPalette": false,
+      "defaultGradients": false,
+      "custom": true,
+      "customDuotone": true,
+      "palette": [
+        {
+          "slug": "base",
+          "color": "#080B12",
+          "name": "Base"
+        },
+        {
+          "slug": "surface",
+          "color": "#0d121c",
+          "name": "Surface"
+        },
+        {
+          "slug": "elevated",
+          "color": "#111827",
+          "name": "Elevated"
+        },
+        {
+          "slug": "primary-text",
+          "color": "#FFFFFF",
+          "name": "Primary text"
+        },
+        {
+          "slug": "body-text",
+          "color": "#CBD5E1",
+          "name": "Body text"
+        },
+        {
+          "slug": "muted-text",
+          "color": "#64748B",
+          "name": "Muted text"
+        },
+        {
+          "slug": "cyan",
+          "color": "#00D2FF",
+          "name": "Electric cyan"
+        },
+        {
+          "slug": "blue",
+          "color": "#0080FF",
+          "name": "Royal blue"
+        },
+        {
+          "slug": "purple",
+          "color": "#7209B7",
+          "name": "Cyber purple"
+        },
+        {
+          "slug": "pink",
+          "color": "#FF006E",
+          "name": "Vibrant coral"
+        },
+        {
+          "slug": "orange",
+          "color": "#FB5607",
+          "name": "Tangerine"
+        },
+        {
+          "slug": "amber",
+          "color": "#FFD166",
+          "name": "Golden amber"
+        }
+      ],
+      "gradients": [
+        {
+          "slug": "primary",
+          "name": "Primary",
+          "gradient": "linear-gradient(135deg, #00D2FF 0%, #0080FF 45%, #7209B7 100%)"
+        },
+        {
+          "slug": "accent",
+          "name": "Energy accent",
+          "gradient": "linear-gradient(135deg, #FF006E 0%, #FB5607 50%, #FFD166 100%)"
+        }
+      ],
+      "duotone": [
+        {
+          "slug": "cyan-dark",
+          "name": "Cyan / dark",
+          "colors": [
+            "#080B12",
+            "#00D2FF"
+          ]
+        },
+        {
+          "slug": "purple-dark",
+          "name": "Purple / dark",
+          "colors": [
+            "#080B12",
+            "#7209B7"
+          ]
+        }
+      ]
+    },
+    "typography": {
+      "fluid": true,
+      "customFontSize": true,
+      "dropCap": false,
+      "fontFamilies": [
+        {
+          "slug": "heading",
+          "name": "Heading",
+          "fontFamily": "\"Plus Jakarta Sans\", ui-sans-serif, system-ui, sans-serif"
+        },
+        {
+          "slug": "body",
+          "name": "Body",
+          "fontFamily": "\"Inter\", ui-sans-serif, system-ui, sans-serif"
+        },
+        {
+          "slug": "mono",
+          "name": "Mono",
+          "fontFamily": "\"JetBrains Mono\", ui-monospace, Menlo, monospace"
+        }
+      ],
+      "fontSizes": [
+        {
+          "slug": "small",
+          "size": "13px",
+          "name": "Small"
+        },
+        {
+          "slug": "medium",
+          "size": "16.5px",
+          "name": "Medium"
+        },
+        {
+          "slug": "large",
+          "size": "19px",
+          "name": "Large"
+        },
+        {
+          "slug": "x-large",
+          "size": "26px",
+          "name": "Extra large"
+        },
+        {
+          "slug": "xx-large",
+          "size": "40px",
+          "name": "Display"
+        }
+      ]
+    },
+    "spacing": {
+      "units": [
+        "px",
+        "em",
+        "rem",
+        "%",
+        "vw"
+      ],
+      "spacingSizes": [
+        {
+          "slug": "20",
+          "size": "8px",
+          "name": "1"
+        },
+        {
+          "slug": "30",
+          "size": "14px",
+          "name": "2"
+        },
+        {
+          "slug": "40",
+          "size": "22px",
+          "name": "3"
+        },
+        {
+          "slug": "50",
+          "size": "34px",
+          "name": "4"
+        },
+        {
+          "slug": "60",
+          "size": "56px",
+          "name": "5"
+        }
+      ]
+    },
+    "border": {
+      "color": true,
+      "radius": true,
+      "style": true,
+      "width": true
+    }
+  },
+  "styles": {
+    "color": {
+      "background": "var(--bg-base, #080B12)",
+      "text": "var(--text-body, #CBD5E1)"
+    },
+    "typography": {
+      "fontFamily": "var:preset|font-family|body",
+      "fontSize": "16.5px",
+      "lineHeight": "1.78"
+    },
+    "elements": {
+      "link": {
+        "color": {
+          "text": "var(--brand-cyan, #00D2FF)"
+        },
+        ":hover": {
+          "color": {
+            "text": "var(--text-primary, #FFFFFF)"
+          }
+        }
+      },
+      "h1": {
+        "typography": {
+          "fontFamily": "var:preset|font-family|heading",
+          "fontWeight": "900",
+          "lineHeight": "1.08",
+          "letterSpacing": "-0.04em"
+        }
+      },
+      "h2": {
+        "typography": {
+          "fontFamily": "var:preset|font-family|heading",
+          "fontWeight": "800",
+          "lineHeight": "1.2",
+          "letterSpacing": "-0.03em"
+        }
+      },
+      "h3": {
+        "typography": {
+          "fontFamily": "var:preset|font-family|heading",
+          "fontWeight": "800",
+          "lineHeight": "1.25"
+        }
+      },
+      "button": {
+        "color": {
+          "background": "var(--brand-cyan, #00D2FF)",
+          "text": "#080B12"
+        },
+        "border": {
+          "radius": "0px"
+        },
+        "typography": {
+          "fontFamily": "var:preset|font-family|mono",
+          "fontWeight": "800",
+          "textTransform": "uppercase",
+          "letterSpacing": "0.1em",
+          "fontSize": "12px"
+        }
+      }
+    },
+    "blocks": {
+      "core/quote": {
+        "border": {
+          "left": {
+            "color": "var(--brand-cyan, #00D2FF)",
+            "width": "3px",
+            "style": "solid"
+          }
+        },
+        "spacing": {
+          "padding": {
+            "top": "14px",
+            "bottom": "14px",
+            "left": "18px",
+            "right": "18px"
+          }
+        }
+      },
+      "core/code": {
+        "typography": {
+          "fontFamily": "var:preset|font-family|mono",
+          "fontSize": "13px"
+        },
+        "color": {
+          "background": "var(--bg-surface, #0d121c)"
+        }
+      },
+      "core/separator": {
+        "color": {
+          "text": "var(--border-color, rgba(148,163,184,0.14))"
+        }
+      }
+    }
+  }
+}
