@@ -15,7 +15,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+ROOT_DIR="${ROOT_DIR:-$(cd "${SCRIPT_DIR}/.." && pwd)}"
 
 if [ -f "${ROOT_DIR}/.env" ]; then
     set -a
@@ -61,8 +61,11 @@ cp -r "${ROOT_DIR}/public/." "${ROOT_STAGE}/"
 
 if command -v php >/dev/null 2>&1; then
     echo "🔍 php -l on staged files"
-    find "${THEME_STAGE}" "${ROOT_STAGE}" -name '*.php' -exec php -l {} + | grep -v '^No syntax errors' || true
-    find "${THEME_STAGE}" "${ROOT_STAGE}" -name '*.php' -exec php -l {} + | grep -q 'Errors parsing' && { echo "❌ PHP syntax error"; exit 1; }
+    lint_output=$(find "${THEME_STAGE}" "${ROOT_STAGE}" -name '*.php' -exec php -l {} + 2>&1 || true)
+    if grep -q 'Errors parsing' <<< "${lint_output}"; then
+        grep -v '^No syntax errors' <<< "${lint_output}"
+        echo "❌ PHP syntax error in staged files"; exit 1
+    fi
 fi
 
 if [ "${STAGE_ONLY:-0}" = "1" ]; then
