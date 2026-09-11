@@ -50,13 +50,62 @@
 
   /* ---- Search modal (Cmd/Ctrl+K) ---- */
   var modal = document.querySelector('.search-modal-backdrop');
+  var resultsList = modal ? modal.querySelector('.search-results-list') : null;
+  var recentMarkup = resultsList ? resultsList.innerHTML : '';
+  var searchIndex = null;
+  var searchIndexPromise = null;
+
+  /* /search-index.json (inc/search-index.php) gives instant results; Enter still submits ?s= */
+  function loadSearchIndex() {
+    if (!searchIndexPromise) {
+      searchIndexPromise = fetch('/search-index.json', { credentials: 'omit' })
+        .then(function (r) { return r.ok ? r.json() : []; })
+        .then(function (data) { searchIndex = Array.isArray(data) ? data : []; return searchIndex; })
+        .catch(function () { searchIndex = []; return searchIndex; });
+    }
+    return searchIndexPromise;
+  }
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+  function renderResults(query) {
+    if (!resultsList) return;
+    var q = query.trim().toLowerCase();
+    if (!q) { resultsList.innerHTML = recentMarkup; return; }
+    var hits = (searchIndex || []).filter(function (p) {
+      return (p.title + ' ' + p.excerpt + ' ' + p.category).toLowerCase().indexOf(q) !== -1;
+    }).slice(0, 12);
+    if (!hits.length) {
+      resultsList.innerHTML = '<div class="search-hint">No matches &mdash; press Enter to search the whole site</div>';
+      return;
+    }
+    resultsList.innerHTML = '<div class="search-hint">Results</div>' + hits.map(function (p) {
+      var href = p.url || ('/posts/' + encodeURIComponent(p.slug));
+      return '<a href="' + escapeHtml(href) + '" class="search-result-item">' +
+        '<div class="search-result-title">' + escapeHtml(p.title) + '</div>' +
+        '<div class="search-result-snippet">' + escapeHtml(p.date) + ' &middot; ' + escapeHtml(p.category) + '</div>' +
+        '</a>';
+    }).join('');
+  }
   function openModal() {
     if (!modal) return;
     modal.classList.add('is-open');
+    loadSearchIndex();
     var i = modal.querySelector('.search-modal-input');
     if (i) { i.focus(); }
   }
   function closeModal() { if (modal) { modal.classList.remove('is-open'); } }
+  if (modal) {
+    var searchInput = modal.querySelector('.search-modal-input');
+    if (searchInput) {
+      searchInput.addEventListener('input', function (e) {
+        var value = e.target.value;
+        loadSearchIndex().then(function () { renderResults(value); });
+      });
+    }
+  }
   document.addEventListener('click', function (e) {
     if (e.target.closest('.search-trigger-btn')) { e.preventDefault(); openModal(); }
     else if (e.target.closest('.search-close-btn')) { closeModal(); closeDrawer(); }
