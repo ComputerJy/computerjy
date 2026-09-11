@@ -11,6 +11,14 @@ function md(html: string): string {
   );
 }
 
+function tokens(text: string): string {
+  return execFileSync(
+    'php',
+    ['-r', 'require "public/markdown.php"; echo computerjy_markdown_token_estimate($argv[1]);', text],
+    { encoding: 'utf8' }
+  );
+}
+
 describe.skipIf(!hasPhp)('public/markdown.php converter', () => {
   it('is loadable from the CLI without WordPress', () => {
     expect(() => md('')).not.toThrow();
@@ -29,5 +37,17 @@ describe.skipIf(!hasPhp)('public/markdown.php converter', () => {
 
   it('collapses runs of blank lines', () => {
     expect(md('<p>a</p><p>b</p>')).toBe('a\n\nb');
+  });
+
+  it('estimates tokens for Latin text', () => {
+    expect(tokens('one two three')).toBe('4');
+  });
+
+  it('estimates tokens for Arabic text (unicode-aware, unlike str_word_count)', () => {
+    expect(tokens('هذا نص عربي بسيط')).toBe('6');
+  });
+
+  it('estimates zero tokens for empty input', () => {
+    expect(tokens('')).toBe('0');
   });
 });
