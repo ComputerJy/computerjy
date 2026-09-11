@@ -27,6 +27,10 @@ describe('deploy/lightsail-apache.conf serves WordPress', () => {
     expect(markdown).toBeGreaterThan(guard);
   });
 
+  it('ends the request after the markdown rewrite so W3TC .htaccess rules never run', () => {
+    expect(vhost).toContain('RewriteRule ^(.*)$ /markdown.php [END,QSA]');
+  });
+
   it('sets the edge cache header only for anonymous HTML reads', () => {
     const line = vhost.split('\n').find((l) => l.includes('s-maxage=3600'));
     expect(line).toBeDefined();
@@ -35,6 +39,7 @@ describe('deploy/lightsail-apache.conf serves WordPress', () => {
     expect(line).toContain('wordpress_logged_in_');
     expect(line).toContain('wp-postpass_');
     expect(line).toContain('comment_author_');
+    expect(line).toContain('%{REQUEST_STATUS} == 200');
   });
 
   it('never lets mod_expires touch generated HTML or JSON', () => {
@@ -47,7 +52,7 @@ describe('deploy/lightsail-apache.conf serves WordPress', () => {
 });
 
 describe('legacy /YYYY/MM/<slug> redirect (moved from the Worker)', () => {
-  const match = vhost.match(/RewriteRule (\^\/\\d\{4\}\S+) \/posts\/\$1 \[R=301,L,NE\]/);
+  const match = vhost.match(/RewriteRule (\^\/\\d\{4\}\S+) \/posts\/\$1 \[R=301,L\]/);
   const pattern = new RegExp(match?.[1] ?? '$^');
 
   it('exists', () => {
