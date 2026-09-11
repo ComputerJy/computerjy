@@ -47,12 +47,26 @@ function computerjy_html_to_markdown( $html ) {
 }
 
 /**
+ * Rough token estimate for the x-markdown-tokens header.
+ *
+ * Counts whitespace-delimited runs with the /u flag so Arabic and other
+ * non-Latin text count too — str_word_count() only sees Latin letters.
+ *
+ * @param string $output Markdown document.
+ * @return int
+ */
+function computerjy_markdown_token_estimate( $output ) {
+    $words = preg_match_all( '/\S+/u', $output );
+    return (int) ceil( ( false === $words ? 0 : $words ) * 1.33 );
+}
+
+/**
  * Send the document with the token estimate the contract requires.
  *
  * @param string $output Markdown.
  */
 function computerjy_markdown_emit( $output ) {
-    header( 'x-markdown-tokens: ' . (int) ( str_word_count( $output ) * 1.33 ) );
+    header( 'x-markdown-tokens: ' . computerjy_markdown_token_estimate( $output ) );
     echo $output;
     exit;
 }
