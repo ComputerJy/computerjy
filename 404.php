@@ -1,44 +1,36 @@
 <?php
 /**
- * ComputerJy World - 404 Error Template
+ * 404.
  *
- * @package ComputerJy
+ * @package ComputerJy2
  */
 
 get_header();
 ?>
 
-<main id="primary-content" class="main-layout" role="main">
-    <div class="container">
-        
-        <div class="error-404-hero">
-            <div style="margin-bottom: 1.5rem; display: inline-block;">
-                <img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logo-icon.svg' ); ?>" alt="ComputerJy Icon" style="width: 100px; height: 100px; margin: 0 auto; filter: drop-shadow(0 10px 20px rgba(0,210,255,0.3));">
-            </div>
+<main id="primary-content" class="container" role="main">
+    <?php computerjy2_breadcrumbs(); ?>
 
-            <div class="error-404-badge">404</div>
-            <h1 style="margin-bottom: 1rem; font-size: 2rem;"><?php esc_html_e( 'Oops! Page Not Found', 'computerjy' ); ?></h1>
-            <p style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 2rem;">
-                <?php esc_html_e( 'The page you were looking for might have been moved, renamed, or temporarily unplugged.', 'computerjy' ); ?>
-            </p>
+    <div class="state-block">
+        <div class="state-code">404</div>
+        <h1 class="state-title"><?php esc_html_e( 'Page not found', 'computerjy2' ); ?></h1>
+        <p class="state-text"><?php esc_html_e( 'That address does not resolve. Try a search, or pick something from the latest posts below.', 'computerjy2' ); ?></p>
+        <div style="max-width:380px;margin:0 auto"><?php get_search_form(); ?></div>
+    </div>
 
-            <div style="max-width: 440px; margin: 0 auto 2.5rem;">
-                <form role="search" method="get" action="<?php echo esc_url( home_url( '/' ) ); ?>" style="display: flex; gap: 8px;">
-                    <input type="search" class="form-input" placeholder="<?php esc_attr_e( 'Search ComputerJy...', 'computerjy' ); ?>" name="s" required />
-                    <button type="submit" class="btn-primary"><?php esc_html_e( 'Search', 'computerjy' ); ?></button>
-                </form>
-            </div>
-
-            <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
-                <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="btn-primary btn-accent">
-                    🏠 <?php esc_html_e( 'Back to Home', 'computerjy' ); ?>
-                </a>
-                <a href="<?php echo esc_url( home_url( '/contact-me/' ) ); ?>" class="btn-primary" style="background: var(--bg-subtle); color: var(--text-primary); border: 1px solid var(--border-color);">
-                    ✉️ <?php esc_html_e( 'Contact Eyad', 'computerjy' ); ?>
-                </a>
-            </div>
-        </div>
-
+    <div class="section-header-bar">
+        <h2 class="section-heading"><?php esc_html_e( 'Latest', 'computerjy2' ); ?></h2>
+        <div class="section-rule"></div>
+    </div>
+    <div class="tile-grid grid-3">
+        <?php
+        $cjy_404 = new WP_Query( array( 'posts_per_page' => 6, 'ignore_sticky_posts' => true, 'no_found_rows' => true ) );
+        while ( $cjy_404->have_posts() ) :
+            $cjy_404->the_post();
+            get_template_part( 'template-parts/content', 'card' );
+        endwhile;
+        wp_reset_postdata();
+        ?>
     </div>
 </main>
 
