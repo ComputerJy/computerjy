@@ -109,10 +109,16 @@ function computerjy2_scripts() {
         null
     );
 
-    wp_enqueue_style( 'computerjy2-theme', get_template_directory_uri() . '/assets/css/theme.css', array(), COMPUTERJY2_VERSION );
-    wp_enqueue_style( 'computerjy2-style', get_stylesheet_uri(), array( 'computerjy2-theme' ), COMPUTERJY2_VERSION );
+    // The origin serves css/js with a 1-year Expires, so the query string
+    // must change with the file, not with the theme's release version.
+    $theme_dir = get_template_directory();
+    $css_ver   = (string) filemtime( $theme_dir . '/assets/css/theme.css' );
+    $js_ver    = (string) filemtime( $theme_dir . '/assets/js/theme.js' );
 
-    wp_enqueue_script( 'computerjy2-theme', get_template_directory_uri() . '/assets/js/theme.js', array(), COMPUTERJY2_VERSION, true );
+    wp_enqueue_style( 'computerjy2-theme', get_template_directory_uri() . '/assets/css/theme.css', array(), $css_ver );
+    wp_enqueue_style( 'computerjy2-style', get_stylesheet_uri(), array( 'computerjy2-theme' ), $css_ver );
+
+    wp_enqueue_script( 'computerjy2-theme', get_template_directory_uri() . '/assets/js/theme.js', array(), $js_ver, true );
 
     if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
         wp_enqueue_script( 'comment-reply' );

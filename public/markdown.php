@@ -22,6 +22,9 @@ function computerjy_html_to_markdown( $html ) {
         return '';
     }
 
+    // Embedded scripts and styles are not prose; drop them before the tag pass.
+    $html = preg_replace( '/<(script|style)\b[^>]*>.*?<\/\1>/si', '', $html );
+
     $md = preg_replace( '/<h1[^>]*>(.*?)<\/h1>/si', "\n# $1\n\n", $html );
     $md = preg_replace( '/<h2[^>]*>(.*?)<\/h2>/si', "\n## $1\n\n", $md );
     $md = preg_replace( '/<h3[^>]*>(.*?)<\/h3>/si', "\n### $1\n\n", $md );
@@ -77,7 +80,7 @@ if ( PHP_SAPI === 'cli' ) {
 }
 
 header( 'Content-Type: text/markdown; charset=utf-8' );
-header( 'Vary: Accept' );
+header( 'Vary: Accept, Accept-Encoding' );
 header( 'Access-Control-Allow-Origin: *' );
 
 $uri = parse_url( $_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH );
@@ -95,6 +98,12 @@ if ( '/auth.md' === $uri || '/.well-known/auth.md' === $uri ) {
 // W3TC must not store this response under the HTML page's cache key.
 define( 'DONOTCACHEPAGE', true );
 define( 'WP_USE_THEMES', false );
+
+// W3TC's advanced-cache.php keys its page cache on REQUEST_URI and ignores
+// Accept. Re-key this request so a cached HTML page for the same URL is never
+// served (or stored) as markdown. Nothing below needs the original value.
+$_SERVER['REQUEST_URI'] = '/markdown.php';
+
 $wp_load = file_exists( __DIR__ . '/wp-load.php' ) ? __DIR__ . '/wp-load.php' : '/var/www/wordpress/wp-load.php';
 require $wp_load;
 
@@ -106,8 +115,29 @@ $home      = home_url( '/' );
 
 // 1. Single post: /posts/<slug>
 if ( preg_match( '#^/posts/([^/]+)$#', $uri, $m ) ) {
-    $post = get_page_by_path( urldecode( $m[1] ), OBJECT, 'post' );
-    if ( $post && 'publish' === $post->post_status ) {
+    // get_page_by_path() with a single post type silently adds 'attachment'
+    // and resolves by iterating post IDs, so an older attachment sharing the
+    // slug can win over the actual post. get_posts() with an explicit
+    // post_status also lets us require 'publish' in the query itself, rather
+    // than fetching a post of unknown status and checking it after the fact.
+    $found = get_posts( array(
+        'name'                   => urldecode( $m[1] ),
+        'post_type'              => 'post',
+        'post_status'            => 'publish',
+        'numberposts'            => 1,
+        'no_found_rows'          => true,
+        'update_post_meta_cache' => false,
+    ) );
+    $post = $found ? $found[0] : null;
+
+    // Password-protected posts must not have their content rendered here;
+    // post_password_required() needs the global $post, which setup_postdata()
+    // below provides for the_content filters too (e.g. shortcodes reading
+    // $post->ID).
+    if ( $post && empty( $post->post_password ) ) {
+        $GLOBALS['post'] = $post; // phpcs:ignore WordPress.WP.GlobalVariablesOverride
+        setup_postdata( $post );
+
         $title      = html_entity_decode( wp_strip_all_tags( get_the_title( $post ) ), ENT_QUOTES, 'UTF-8' );
         $date       = get_the_date( 'F j, Y', $post );
         $categories = get_the_category( $post->ID );
@@ -122,6 +152,8 @@ if ( preg_match( '#^/posts/([^/]+)$#', $uri, $m ) ) {
         $output .= $content . "\n\n";
         $output .= "---\n";
         $output .= "*{$site_name} — {$home}*\n";
+
+        wp_reset_postdata();
 
         computerjy_markdown_emit( $output );
     }

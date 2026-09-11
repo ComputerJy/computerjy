@@ -39,6 +39,10 @@ describe.skipIf(!hasPhp)('public/markdown.php converter', () => {
     expect(md('<p>a</p><p>b</p>')).toBe('a\n\nb');
   });
 
+  it('strips embedded script and style tags before conversion', () => {
+    expect(md('<p>a</p><script>alert(1)</script><p>b</p>')).toBe('a\n\nb');
+  });
+
   it('estimates tokens for Latin text', () => {
     expect(tokens('one two three')).toBe('4');
   });
