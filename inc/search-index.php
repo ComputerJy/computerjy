@@ -27,6 +27,18 @@ function computerjy2_search_index_rewrite() {
 add_action( 'init', 'computerjy2_search_index_rewrite' );
 
 /**
+ * Whitelist the query var the rewrite above sets, or parse_request drops it.
+ *
+ * @param string[] $vars Public query vars.
+ * @return string[]
+ */
+function computerjy2_search_index_query_vars( $vars ) {
+    $vars[] = 'computerjy2_search_index';
+    return $vars;
+}
+add_filter( 'query_vars', 'computerjy2_search_index_query_vars' );
+
+/**
  * Flush rewrite rules once, when the theme is activated, so the rule above exists.
  */
 function computerjy2_search_index_activate() {
