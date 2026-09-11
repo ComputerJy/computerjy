@@ -1,136 +1,149 @@
 <?php
 /**
- * Markdown for Agents - RFC Content Negotiation Handler
- * Converts ComputerJy World pages to clean, agent-ready Markdown when Accept: text/markdown is requested.
+ * Markdown for Agents — RFC content-negotiation handler.
+ *
+ * Apache rewrites any request carrying `Accept: text/markdown` here after
+ * confirming no real file matches (deploy/lightsail-apache.conf). Content
+ * comes straight from WordPress, so the handler works from either the
+ * WordPress DocumentRoot or the retired Astro build, and never lags a publish.
+ *
+ * Contract: .agents/rules/ai-agent-discovery.md §2 — text/markdown,
+ * x-markdown-tokens, clean semantic Markdown.
  */
 
-// Set proper headers
-header('Content-Type: text/markdown; charset=utf-8');
-header('Vary: Accept');
-header('Access-Control-Allow-Origin: *');
+/**
+ * Very small HTML → Markdown conversion for post bodies.
+ *
+ * @param string $html Rendered post HTML.
+ * @return string
+ */
+function computerjy_html_to_markdown( $html ) {
+    if ( empty( $html ) ) {
+        return '';
+    }
 
-$uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
-$uri = rtrim($uri, '/') ?: '/';
+    $md = preg_replace( '/<h1[^>]*>(.*?)<\/h1>/si', "\n# $1\n\n", $html );
+    $md = preg_replace( '/<h2[^>]*>(.*?)<\/h2>/si', "\n## $1\n\n", $md );
+    $md = preg_replace( '/<h3[^>]*>(.*?)<\/h3>/si', "\n### $1\n\n", $md );
+    $md = preg_replace( '/<h4[^>]*>(.*?)<\/h4>/si', "\n#### $1\n\n", $md );
 
-$dist_dir = '/var/www/computerjy_dist';
+    $md = preg_replace( '/<a\s+[^>]*href=["\']([^"\']+)["\'][^>]*>(.*?)<\/a>/si', '[$2]($1)', $md );
 
-// 0. Static markdown documents
-if ($uri === '/auth.md' || $uri === '/.well-known/auth.md') {
-    $auth_file = $dist_dir . '/auth.md';
-    if (file_exists($auth_file)) {
-        echo file_get_contents($auth_file);
+    $md = preg_replace( '/<pre[^>]*><code[^>]*>(.*?)<\/code><\/pre>/si', "\n```\n$1\n```\n\n", $md );
+    $md = preg_replace( '/<code[^>]*>(.*?)<\/code>/si', '`$1`', $md );
+
+    $md = preg_replace( '/<blockquote[^>]*>(.*?)<\/blockquote>/si', "\n> $1\n\n", $md );
+
+    $md = preg_replace( '/<li[^>]*>(.*?)<\/li>/si', "- $1\n", $md );
+    $md = preg_replace( '/<p[^>]*>(.*?)<\/p>/si', "$1\n\n", $md );
+    $md = preg_replace( '/<br\s*\/?>/si', "\n", $md );
+    $md = preg_replace( '/<hr\s*\/?>/si', "\n---\n\n", $md );
+
+    $md = strip_tags( $md );
+    $md = html_entity_decode( $md, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+    $md = preg_replace( "/\n{3,}/", "\n\n", $md );
+
+    return trim( $md );
+}
+
+/**
+ * Send the document with the token estimate the contract requires.
+ *
+ * @param string $output Markdown.
+ */
+function computerjy_markdown_emit( $output ) {
+    header( 'x-markdown-tokens: ' . (int) ( str_word_count( $output ) * 1.33 ) );
+    echo $output;
+    exit;
+}
+
+// The converter is unit-tested from the CLI; nothing below runs there.
+if ( PHP_SAPI === 'cli' ) {
+    return;
+}
+
+header( 'Content-Type: text/markdown; charset=utf-8' );
+header( 'Vary: Accept' );
+header( 'Access-Control-Allow-Origin: *' );
+
+$uri = parse_url( $_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH );
+$uri = rtrim( (string) $uri, '/' ) ?: '/';
+
+// 0. Static markdown documents live next to this file.
+if ( '/auth.md' === $uri || '/.well-known/auth.md' === $uri ) {
+    $auth_file = __DIR__ . '/auth.md';
+    if ( file_exists( $auth_file ) ) {
+        readfile( $auth_file );
         exit;
     }
 }
 
-function html_to_markdown($html) {
-    if (empty($html)) return '';
-    
-    // Replace headings
-    $md = preg_replace('/<h1[^>]*>(.*?)<\/h1>/si', "\n# $1\n\n", $html);
-    $md = preg_replace('/<h2[^>]*>(.*?)<\/h2>/si', "\n## $1\n\n", $md);
-    $md = preg_replace('/<h3[^>]*>(.*?)<\/h3>/si', "\n### $1\n\n", $md);
-    $md = preg_replace('/<h4[^>]*>(.*?)<\/h4>/si', "\n#### $1\n\n", $md);
-    
-    // Replace links
-    $md = preg_replace('/<a\s+[^>]*href=["\']([^"\']+)["\'][^>]*>(.*?)<\/a>/si', '[$2]($1)', $md);
-    
-    // Replace code blocks and pre
-    $md = preg_replace('/<pre[^>]*><code[^>]*>(.*?)<\/code><\/pre>/si', "\n```\n$1\n```\n\n", $md);
-    $md = preg_replace('/<code[^>]*>(.*?)<\/code>/si', '`$1`', $md);
-    
-    // Replace blockquotes
-    $md = preg_replace('/<blockquote[^>]*>(.*?)<\/blockquote>/si', "\n> $1\n\n", $md);
-    
-    // Replace list items and paragraphs
-    $md = preg_replace('/<li[^>]*>(.*?)<\/li>/si', "- $1\n", $md);
-    $md = preg_replace('/<p[^>]*>(.*?)<\/p>/si', "$1\n\n", $md);
-    $md = preg_replace('/<br\s*\/?>/si', "\n", $md);
-    $md = preg_replace('/<hr\s*\/?>/si', "\n---\n\n", $md);
-    
-    // Strip remaining tags
-    $md = strip_tags($md);
-    
-    // Unescape entities
-    $md = html_entity_decode($md, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-    
-    // Normalize newlines
-    $md = preg_replace("/\n{3,}/", "\n\n", $md);
-    return trim($md);
-}
+// W3TC must not store this response under the HTML page's cache key.
+define( 'DONOTCACHEPAGE', true );
+define( 'WP_USE_THEMES', false );
+$wp_load = file_exists( __DIR__ . '/wp-load.php' ) ? __DIR__ . '/wp-load.php' : '/var/www/wordpress/wp-load.php';
+require $wp_load;
 
-// 1. Single Post View: /posts/{slug}
-if (preg_match('#^/posts/([^/]+)#', $uri, $matches)) {
-    $slug = urldecode($matches[1]);
-    $posts_file = $dist_dir . '/data/posts.json';
-    
-    $post_data = null;
-    if (file_exists($posts_file)) {
-        $posts = json_decode(file_get_contents($posts_file), true);
-        if (is_array($posts)) {
-            foreach ($posts as $p) {
-                if ($p['slug'] === $slug) {
-                    $post_data = $p;
-                    break;
-                }
-            }
-        }
-    }
-    
-    if ($post_data) {
-        $title = $post_data['title']['rendered'] ?? 'Article';
-        $date = date('F j, Y', strtotime($post_data['date'] ?? 'now'));
-        $cat = $post_data['primaryCategory']['name'] ?? 'Tech';
-        $content = html_to_markdown($post_data['content']['rendered'] ?? '');
-        
-        $output = "# {$title}\n\n";
-        $output .= "*Published: {$date} | Category: {$cat} | Author: Eyad Salah*\n";
-        $output .= "*URL: https://www.computerjy.com{$uri}*\n\n";
+// The theme injects a sponsor container into the_content; agents do not want it.
+remove_filter( 'the_content', 'computerjy2_inject_inarticle_slot', 20 );
+
+$site_name = get_bloginfo( 'name' );
+$home      = home_url( '/' );
+
+// 1. Single post: /posts/<slug>
+if ( preg_match( '#^/posts/([^/]+)$#', $uri, $m ) ) {
+    $post = get_page_by_path( urldecode( $m[1] ), OBJECT, 'post' );
+    if ( $post && 'publish' === $post->post_status ) {
+        $title      = html_entity_decode( wp_strip_all_tags( get_the_title( $post ) ), ENT_QUOTES, 'UTF-8' );
+        $date       = get_the_date( 'F j, Y', $post );
+        $categories = get_the_category( $post->ID );
+        $category   = empty( $categories ) ? 'Tech' : $categories[0]->name;
+        $author     = get_the_author_meta( 'display_name', $post->post_author );
+        $content    = computerjy_html_to_markdown( apply_filters( 'the_content', $post->post_content ) );
+
+        $output  = "# {$title}\n\n";
+        $output .= "*Published: {$date} | Category: {$category} | Author: {$author}*\n";
+        $output .= '*URL: ' . get_permalink( $post ) . "*\n\n";
         $output .= "---\n\n";
         $output .= $content . "\n\n";
         $output .= "---\n";
-        $output .= "*ComputerJy World — https://www.computerjy.com/*\n";
-        
-        $tokens = (int) (str_word_count($output) * 1.33);
-        header("x-markdown-tokens: {$tokens}");
-        echo $output;
-        exit;
+        $output .= "*{$site_name} — {$home}*\n";
+
+        computerjy_markdown_emit( $output );
     }
 }
 
-// 2. Homepage or general listing: /
-$posts_file = $dist_dir . '/data/posts.json';
-$output = "# ComputerJy World\n\n";
-$output .= "> Entertainment, Tech tips & Occasional software reviews by Eyad Salah since 2007.\n\n";
-$output .= "Website: https://www.computerjy.com/\n";
-$output .= "API Catalog: https://www.computerjy.com/.well-known/api-catalog\n";
-$output .= "OpenAPI Spec: https://www.computerjy.com/api/openapi.json\n";
-$output .= "Auth.md: https://www.computerjy.com/auth.md\n\n";
+// 2. Everything else: the site summary with the latest articles.
+$output  = "# {$site_name}\n\n";
+$output .= '> ' . get_bloginfo( 'description' ) . "\n\n";
+$output .= "Website: {$home}\n";
+$output .= "API Catalog: {$home}.well-known/api-catalog\n";
+$output .= "OpenAPI Spec: {$home}api/openapi.json\n";
+$output .= "Auth.md: {$home}auth.md\n\n";
 $output .= "## Articles & Archives\n\n";
 
-if (file_exists($posts_file)) {
-    $posts = json_decode(file_get_contents($posts_file), true);
-    if (is_array($posts)) {
-        $count = 0;
-        foreach ($posts as $p) {
-            if ($count++ >= 30) break;
-            $title = $p['title']['rendered'] ?? 'Untitled';
-            $slug = $p['slug'] ?? '';
-            $date = date('Y-m-d', strtotime($p['date'] ?? 'now'));
-            $cat = $p['primaryCategory']['name'] ?? 'Tech';
-            $excerpt = trim(strip_tags($p['excerpt']['rendered'] ?? ''));
-            $output .= "- **[{$title}](https://www.computerjy.com/posts/{$slug}/)** ({$date} in *{$cat}*)\n";
-            if (!empty($excerpt)) {
-                $output .= "  > {$excerpt}\n\n";
-            }
-        }
+$recent = get_posts( array(
+    'post_type'              => 'post',
+    'post_status'            => 'publish',
+    'numberposts'            => 30,
+    'no_found_rows'          => true,
+    'update_post_meta_cache' => false,
+) );
+
+foreach ( $recent as $p ) {
+    $title      = html_entity_decode( wp_strip_all_tags( get_the_title( $p ) ), ENT_QUOTES, 'UTF-8' );
+    $date       = get_the_date( 'Y-m-d', $p );
+    $categories = get_the_category( $p->ID );
+    $category   = empty( $categories ) ? 'Tech' : $categories[0]->name;
+    $excerpt    = trim( wp_strip_all_tags( get_the_excerpt( $p ) ) );
+
+    $output .= '- **[' . $title . '](' . get_permalink( $p ) . ")** ({$date} in *{$category}*)\n";
+    if ( '' !== $excerpt ) {
+        $output .= "  > {$excerpt}\n\n";
     }
 }
 
 $output .= "\n---\n";
-$output .= "*For full search index of all 413+ articles, see: https://www.computerjy.com/search-index.json*\n";
+$output .= "*For the full search index of every article, see: {$home}search-index.json*\n";
 
-$tokens = (int) (str_word_count($output) * 1.33);
-header("x-markdown-tokens: {$tokens}");
-echo $output;
-exit;
+computerjy_markdown_emit( $output );
