@@ -30,5 +30,5 @@ Allow: /
 User-agent: Meta-ExternalAgent
 Allow: /
 
-Sitemap: https://www.computerjy.com/sitemap-index.xml
+Sitemap: https://www.computerjy.com/sitemap.xml
 Agentmap: https://www.computerjy.com/.well-known/ai-catalog.json
