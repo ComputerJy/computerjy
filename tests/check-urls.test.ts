@@ -11,9 +11,13 @@ describe('scripts/check-urls.sh', () => {
   });
 
   it('checks every slug in scripts/known-slugs.json, not a sample', () => {
-    const slugs: string[] = JSON.parse(readFileSync('scripts/known-slugs.json', 'utf8'));
+    const slugs: string[] = JSON.parse(
+      readFileSync('scripts/known-slugs.json', 'utf8')
+    );
     // --print-urls lists the URLs it would request without hitting the network.
-    const out = execFileSync('bash', [script, '--print-urls'], { encoding: 'utf8' });
+    const out = execFileSync('bash', [script, '--print-urls'], {
+      encoding: 'utf8',
+    });
     for (const slug of slugs) expect(out).toContain(`/posts/${slug}\n`);
   });
 
@@ -31,6 +35,8 @@ describe('scripts/check-urls.sh', () => {
     expect(wp).toContain('/category/entertainment 200');
     expect(wp).toContain('/tag/linux 200');
     expect(wp).toContain('/privacy-policy 200');
-    expect(wp).toContain('/2008/01/1goal 301 https://www.computerjy.com/posts/1goal');
+    expect(wp).toContain(
+      '/2008/01/1goal 301 https://www.computerjy.com/posts/1goal'
+    );
   });
 });

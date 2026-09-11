@@ -107,7 +107,7 @@ function computerjy2_search_index_serve( $wp ) {
 
     // Keep page-cache plugins (W3TC) from storing this JSON as an HTML page.
     if ( ! defined( 'DONOTCACHEPAGE' ) ) {
-        define( 'DONOTCACHEPAGE', true );
+        define( 'DONOTCACHEPAGE', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- cache-plugin convention.
     }
 
     status_header( 200 );

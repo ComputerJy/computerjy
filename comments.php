@@ -19,7 +19,7 @@ if ( post_password_required() ) {
             <?php
             $cjy_count = (int) get_comments_number();
             /* translators: %d: comment count */
-            printf( esc_html( _n( 'COMMENTS [%d]', 'COMMENTS [%d]', $cjy_count, 'computerjy2' ) ), $cjy_count );
+            echo esc_html( sprintf( _n( 'COMMENTS [%d]', 'COMMENTS [%d]', $cjy_count, 'computerjy2' ), $cjy_count ) );
             ?>
         </h2>
 

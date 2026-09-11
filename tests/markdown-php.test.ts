@@ -6,7 +6,11 @@ const hasPhp = spawnSync('php', ['-v']).status === 0;
 function md(html: string): string {
   return execFileSync(
     'php',
-    ['-r', 'require "public/markdown.php"; echo computerjy_html_to_markdown($argv[1]);', html],
+    [
+      '-r',
+      'require "public/markdown.php"; echo computerjy_html_to_markdown($argv[1]);',
+      html,
+    ],
     { encoding: 'utf8' }
   );
 }
@@ -14,7 +18,11 @@ function md(html: string): string {
 function tokens(text: string): string {
   return execFileSync(
     'php',
-    ['-r', 'require "public/markdown.php"; echo computerjy_markdown_token_estimate($argv[1]);', text],
+    [
+      '-r',
+      'require "public/markdown.php"; echo computerjy_markdown_token_estimate($argv[1]);',
+      text,
+    ],
     { encoding: 'utf8' }
   );
 }
@@ -25,7 +33,9 @@ describe.skipIf(!hasPhp)('public/markdown.php converter', () => {
   });
 
   it('converts headings, links, code and paragraphs', () => {
-    const out = md('<h2>Title</h2><p>See <a href="/posts/x">this</a> and <code>ls</code>.</p>');
+    const out = md(
+      '<h2>Title</h2><p>See <a href="/posts/x">this</a> and <code>ls</code>.</p>'
+    );
     expect(out).toContain('## Title');
     expect(out).toContain('[this](/posts/x)');
     expect(out).toContain('`ls`');

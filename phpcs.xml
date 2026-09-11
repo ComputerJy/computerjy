@@ -19,8 +19,6 @@
 
     <!-- Directories to ignore -->
     <exclude-pattern>*/node_modules/*</exclude-pattern>
-    <exclude-pattern>*/dist/*</exclude-pattern>
-    <exclude-pattern>*/.astro/*</exclude-pattern>
     <exclude-pattern>*/assets/*</exclude-pattern>
     <exclude-pattern>*/public/*</exclude-pattern>
 
@@ -42,7 +40,7 @@
     <rule ref="WordPress.WP.I18n">
         <properties>
             <property name="text_domain" type="array">
-                <element value="computerjy" />
+                <element value="computerjy2" />
             </property>
         </properties>
     </rule>
@@ -54,6 +52,8 @@
     <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
         <properties>
             <property name="prefixes" type="array">
+                <element value="computerjy2" />
+                <!-- standalone plugins in inc/computerjy-*.php -->
                 <element value="computerjy" />
             </property>
         </properties>

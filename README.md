@@ -15,8 +15,8 @@ cd theme && zip -r ../computerjy-2.zip . -x ".*"
 
 Upload in **Appearance → Themes → Add New → Upload Theme**, then:
 
-1. **Appearance → Menus** — assign *Primary Navigation* (Home, Tech Tips,
-   Entertainment, Contact) and optionally *Footer Links*.
+1. **Appearance → Menus** — assign _Primary Navigation_ (Home, Tech Tips,
+   Entertainment, Contact) and optionally _Footer Links_.
 2. **Appearance → Customize → ComputerJy: Brand & Social** — eyebrow tagline
    and social URLs.
 3. **Appearance → Customize → ComputerJy: Sponsor Slots** — paste AdSense or
@@ -26,22 +26,22 @@ Upload in **Appearance → Themes → Add New → Upload Theme**, then:
 
 ## Templates
 
-| File | Covers |
-| --- | --- |
-| `index.php` | Home / blog feed: lead block + Latest grid |
-| `front-page.php` | Static front page, else the feed |
-| `single.php` + `template-parts/content-single.php` | Single post |
-| `page.php` | Page (narrow reading shell) |
-| `page-templates/full-width.php` | Full-width page template |
-| `page-templates/landing.php` | Edge-to-edge landing page template |
-| `archive.php` | Generic archive |
-| `category.php` | Category archive with hero band |
-| `tag.php`, `date.php` | Delegate to `archive.php` |
-| `author.php` | Author profile page |
-| `search.php`, `searchform.php` | Search results and form |
-| `404.php` | Not found + latest posts |
-| `comments.php` | Chat-bubble comment thread |
-| `sidebar.php` | Author, trending, categories, tags, sticky slot, widgets |
+| File                                               | Covers                                                   |
+| -------------------------------------------------- | -------------------------------------------------------- |
+| `index.php`                                        | Home / blog feed: lead block + Latest grid               |
+| `front-page.php`                                   | Static front page, else the feed                         |
+| `single.php` + `template-parts/content-single.php` | Single post                                              |
+| `page.php`                                         | Page (narrow reading shell)                              |
+| `page-templates/full-width.php`                    | Full-width page template                                 |
+| `page-templates/landing.php`                       | Edge-to-edge landing page template                       |
+| `archive.php`                                      | Generic archive                                          |
+| `category.php`                                     | Category archive with hero band                          |
+| `tag.php`, `date.php`                              | Delegate to `archive.php`                                |
+| `author.php`                                       | Author profile page                                      |
+| `search.php`, `searchform.php`                     | Search results and form                                  |
+| `404.php`                                          | Not found + latest posts                                 |
+| `comments.php`                                     | Chat-bubble comment thread                               |
+| `sidebar.php`                                      | Author, trending, categories, tags, sticky slot, widgets |
 
 ## Layout slots
 
