@@ -36,33 +36,33 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          tools: composer, phpcs
+          tools: composer
 
       - name: Check PHP Syntax (Linting)
         run: |
-          find . -maxdepth 3 -name "*.php" -not -path "*/node_modules/*" -exec php -l {} +
+          find . -maxdepth 3 -name "*.php" -not -path "*/node_modules/*" -not -path "*/vendor/*" -exec php -l {} +
 
       - name: Get Composer Cache Directory
         id: composer-cache
-        run: echo "dir=$(composer config --global cache-files-dir)" >> "$GITHUB_OUTPUT"
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
 
-      - name: Cache Composer Global Packages
+      - name: Cache Composer Packages
         uses: actions/cache@v6
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-global-${{ hashFiles('phpcs.xml') }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.json') }}
           restore-keys: |
-            ${{ runner.os }}-composer-global-
+            ${{ runner.os }}-composer-
 
+      # composer.json pins WPCS + the installer plugin; `composer lint` is the
+      # same command developers run locally.
       - name: Install WordPress Coding Standards
         run: |
-          composer global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
-          composer global require --dev wp-coding-standards/wpcs dealerdirect/phpcodesniffer-composer-installer
-          composer global exec -- phpcs -i
+          composer install --no-interaction --no-progress --prefer-dist
+          vendor/bin/phpcs -i
 
       - name: Scan WordPress PHP Code Security
-        run: |
-          composer global exec -- phpcs --standard=phpcs.xml
+        run: composer lint
 
   npm-audit-scan:
     name: NPM Dependency Vulnerability Audit
