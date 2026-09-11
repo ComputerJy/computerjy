@@ -135,7 +135,12 @@ slugs() {
             case "$out" in
                 '[]') break ;;
                 '['*) ;;
-                *) break ;;
+                *)
+                    if [ -z "$out" ]; then
+                        echo "WARN: REST page $page returned no body; live slug list may be truncated" >&2
+                    fi
+                    break
+                    ;;
             esac
             node -e 'JSON.parse(process.argv[1]).forEach(p=>console.log(p.slug))' "$out"
             page=$((page + 1))
