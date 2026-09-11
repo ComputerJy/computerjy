@@ -1,5 +1,6 @@
 # Dependencies
 node_modules/
+vendor/
 .pnpm-store/
 
 # Build outputs of sibling projects and tool caches
