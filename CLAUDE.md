@@ -36,6 +36,9 @@ Keep them in sync when you change markup structure.
   in-article slot is injected by a `the_content` filter, not by a template.
 - `inc/related.php` — related + trending queries, transient-cached, purged on
   `save_post`, `wp_insert_comment`, and common cache-plugin flush hooks.
+- `inc/search-index.php` — serves `/search-index.json` (the ⌘K dataset the
+  discovery layer advertises) in the shape the Astro build produced; transient
+  `cjy2_search_index`, flushed with the related/trending caches.
 - `inc/plugin-compat.php` — CF7, Jetpack, AMP, SEO plugins, cache plugins.
 - `inc/customizer.php` — brand/social, layout, sponsor slots.
 - `inc/comment-walker.php` — `computerjy2_comment()` callback (chat bubbles).
