@@ -2,7 +2,7 @@
 # ==============================================================================
 # Deploy the ComputerJy 2.0 theme and the agent-discovery files to the origin.
 #
-# The repo root is both the theme root and the Astro project, so the theme is
+# The repo root also carries the deploy tooling, tests and the retired edge Worker, so the theme is
 # staged from an allowlist: only what WordPress needs reaches the server, and
 # .env / node_modules / src never land in a web-served directory.
 #

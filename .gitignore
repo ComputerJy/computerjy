@@ -2,9 +2,9 @@
 node_modules/
 .pnpm-store/
 
-# Build outputs
+# Build outputs of sibling projects and tool caches
 dist/
-.astro/
+.vitest/
 
 # Logs
 npm-debug.log*
