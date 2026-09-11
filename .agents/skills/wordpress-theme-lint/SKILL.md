@@ -13,7 +13,7 @@ This skill guides PHP linting, security checking, and theme packaging for the cl
 Run a syntax check across all root, template, and include PHP files:
 
 ```bash
-find . -maxdepth 3 -name "*.php" -not -path "*/node_modules/*" -not -path "*/dist/*" -not -path "*/.astro/*" -exec php -l {} +
+find . -maxdepth 3 -name "*.php" -not -path "*/node_modules/*" -exec php -l {} +
 ```
 
 ## WordPress Coding Standards & Security Guidelines

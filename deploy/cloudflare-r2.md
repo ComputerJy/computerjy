@@ -1,5 +1,9 @@
 # Cloudflare R2 + edge Worker
 
+> **2026-09-12:** the Astro source and `deploy.yml` are gone from the repo (MIGRATION.md §6).
+> The Worker keeps serving the last build from R2 until its routes are detached at the
+> cutover; nothing below that says "rebuild" or "deploy" can be run any more.
+
 Serves the Astro build (`dist/`) from a Cloudflare R2 bucket through a Worker,
 and leaves `/wp-admin`, `/wp-json`, `/wp-content` and `markdown.php` on the
 Lightsail origin.

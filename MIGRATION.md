@@ -33,11 +33,11 @@ need the same check.
 
 ## 2. Endpoints Astro generated that WordPress does not
 
-| Astro | WordPress equivalent | Action |
-| --- | --- | --- |
-| `/rss.xml` (`src/pages/rss.xml.ts`) | `/feed/` | 301 `/rss.xml` → `/feed/`, or a rewrite so the old URL keeps working. Feed readers will not re-subscribe. |
-| `/search-index.json` | none | The ⌘K modal in this theme submits to `?s=` instead. If you want instant client-side search back, keep generating an index (a small plugin or a transient-backed REST route). |
-| `/404` | `404.php` | Included in this theme. |
+| Astro                               | WordPress equivalent | Action                                                                                                                                                                        |
+| ----------------------------------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/rss.xml` (`src/pages/rss.xml.ts`) | `/feed/`             | 301 `/rss.xml` → `/feed/`, or a rewrite so the old URL keeps working. Feed readers will not re-subscribe.                                                                     |
+| `/search-index.json`                | none                 | The ⌘K modal in this theme submits to `?s=` instead. If you want instant client-side search back, keep generating an index (a small plugin or a transient-backed REST route). |
+| `/404`                              | `404.php`            | Included in this theme.                                                                                                                                                       |
 
 The theme's search overlay currently lists recent posts and hands the query to
 WordPress search. That is a real downgrade from the prebuilt index — decide
@@ -47,7 +47,7 @@ whether that matters before cutover.
 
 `public/.well-known/*`, `public/api/openapi.json`, `public/agent-card.json`,
 `public/ai-catalog.json`, `public/robots.txt`, `public/security.txt` and
-`public/markdown.php` are currently served from the static build. They must keep
+`public/markdown.php` were served from the static build. They must keep
 working at the same paths with the same content types and `Link` headers —
 `deploy/lightsail-apache.conf` already encodes those rules, and
 `.agents/rules/ai-agent-discovery.md` is the spec.
@@ -86,16 +86,25 @@ changes the shape of the problem:
 
 ## 6. What to retire afterwards
 
-- `inc/computerjy-rebuild-webhook.php` — the hand-installed plugin that fires
-  `repository_dispatch` on content change. With no static build to rebuild, it
-  is pure overhead. Deactivate it rather than deleting, until you are sure.
-- `.github/workflows/deploy.yml` and `deploy/deploy-lightsail.sh` — no longer
-  the deploy path for the public site.
-- `inc/computerjy-rest-comments.php` — this theme uses the native comment form,
-  so anonymous REST commenting is no longer required by the front end. Leave it
-  installed if anything else posts comments over REST.
-- The Astro source (`src/`, `astro.config.mjs`, the content loaders) — keep it in
-  the repo as the rollback, but it stops being the production frontend.
+Already removed from the repo (2026-09-12, ahead of the cutover): the Astro
+source (`src/`, `astro.config.mjs`, `tailwind.config.mjs`), its build/verify
+pipeline (`scripts/verify-build.mjs`, `deploy/deploy-lightsail.sh`,
+`.github/workflows/deploy.yml`), and the two plugins that only served the
+static build — `computerjy-rebuild-webhook` and `computerjy-rest-comments`.
+Everything is recoverable from git history (last commit carrying them:
+`64a56af`).
+
+Still installed on the origin and to be dealt with at cutover:
+
+- **Deactivate** `computerjy-rebuild-webhook` (it dispatches to a workflow that
+  no longer exists) and `computerjy-rest-comments` (the theme's native comment
+  form POSTs to `wp-comments-post.php`; leave it only if something else posts
+  comments over REST).
+- `workers/edge-router/` and `deploy/cloudflare-r2.md` stay in the repo until
+  the Worker routes are detached (step 5.3). The R2 bucket holds the last
+  static build as a frozen snapshot, so re-attaching the routes is still a
+  rollback — but it can no longer be rebuilt. Delete the Worker directory, its
+  two tests and the R2 doc once the cutover has held for a week.
 
 ## 7. Analytics
 
