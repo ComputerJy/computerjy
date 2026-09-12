@@ -172,9 +172,14 @@ check_markdown / || fails=$((fails + 1))
 check_markdown /posts/1goal || fails=$((fails + 1))
 
 echo "== every post slug =="
-slug_fails=$(slugs | sort -u | sed 's#^#/posts/#' \
-    | xargs -P 8 -I{} bash -c 'check "$1" 200 "" text/html' _ {} \
-    | tee /dev/stderr | grep -c '^FAIL' || true)
+# Collected in a temp file rather than `tee /dev/stderr`: re-opening /dev/stderr
+# truncates a log the caller redirected 2>&1 into, wiping the sections above.
+slug_out=$(mktemp)
+slugs | sort -u | sed 's#^#/posts/#' \
+    | xargs -P 8 -I{} bash -c 'check "$1" 200 "" text/html' _ {} > "$slug_out" || true
+cat "$slug_out"
+slug_fails=$(grep -c '^FAIL' "$slug_out" || true)
+rm -f "$slug_out"
 fails=$((fails + slug_fails))
 
 echo
