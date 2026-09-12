@@ -109,11 +109,8 @@ function computerjy2_scripts() {
         null
     );
 
-    // The origin serves css/js with a 1-year Expires, so the query string
-    // must change with the file, not with the theme's release version.
-    $theme_dir = get_template_directory();
-    $css_ver   = (string) filemtime( $theme_dir . '/assets/css/theme.css' );
-    $js_ver    = (string) filemtime( $theme_dir . '/assets/js/theme.js' );
+    $css_ver = computerjy2_asset_version( 'assets/css/theme.css' );
+    $js_ver  = computerjy2_asset_version( 'assets/js/theme.js' );
 
     wp_enqueue_style( 'computerjy2-theme', get_template_directory_uri() . '/assets/css/theme.css', array(), $css_ver );
     wp_enqueue_style( 'computerjy2-style', get_stylesheet_uri(), array( 'computerjy2-theme' ), $css_ver );
@@ -125,6 +122,23 @@ function computerjy2_scripts() {
     }
 }
 add_action( 'wp_enqueue_scripts', 'computerjy2_scripts' );
+
+/**
+ * Cache-busting version for a theme asset.
+ *
+ * The origin serves css/js with a 1-year Expires, so the query string must
+ * change with the file, not with the theme's release version. A missing file
+ * (a partial deploy) falls back to the release version instead of an empty
+ * `?ver=`.
+ *
+ * @param string $rel Path relative to the theme root.
+ * @return string
+ */
+function computerjy2_asset_version( $rel ) {
+    $file  = get_template_directory() . '/' . ltrim( $rel, '/' );
+    $mtime = file_exists( $file ) ? filemtime( $file ) : false;
+    return $mtime ? (string) $mtime : COMPUTERJY2_VERSION;
+}
 
 /**
  * Block editor assets (fonts, so the editor matches the front end).
