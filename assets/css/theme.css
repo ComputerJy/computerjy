@@ -96,7 +96,7 @@ body {
   background: var(--bg-base);
   color: var(--text-body);
   font-family: var(--font-body);
-  font-size: 16.5px;
+  font-size: 1.03125rem;
   line-height: 1.78;
   -webkit-font-smoothing: antialiased;
   overflow-wrap: break-word;
@@ -157,7 +157,7 @@ a:focus-visible {
   background: var(--brand-cyan);
   color: #080b12;
   padding: 10px 16px;
-  font: 800 12px/1 var(--font-mono);
+  font: 800 0.75rem/1 var(--font-mono);
   letter-spacing: 0.12em;
 }
 .skip-link:focus {
@@ -199,7 +199,7 @@ a:focus-visible {
   height: 26px;
 }
 .brand-word {
-  font: 800 17px/1 var(--font-heading);
+  font: 800 1.0625rem/1 var(--font-heading);
   color: var(--text-primary);
   letter-spacing: -0.02em;
   white-space: nowrap;
@@ -227,7 +227,7 @@ a:focus-visible {
   }
 }
 .nav-list a {
-  font: 600 12px/1 var(--font-mono);
+  font: 600 0.75rem/1 var(--font-mono);
   color: var(--text-secondary);
   white-space: nowrap;
 }
@@ -256,7 +256,7 @@ a:focus-visible {
   background: transparent;
   border: 1px solid var(--border-color);
   color: var(--text-secondary);
-  font: 600 11px/1 var(--font-mono);
+  font: 600 0.75rem/1 var(--font-mono);
   letter-spacing: 0.08em;
   padding: 7px 9px;
   min-height: 36px;
@@ -279,7 +279,7 @@ a:focus-visible {
   color: var(--brand-cyan);
 }
 .search-kbd-shortcut {
-  font: 600 10px/1 var(--font-mono);
+  font: 600 0.75rem/1 var(--font-mono);
   color: var(--text-muted);
 }
 .mobile-menu-btn {
@@ -310,7 +310,7 @@ a:focus-visible {
   gap: 10px;
   padding: 16px 0;
   border-bottom: 1px solid var(--border-color);
-  font: 600 11.5px/1 var(--font-mono);
+  font: 600 0.75rem/1 var(--font-mono);
   letter-spacing: 0.06em;
   color: var(--text-muted);
 }
@@ -331,7 +331,7 @@ a:focus-visible {
   min-height: 24px;
   background: var(--brand-cyan);
   color: var(--chip-fg);
-  font: 800 9.5px/1 var(--font-mono);
+  font: 800 0.75rem/1 var(--font-mono);
   letter-spacing: 0.13em;
   text-transform: uppercase;
   padding: 5px 8px;
@@ -355,7 +355,7 @@ a:focus-visible {
 .badge-glow {
   background: var(--grad-primary);
   color: #fff;
-  font: 800 10px/1 var(--font-mono);
+  font: 800 0.75rem/1 var(--font-mono);
   letter-spacing: 0.16em;
   padding: 6px 10px;
   display: inline-block;
@@ -368,7 +368,7 @@ a:focus-visible {
 }
 .section-heading {
   margin: 0;
-  font: 800 10px/1 var(--font-mono);
+  font: 800 0.75rem/1 var(--font-mono);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: #fff;
@@ -381,18 +381,18 @@ a:focus-visible {
   background: var(--border-color);
 }
 .section-count {
-  font: 600 11px/1 var(--font-mono);
+  font: 600 0.75rem/1 var(--font-mono);
   color: var(--text-subtle);
 }
 .breadcrumbs-trail {
-  font: 600 10.5px/1.8 var(--font-mono);
+  font: 600 0.75rem/1.8 var(--font-mono);
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   padding: 16px 0 0;
 }
 .breadcrumbs-trail a {
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 .breadcrumbs-trail a:hover {
   color: var(--brand-cyan);
@@ -472,7 +472,7 @@ a:focus-visible {
 }
 .post-card .entry-title {
   margin: 9px 0 0;
-  font: 700 14.5px/1.34 var(--font-heading);
+  font: 700 0.90625rem/1.34 var(--font-heading);
   letter-spacing: -0.01em;
 }
 .post-card .entry-title a {
@@ -482,7 +482,7 @@ a:focus-visible {
   color: var(--brand-cyan);
 }
 .post-card .card-cat {
-  font: 800 9px/1 var(--font-mono);
+  font: 800 0.75rem/1 var(--font-mono);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--brand-cyan);
@@ -492,14 +492,14 @@ a:focus-visible {
 }
 .lead-card .entry-title {
   margin: 0 0 10px;
-  font: 900 26px/1.16 var(--font-heading);
+  font: 900 1.625rem/1.16 var(--font-heading);
 }
 .lead-card .entry-title a {
   color: var(--text-primary);
 }
 .lead-card .entry-excerpt {
   margin: 0;
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.65;
   color: var(--text-secondary);
 }
@@ -520,7 +520,7 @@ a:focus-visible {
 }
 .side-card .entry-title {
   margin: 9px 0 0;
-  font: 700 15px/1.32 var(--font-heading);
+  font: 700 0.9375rem/1.32 var(--font-heading);
 }
 .side-card .entry-title a {
   color: var(--text-primary);
@@ -530,7 +530,7 @@ a:focus-visible {
   width: 100%;
 }
 .entry-meta-mono {
-  font: 600 11px/1.6 var(--font-mono);
+  font: 600 0.75rem/1.6 var(--font-mono);
   color: var(--text-muted);
   letter-spacing: 0.04em;
 }
@@ -541,17 +541,17 @@ a:focus-visible {
   border-bottom: 1px solid var(--border-color);
 }
 .archive-title {
-  font: 900 34px/1.1 var(--font-heading);
+  font: 900 2.125rem/1.1 var(--font-heading);
   margin: 10px 0 8px;
 }
 .archive-description {
   margin: 0;
   color: var(--text-secondary);
-  font-size: 15px;
+  font-size: 0.9375rem;
   max-width: 60ch;
 }
 .archive-kicker {
-  font: 800 10px/1 var(--font-mono);
+  font: 800 0.75rem/1 var(--font-mono);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--brand-cyan);
@@ -638,7 +638,7 @@ a:focus-visible {
   height: 30px;
 }
 .byline-name {
-  font: 600 11.5px/1.5 var(--font-mono);
+  font: 600 0.75rem/1.5 var(--font-mono);
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -660,7 +660,7 @@ a:focus-visible {
   cursor: pointer;
   padding: 6px 10px;
   min-height: 28px;
-  font: 700 10.5px/1 var(--font-mono);
+  font: 700 0.75rem/1 var(--font-mono);
   letter-spacing: 0.1em;
   color: var(--text-secondary);
   text-transform: uppercase;
@@ -689,7 +689,7 @@ a:focus-visible {
 
 /* ---------- 12. Entry content / block editor ---------- */
 .entry-content {
-  font-size: 16.5px;
+  font-size: 1.03125rem;
   line-height: 1.78;
   color: var(--text-body);
 }
@@ -707,7 +707,7 @@ a:focus-visible {
 }
 .entry-content h2 {
   margin: 1.6em 0 0.5em;
-  font-size: 24px;
+  font-size: 1.5rem;
 }
 .entry-content h2::before {
   content: '## ';
@@ -717,7 +717,7 @@ a:focus-visible {
 }
 .entry-content h3 {
   margin: 1.5em 0 0.45em;
-  font-size: 19px;
+  font-size: 1.1875rem;
 }
 .entry-content h3::before {
   content: '### ';
@@ -752,14 +752,14 @@ a:focus-visible {
   padding: 14px 18px;
   background: var(--bg-surface);
   border-left: 3px solid var(--brand-cyan);
-  font-size: 16px;
+  font-size: 1rem;
   color: var(--text-body);
 }
 .wp-block-quote cite,
 .entry-content cite {
   display: block;
   margin-top: 8px;
-  font: 600 11px/1 var(--font-mono);
+  font: 600 0.75rem/1 var(--font-mono);
   color: var(--text-muted);
   letter-spacing: 0.08em;
   font-style: normal;
@@ -770,7 +770,7 @@ a:focus-visible {
   background: var(--bg-surface);
   border-left: 3px solid var(--brand-cyan);
   padding: 14px 16px;
-  font: 400 13px/1.7 var(--font-mono);
+  font: 400 0.8125rem/1.7 var(--font-mono);
   color: var(--text-secondary);
   overflow: auto;
 }
@@ -788,7 +788,7 @@ a:focus-visible {
 .wp-block-table table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14.5px;
+  font-size: 0.90625rem;
 }
 .entry-content th,
 .entry-content td {
@@ -798,7 +798,7 @@ a:focus-visible {
 }
 .entry-content th {
   background: var(--bg-elevated);
-  font: 700 11px/1 var(--font-mono);
+  font: 700 0.75rem/1 var(--font-mono);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-primary);
@@ -809,7 +809,7 @@ a:focus-visible {
 }
 .entry-content figcaption,
 .wp-block-image figcaption {
-  font: 500 12px/1.6 var(--font-mono);
+  font: 500 0.75rem/1.6 var(--font-mono);
   color: var(--text-muted);
   margin-top: 8px;
 }
@@ -823,7 +823,7 @@ a:focus-visible {
   background: var(--brand-cyan);
   color: var(--chip-fg);
   border-radius: 0;
-  font: 800 12px/1 var(--font-mono);
+  font: 800 0.75rem/1 var(--font-mono);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   padding: 12px 18px;
@@ -876,7 +876,7 @@ a:focus-visible {
   background: var(--bg-subtle);
   border: 1px solid var(--border-color);
   color: var(--text-secondary);
-  font: 600 11px/1 var(--font-mono);
+  font: 600 0.75rem/1 var(--font-mono);
   padding: 5px 9px;
 }
 .tag-chip:hover {
@@ -886,7 +886,7 @@ a:focus-visible {
 
 /* ---------- 14. Related posts ---------- */
 .block-kicker {
-  font: 800 10px/1 var(--font-mono);
+  font: 800 0.75rem/1 var(--font-mono);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--brand-cyan);
@@ -895,7 +895,7 @@ a:focus-visible {
 .related-grid .related-item h3 {
   margin: 0;
   padding: 11px;
-  font: 700 13px/1.35 var(--font-heading);
+  font: 700 0.8125rem/1.35 var(--font-heading);
 }
 .related-grid .related-item h3 a {
   color: var(--text-primary);
@@ -912,7 +912,7 @@ a:focus-visible {
 }
 .widget-title,
 .sidebar-widget h3 {
-  font: 800 9.5px/1 var(--font-mono);
+  font: 800 0.75rem/1 var(--font-mono);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--text-primary);
@@ -934,12 +934,12 @@ a:focus-visible {
   margin: 0 auto 10px;
 }
 .author-card .author-name {
-  font: 800 14px/1 var(--font-heading);
+  font: 800 0.875rem/1 var(--font-heading);
   color: var(--text-primary);
 }
 .author-card p {
   margin: 8px 0 0;
-  font-size: 12.5px;
+  font-size: 0.78125rem;
   line-height: 1.6;
   color: var(--text-secondary);
 }
@@ -953,7 +953,7 @@ a:focus-visible {
   gap: 10px;
 }
 .trending-rank {
-  font: 700 11px/1.4 var(--font-mono);
+  font: 700 0.75rem/1.4 var(--font-mono);
   flex: none;
 }
 .trending-item:nth-child(1) .trending-rank {
@@ -969,7 +969,7 @@ a:focus-visible {
   color: var(--text-subtle);
 }
 .trending-item a {
-  font: 600 13px/1.45 var(--font-body);
+  font: 600 0.8125rem/1.45 var(--font-body);
   color: var(--text-body);
 }
 .trending-item a:hover {
@@ -984,7 +984,7 @@ a:focus-visible {
   gap: 9px;
 }
 .sidebar-widget ul li a {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--text-secondary);
 }
 .sidebar-widget ul li a:hover {
@@ -1000,7 +1000,7 @@ a:focus-visible {
   border: 1px dashed var(--rule-strong);
   background: rgba(0, 210, 255, 0.04);
   color: var(--text-muted);
-  font: 600 9.5px/1 var(--font-mono);
+  font: 600 0.75rem/1 var(--font-mono);
   letter-spacing: 0.16em;
   text-transform: uppercase;
   display: flex;
@@ -1051,7 +1051,7 @@ a:focus-visible {
   margin-top: 28px;
 }
 .comments-title {
-  font: 800 10px/1 var(--font-mono);
+  font: 800 0.75rem/1 var(--font-mono);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--text-primary);
@@ -1090,7 +1090,7 @@ a:focus-visible {
   border-color: rgba(0, 210, 255, 0.22);
 }
 .comment-header {
-  font: 600 11px/1 var(--font-mono);
+  font: 600 0.75rem/1 var(--font-mono);
   color: var(--text-primary);
   margin-bottom: 8px;
   letter-spacing: 0.06em;
@@ -1103,7 +1103,7 @@ a:focus-visible {
   color: var(--text-subtle);
 }
 .comment-body {
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.6;
   color: var(--text-body);
 }
@@ -1114,7 +1114,7 @@ a:focus-visible {
   margin-top: 8px;
 }
 .comment-reply a {
-  font: 700 10.5px/1 var(--font-mono);
+  font: 700 0.75rem/1 var(--font-mono);
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -1125,7 +1125,7 @@ a:focus-visible {
 }
 .comment-form label {
   display: block;
-  font: 700 10px/1 var(--font-mono);
+  font: 700 0.75rem/1 var(--font-mono);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--text-secondary);
@@ -1145,7 +1145,7 @@ select {
   border: 1px solid var(--border-color);
   color: var(--text-primary);
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: 0.875rem;
   padding: 10px 12px;
   border-radius: 0;
 }
@@ -1161,7 +1161,7 @@ button.submit {
   color: var(--chip-fg);
   border: 0;
   cursor: pointer;
-  font: 800 11px/1 var(--font-mono);
+  font: 800 0.75rem/1 var(--font-mono);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   padding: 12px 18px;
@@ -1189,7 +1189,7 @@ button.submit {
   padding: 9px 14px;
   border: 1px solid var(--border-color);
   color: var(--text-secondary);
-  font: 600 12px/1 var(--font-mono);
+  font: 600 0.75rem/1 var(--font-mono);
 }
 .nav-links .page-numbers.current {
   background: var(--brand-cyan);
@@ -1217,7 +1217,7 @@ button.submit {
   text-align: right;
 }
 .post-navigation a {
-  font: 700 14px/1.35 var(--font-heading);
+  font: 700 0.875rem/1.35 var(--font-heading);
   color: var(--text-primary);
 }
 .post-navigation a:hover {
@@ -1237,7 +1237,7 @@ button.submit {
   padding: 30px 0;
 }
 .footer-col-title {
-  font: 800 10px/1 var(--font-mono);
+  font: 800 0.75rem/1 var(--font-mono);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--text-primary);
@@ -1247,7 +1247,7 @@ button.submit {
   color: var(--brand-cyan);
 }
 .footer-widget p {
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.6;
   color: var(--text-secondary);
 }
@@ -1267,7 +1267,7 @@ button.submit {
   color: var(--chip-fg);
   border: 0;
   cursor: pointer;
-  font: 800 11px/1 var(--font-mono);
+  font: 800 0.75rem/1 var(--font-mono);
   letter-spacing: 0.1em;
 }
 .footer-links {
@@ -1279,7 +1279,7 @@ button.submit {
   gap: 8px;
 }
 .footer-links a {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--text-secondary);
 }
 .footer-links a:hover {
@@ -1304,14 +1304,14 @@ button.submit {
 }
 .footer-legal {
   margin-top: 14px;
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.8;
 }
 .site-credit {
   border-top: 1px solid var(--border-color);
   padding: 13px var(--gutter);
   text-align: center;
-  font: 600 11px/1 var(--font-mono);
+  font: 600 0.75rem/1 var(--font-mono);
   color: var(--text-subtle);
   letter-spacing: 0.12em;
 }
@@ -1328,7 +1328,7 @@ button.submit {
   display: none;
   align-items: center;
   justify-content: center;
-  font: 800 14px/1 var(--font-mono);
+  font: 800 0.875rem/1 var(--font-mono);
   z-index: 50;
 }
 .back-to-top.is-visible {
@@ -1366,7 +1366,7 @@ button.submit {
 .search-modal-input {
   background: transparent;
   border: 0;
-  font-size: 15px;
+  font-size: 0.9375rem;
   color: var(--text-primary);
   padding: 0;
 }
@@ -1374,7 +1374,7 @@ button.submit {
   background: transparent;
   border: 1px solid var(--border-color);
   color: var(--text-muted);
-  font: 600 10px/1 var(--font-mono);
+  font: 600 0.75rem/1 var(--font-mono);
   padding: 6px 8px;
   cursor: pointer;
 }
@@ -1388,17 +1388,17 @@ button.submit {
   border-bottom: 1px solid var(--border-color);
 }
 .search-result-title {
-  font: 700 14px/1.35 var(--font-heading);
+  font: 700 0.875rem/1.35 var(--font-heading);
   color: var(--text-primary);
 }
 .search-result-snippet {
-  font: 500 11.5px/1 var(--font-mono);
+  font: 500 0.75rem/1 var(--font-mono);
   color: var(--text-muted);
   margin-top: 6px;
 }
 .search-hint {
   padding: 10px 16px;
-  font: 600 10px/1 var(--font-mono);
+  font: 600 0.75rem/1 var(--font-mono);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--text-subtle);
@@ -1429,7 +1429,7 @@ button.submit {
   display: block;
   padding: 12px 10px;
   border: 1px solid var(--border-color);
-  font: 600 13px/1 var(--font-mono);
+  font: 600 0.8125rem/1 var(--font-mono);
   color: var(--text-secondary);
 }
 .mobile-nav-list a:hover {
@@ -1453,12 +1453,12 @@ button.submit {
   color: transparent;
 }
 .state-title {
-  font: 900 24px/1.2 var(--font-heading);
+  font: 900 1.5rem/1.2 var(--font-heading);
   margin: 10px 0;
 }
 .state-text {
   color: var(--text-secondary);
-  font-size: 15px;
+  font-size: 0.9375rem;
   max-width: 52ch;
   margin: 0 auto 18px;
 }
@@ -1490,7 +1490,7 @@ button.submit {
 }
 .landing-hero p {
   color: var(--text-secondary);
-  font-size: 17px;
+  font-size: 1.0625rem;
   max-width: 58ch;
   margin: 0 auto;
 }
@@ -1499,13 +1499,13 @@ button.submit {
 .wpcf7 form .wpcf7-response-output {
   border: 1px solid var(--border-color);
   color: var(--text-secondary);
-  font: 600 12px/1.5 var(--font-mono);
+  font: 600 0.75rem/1.5 var(--font-mono);
   padding: 10px 12px;
   margin: 12px 0 0;
 }
 .wpcf7-form label {
   display: block;
-  font: 700 10px/1 var(--font-mono);
+  font: 700 0.75rem/1 var(--font-mono);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--text-secondary);
@@ -1516,28 +1516,28 @@ button.submit {
   color: var(--chip-fg);
   border: 0;
   cursor: pointer;
-  font: 800 11px/1 var(--font-mono);
+  font: 800 0.75rem/1 var(--font-mono);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   padding: 12px 18px;
 }
 .wpcf7-not-valid-tip {
   color: var(--text-error);
-  font: 600 11px/1.4 var(--font-mono);
+  font: 600 0.75rem/1.4 var(--font-mono);
 }
 #breadcrumbs,
 .rank-math-breadcrumb,
 .yoast-breadcrumb {
-  font: 600 10.5px/1.8 var(--font-mono);
+  font: 600 0.75rem/1.8 var(--font-mono);
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   padding-top: 16px;
 }
 #breadcrumbs a,
 .rank-math-breadcrumb a,
 .yoast-breadcrumb a {
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 .sharedaddy,
 .jp-relatedposts,
@@ -1608,7 +1608,7 @@ button.submit {
 }
 @media (max-width: 720px) {
   body {
-    font-size: 16px;
+    font-size: 1rem;
   }
   .site-nav {
     display: none;
@@ -1688,4 +1688,47 @@ button.submit {
     background: #fff;
     color: #000;
   }
+}
+
+/* Fix widget contrast and spacing */
+.sharedaddy,
+.jp-relatedposts,
+#jp-relatedposts {
+  margin-top: 0 !important;
+}
+.comment-likes-widget {
+  margin: 0;
+  padding: 0;
+}
+.widget_calendar,
+#wp-calendar {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  padding: 10px;
+}
+#wp-calendar th {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+#wp-calendar td {
+  color: var(--text-body);
+}
+.comment-form input[type='text'],
+.comment-form input[type='email'],
+.comment-form input[type='url'],
+.comment-form textarea {
+  background: var(--bg-subtle) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+}
+.comment-form textarea:focus,
+.comment-form input:focus {
+  border-color: var(--brand-cyan) !important;
+  outline: none !important;
+}
+
+.sharedaddy img, .sharedaddy svg, .sharedaddy iframe,
+.comment-likes-widget img, .comment-likes-widget svg, .comment-likes-widget iframe {
+  display: inline-block !important;
+  height: initial !important;
 }
