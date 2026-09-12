@@ -1,6 +1,12 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { existsSync, mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdtempSync,
+  mkdirSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -66,6 +72,37 @@ describe('deploy/deploy-theme.sh staging', () => {
   });
 });
 
+// A minimal fake repo root with no .env: the script cannot source credentials
+// from it, so a run that goes past the STAGE_ONLY exit can never reach a server.
+function makeFakeRoot(
+  prefix: string,
+  extra: Record<string, string> = {}
+): string {
+  const root = mkdtempSync(join(tmpdir(), prefix));
+  for (const d of [
+    'inc',
+    'template-parts',
+    'page-templates',
+    'assets/css',
+    'assets/js',
+    'public',
+  ]) {
+    mkdirSync(join(root, d), { recursive: true });
+  }
+  writeFileSync(join(root, 'style.css'), '/* empty */');
+  writeFileSync(join(root, 'index.php'), '<?php // valid ?>');
+  writeFileSync(join(root, 'functions.php'), '<?php // valid ?>');
+  writeFileSync(join(root, 'theme.json'), '{}');
+  writeFileSync(join(root, 'screenshot.png'), '');
+  writeFileSync(
+    join(root, 'inc', 'template-tags.php'),
+    '<?php function valid() {} ?>'
+  );
+  for (const [rel, body] of Object.entries(extra))
+    writeFileSync(join(root, rel), body);
+  return root;
+}
+
 // Check if php is available for lint gate tests
 const phpAvailable = spawnSync('php', ['-v']).status === 0;
 
@@ -73,24 +110,10 @@ describe('deploy/deploy-theme.sh php -l gate', () => {
   it.skipIf(!phpAvailable)(
     'aborts when a staged .php file has syntax errors',
     () => {
-      const fakeRoot = mkdtempSync(join(tmpdir(), 'cjy-lint-fail-'));
+      const fakeRoot = makeFakeRoot('cjy-lint-fail-', {
+        'inc/broken.php': '<?php function (',
+      });
       const fakeStage = mkdtempSync(join(tmpdir(), 'cjy-stage-lint-'));
-
-      // Create minimal fake repo structure with a broken PHP file
-      mkdirSync(join(fakeRoot, 'inc'), { recursive: true });
-      mkdirSync(join(fakeRoot, 'template-parts'), { recursive: true });
-      mkdirSync(join(fakeRoot, 'page-templates'), { recursive: true });
-      mkdirSync(join(fakeRoot, 'assets', 'css'), { recursive: true });
-      mkdirSync(join(fakeRoot, 'assets', 'js'), { recursive: true });
-      mkdirSync(join(fakeRoot, 'public'), { recursive: true });
-
-      // Write minimal files
-      writeFileSync(join(fakeRoot, 'style.css'), '/* empty */');
-      writeFileSync(join(fakeRoot, 'index.php'), '<?php // valid ?>');
-      writeFileSync(join(fakeRoot, 'functions.php'), '<?php // valid ?>');
-      writeFileSync(join(fakeRoot, 'theme.json'), '{}');
-      writeFileSync(join(fakeRoot, 'screenshot.png'), '');
-      writeFileSync(join(fakeRoot, 'inc', 'broken.php'), '<?php function (');
 
       const result = spawnSync('bash', ['deploy/deploy-theme.sh'], {
         env: {
@@ -111,27 +134,8 @@ describe('deploy/deploy-theme.sh php -l gate', () => {
   it.skipIf(!phpAvailable)(
     'succeeds when all staged .php files are valid',
     () => {
-      const fakeRoot = mkdtempSync(join(tmpdir(), 'cjy-lint-ok-'));
+      const fakeRoot = makeFakeRoot('cjy-lint-ok-');
       const fakeStage = mkdtempSync(join(tmpdir(), 'cjy-stage-lint-'));
-
-      // Create minimal fake repo structure with valid PHP files
-      mkdirSync(join(fakeRoot, 'inc'), { recursive: true });
-      mkdirSync(join(fakeRoot, 'template-parts'), { recursive: true });
-      mkdirSync(join(fakeRoot, 'page-templates'), { recursive: true });
-      mkdirSync(join(fakeRoot, 'assets', 'css'), { recursive: true });
-      mkdirSync(join(fakeRoot, 'assets', 'js'), { recursive: true });
-      mkdirSync(join(fakeRoot, 'public'), { recursive: true });
-
-      // Write minimal files with valid PHP
-      writeFileSync(join(fakeRoot, 'style.css'), '/* empty */');
-      writeFileSync(join(fakeRoot, 'index.php'), '<?php // valid ?>');
-      writeFileSync(join(fakeRoot, 'functions.php'), '<?php // valid ?>');
-      writeFileSync(join(fakeRoot, 'theme.json'), '{}');
-      writeFileSync(join(fakeRoot, 'screenshot.png'), '');
-      writeFileSync(
-        join(fakeRoot, 'inc', 'template-tags.php'),
-        '<?php function valid() {} ?>'
-      );
 
       const result = spawnSync('bash', ['deploy/deploy-theme.sh'], {
         env: {
@@ -148,4 +152,50 @@ describe('deploy/deploy-theme.sh php -l gate', () => {
       expect(result.stdout + result.stderr).toContain('Staged only');
     }
   );
+});
+
+describe('deploy/deploy-theme.sh staging directory lifetime', () => {
+  const stagedPath = (out: string) =>
+    /Staging theme in (\S+)\/theme/.exec(out)?.[1] ?? '';
+  // ROOT_DIR points at a fake root (no .env), and every host variable is
+  // blanked, so a run that passes the STAGE_ONLY exit stops at the
+  // SERVER_HOST check — after the cleanup trap must have been armed.
+  const run = (env: Record<string, string>) =>
+    spawnSync('bash', ['deploy/deploy-theme.sh'], {
+      env: {
+        ...process.env,
+        ROOT_DIR: makeFakeRoot('cjy-lifetime-'),
+        SERVER_HOST: '',
+        LIGHTSAIL_HOST: '',
+        ...env,
+      },
+      encoding: 'utf-8',
+    });
+
+  it('removes a self-created STAGE_DIR once the deploy proper begins', () => {
+    const result = run({ STAGE_DIR: '', STAGE_ONLY: '0' });
+    const dir = stagedPath(result.stdout);
+    expect(dir).not.toBe('');
+    expect(result.status).not.toBe(0);
+    expect(result.stdout + result.stderr).toContain('SERVER_HOST is not set');
+    expect(existsSync(dir)).toBe(false);
+  });
+
+  it('keeps a self-created STAGE_DIR under STAGE_ONLY=1 so it can be inspected', () => {
+    const result = run({ STAGE_DIR: '', STAGE_ONLY: '1' });
+    const dir = stagedPath(result.stdout);
+    expect(result.status).toBe(0);
+    expect(dir).not.toBe('');
+    expect(existsSync(join(dir, 'theme', 'style.css'))).toBe(true);
+    rmSync(dir, { recursive: true, force: true });
+  });
+
+  it('never removes a STAGE_DIR passed in by the caller', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'cjy-stage-keep-'));
+    const result = run({ STAGE_DIR: dir, STAGE_ONLY: '0' });
+    expect(result.status).not.toBe(0);
+    expect(result.stdout + result.stderr).toContain('SERVER_HOST is not set');
+    expect(existsSync(join(dir, 'theme', 'style.css'))).toBe(true);
+    rmSync(dir, { recursive: true, force: true });
+  });
 });
