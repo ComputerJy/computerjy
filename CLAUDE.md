@@ -36,7 +36,12 @@ not introduce a bundler without asking.
 - `composer install && composer lint` — phpcs with WordPress-Extra
   (`phpcs.xml`); `npm run lint:php` is the plain `php -l` sweep.
 - No WordPress runs locally. WP-bound code is verified against the origin
-  through an SSH tunnel: `CONNECT_TO=… scripts/check-urls.sh`.
+  through an SSH tunnel (creds in `.env`):
+  `ssh -i $KEY_PATH -f -N -L 8443:127.0.0.1:443 $SERVER_USER@$SERVER_HOST`, then
+  `CONNECT_TO=www.computerjy.com:443:127.0.0.1:8443 MODE=wordpress LIVE_SLUGS=1 scripts/check-urls.sh`
+  (or `curl --connect-to …`). On the server itself:
+  `curl -sk --resolve www.computerjy.com:443:127.0.0.1 https://www.computerjy.com/…`.
+  Run the same check without `CONNECT_TO` against the live edge after a deploy.
 - `deploy/lightsail-apache.conf` is read by `tests/edge-router.test.ts` and
   `tests/apache-vhost.test.ts`: the `Link` header, the five security headers,
   the Jetpack root rewrite and `Alias /wp-cron.php` must stay byte-identical.
@@ -45,6 +50,27 @@ Two static previews render the real `assets/css/theme.css` and
 `assets/js/theme.js` with no WordPress: `preview-home.html`,
 `preview-single.html`. Open them in a browser to check styling changes fast.
 Keep them in sync when you change markup structure.
+
+## Production (origin + Cloudflare)
+
+- wp-cli on the origin: `sudo -u www-data wp --path=/var/www/wordpress …`.
+  W3TC's `flush all` / `fix_environment` can take minutes — wrap in `timeout`.
+- Cloudflare caches anonymous HTML for 1 h from the vhost's `s-maxage`. The
+  Cache Rule **must** keep the `wordpress_logged_in_` / `wp-postpass_` /
+  `comment_author_` cookie bypasses and `not any(http.request.headers["accept"][*]
+  contains "text/markdown")` — Cloudflare ignores `Vary`, so without the latter
+  agents receive cached HTML. Manual purge:
+  `wp eval 'computerjy_edge_cache_purge();'`.
+- W3TC: page cache Disk:Enhanced, object cache APCu. Keep **off**: Browser
+  Cache → HTML and "Other" `Cache-Control`/`Expires` (the latter put a 1-year
+  `max-age` on REST JSON), `minify.*.http2push` (emits a `103` preload for a
+  file that doesn't exist), the duplicate security headers. `search-index.json`
+  and `markdown.php` are in the never-cache list.
+- Yoast SEO owns sitemaps (`/sitemap_index.xml`; the vhost 301s the old URLs
+  there). Comments render through Jetpack's hosted form. WP-Cron runs from
+  `/etc/cron.d/computerjy-wp-cron`, not page loads.
+- `public/` files are served straight from the docroot by the vhost's real-file
+  check; Yoast also drops `llms.txt` there.
 
 ## Architecture
 
