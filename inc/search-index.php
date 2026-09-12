@@ -114,7 +114,7 @@ function computerjy2_search_index_serve( $wp ) {
     header( 'Content-Type: application/json; charset=utf-8' );
     header( 'Cache-Control: public, max-age=0, must-revalidate, s-maxage=3600' );
     header( 'Access-Control-Allow-Origin: *' );
-    echo wp_json_encode( computerjy2_search_index_data() );
+    echo wp_json_encode( computerjy2_search_index_data(), JSON_UNESCAPED_SLASHES );
     exit;
 }
 add_action( 'parse_request', 'computerjy2_search_index_serve' );

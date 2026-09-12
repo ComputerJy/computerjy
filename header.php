@@ -128,7 +128,7 @@
                 ?>
                 <a href="<?php the_permalink(); ?>" class="search-result-item">
                     <div class="search-result-title"><?php the_title(); ?></div>
-                    <div class="search-result-snippet"><?php echo esc_html( get_the_date( 'Y-m-d' ) ); ?> &middot; <?php echo esc_html( computerjy2_reading_time() ); ?></div>
+                    <div class="search-result-snippet"><?php echo esc_html( get_the_date( 'd/m/Y' ) ); ?> &middot; <?php echo esc_html( computerjy2_reading_time() ); ?></div>
                 </a>
                 <?php
             endwhile;
