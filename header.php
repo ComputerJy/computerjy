@@ -80,8 +80,18 @@
                 <span><?php esc_html_e( 'SEARCH', 'computerjy2' ); ?></span>
                 <kbd class="search-kbd-shortcut" aria-hidden="true">&#8984;K</kbd>
             </button>
-            <button class="theme-toggle-btn" type="button" aria-label="<?php esc_attr_e( 'Toggle light and dark mode', 'computerjy2' ); ?>" aria-pressed="false">&#9689;</button>
-            <button class="mobile-menu-btn" type="button" aria-label="<?php esc_attr_e( 'Open menu', 'computerjy2' ); ?>" aria-expanded="false" aria-controls="cjy-mobile-drawer">&#9776;</button>
+            <button class="theme-toggle-btn" type="button" aria-label="<?php esc_attr_e( 'Toggle light and dark mode', 'computerjy2' ); ?>" aria-pressed="false">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </button>
+            <button class="mobile-menu-btn" type="button" aria-label="<?php esc_attr_e( 'Open menu', 'computerjy2' ); ?>" aria-expanded="false" aria-controls="cjy-mobile-drawer">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
         </div>
     </div>
 </header>

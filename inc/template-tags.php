@@ -133,7 +133,7 @@ function computerjy2_eyebrow_strip() {
     $tagline = get_theme_mod( 'computerjy2_tagline', get_bloginfo( 'description' ) );
     ?>
     <div class="eyebrow-strip">
-        <span class="sparkle" aria-hidden="true">&#10022;</span>
+        <span class="sparkle" aria-hidden="true">✨</span>
         <span class="eyebrow-tagline"><?php echo esc_html( $tagline ); ?></span>
         <span class="eyebrow-date"><?php echo esc_html( date_i18n( 'Y-m-d' ) ); ?></span>
     </div>
