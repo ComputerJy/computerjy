@@ -47,4 +47,4 @@ Verify that all agent discovery endpoints are present and valid in `public/`:
    - Content-Type headers for well-known JSON files.
 
 3. **WebMCP Registration**:
-   Verify that the in-page tool definitions (`navigator.modelContext` / `window.modelContext`) match the published tool schemas. The theme does not register them yet — see the open issue "WebMCP in-page tool registration was lost with the Astro layout"; once ported they live in `assets/js/theme.js`.
+   Verify that the in-page tool definitions in `assets/js/theme.js` (`registerWebMcp()`, registered on `navigator.modelContext` / `window.modelContext`) match the published tool schemas.

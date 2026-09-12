@@ -245,4 +245,99 @@
       slot.classList.add('is-filled');
     }
   });
+
+  /* ---- WebMCP: expose browser tools to AI agents (idle-loaded) ----
+     Tool names and schemas match /.well-known/mcp/server-card.json and the
+     search-articles agent skill; both read /search-index.json. */
+  function searchIndex() {
+    return fetch('/search-index.json', { credentials: 'omit' }).then(
+      function (r) {
+        if (!r.ok) {
+          throw new Error('search-index.json ' + r.status);
+        }
+        return r.json();
+      }
+    );
+  }
+  function registerWebMcp() {
+    var tools = [
+      {
+        name: 'search_articles',
+        description:
+          'Search across 413+ historical tech tutorials, guides, and humor articles on ComputerJy World',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: { type: 'string', description: 'Search term or keywords' },
+          },
+          required: ['query'],
+        },
+        execute: function (params) {
+          var q = String((params && params.query) || '').toLowerCase();
+          return searchIndex()
+            .then(function (data) {
+              var results = data
+                .filter(function (p) {
+                  return (
+                    (p.title && p.title.toLowerCase().indexOf(q) !== -1) ||
+                    (p.excerpt && p.excerpt.toLowerCase().indexOf(q) !== -1)
+                  );
+                })
+                .slice(0, 5);
+              return { success: true, results: results };
+            })
+            .catch(function (e) {
+              return { success: false, error: e.message };
+            });
+        },
+      },
+      {
+        name: 'get_latest_articles',
+        description:
+          'Fetch the most recent tech and entertainment articles from ComputerJy World',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            limit: {
+              type: 'number',
+              description: 'Number of articles to fetch (max 10)',
+            },
+          },
+        },
+        execute: function (params) {
+          var limit = Math.min((params && params.limit) || 5, 10);
+          return searchIndex()
+            .then(function (data) {
+              return { success: true, articles: data.slice(0, limit) };
+            })
+            .catch(function (e) {
+              return { success: false, error: e.message };
+            });
+        },
+      },
+    ];
+    [navigator.modelContext, window.modelContext].forEach(function (ctx) {
+      if (!ctx) {
+        return;
+      }
+      if (typeof ctx.registerTool === 'function') {
+        tools.forEach(function (tool) {
+          try {
+            ctx.registerTool(tool);
+          } catch (e) {}
+        });
+      } else if (typeof ctx.provideContext === 'function') {
+        try {
+          ctx.provideContext({ tools: tools });
+        } catch (e) {}
+      }
+    });
+  }
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(registerWebMcp, { timeout: 2500 });
+  } else {
+    window.addEventListener('load', function () {
+      setTimeout(registerWebMcp, 1000);
+    });
+  }
 })();
