@@ -80,7 +80,7 @@ function computerjy_edge_cache_purge() {
         return false;
     }
     if ( 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
-        error_log( 'computerjy-edge-cache: purge returned ' . wp_remote_retrieve_response_code( $response ) . ': ' . wp_remote_retrieve_body( $response ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions
+        error_log( 'computerjy-edge-cache: purge returned ' . wp_remote_retrieve_response_code( $response ) . ': ' . substr( (string) wp_remote_retrieve_body( $response ), 0, 200 ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions
         return false;
     }
     return true;
