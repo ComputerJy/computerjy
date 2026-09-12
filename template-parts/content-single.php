@@ -65,7 +65,7 @@
                     ?>
                     <div class="related-item">
                         <?php computerjy2_thumb( 'computerjy2-side' ); ?>
-                        <h4><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h4>
+                        <h3><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
                     </div>
                     <?php
                 endwhile;

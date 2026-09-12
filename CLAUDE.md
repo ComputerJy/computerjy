@@ -110,7 +110,10 @@ Keep them in sync when you change markup structure.
   rule; add or reuse a `var(--*)`.
 - **Dark is the default token set.** `[data-theme="light"]` overrides it. Any new
   color token must be defined in both blocks, and must clear WCAG AA (4.5:1) for
-  body text on `--bg-base` in both.
+  body text on `--bg-base` in both (`tests/contrast.test.ts` checks every
+  `--text-*` token against every `--bg-*`). `--brand-blue/purple/pink/orange`
+  are for borders, backgrounds and gradients only — as text use
+  `--text-accent-blue`, `--text-accent-purple`, `--text-error`.
 - **Avoid class names containing `ad`, `ads`, `banner`, `share`, `social`** —
   browser filter lists hide them and the element vanishes for real visitors.
   This is why the share rails are `.byline-links` / `.post-links-row` and the

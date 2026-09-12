@@ -49,7 +49,16 @@
         </nav>
         <div class="header-actions">
           <button class="search-trigger-btn" type="button">
-            <span>SEARCH</span><kbd class="search-kbd-shortcut">⌘K</kbd>
+            <svg
+              class="search-trigger-icon"
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              focusable="false"
+            >
+              <circle cx="11" cy="11" r="7"></circle>
+              <path d="m20 20-4-4"></path></svg
+            ><span>SEARCH</span
+            ><kbd class="search-kbd-shortcut" aria-hidden="true">⌘K</kbd>
           </button>
           <button
             class="theme-toggle-btn"
@@ -58,7 +67,13 @@
           >
             ◙
           </button>
-          <button class="mobile-menu-btn" type="button" aria-label="Menu">
+          <button
+            class="mobile-menu-btn"
+            type="button"
+            aria-label="Open menu"
+            aria-expanded="false"
+            aria-controls="cjy-mobile-drawer"
+          >
             ☰
           </button>
         </div>
@@ -67,7 +82,11 @@
 
     <!-- Mirrors header.php: mobile drawer + ⌘K search modal (theme.js drives both) -->
     <div class="mobile-drawer-backdrop">
-      <aside class="mobile-drawer" aria-label="Mobile menu">
+      <aside
+        class="mobile-drawer"
+        id="cjy-mobile-drawer"
+        aria-label="Mobile menu"
+      >
         <div class="mobile-drawer-header">
           <span class="brand-word"
             >Computer<span class="brand-accent">Jy</span></span
@@ -417,7 +436,7 @@
       <div class="container">
         <div class="footer-cols">
           <div class="footer-widget">
-            <h4 class="footer-col-title is-cyan">Newsletter</h4>
+            <h2 class="footer-col-title is-cyan">Newsletter</h2>
             <p>One email when something worth reading goes up.</p>
             <form class="newsletter-form" onsubmit="return false;">
               <input type="email" placeholder="you@email.com" /><button
@@ -428,7 +447,7 @@
             </form>
           </div>
           <div class="footer-widget">
-            <h4 class="footer-col-title">Categories</h4>
+            <h2 class="footer-col-title">Categories</h2>
             <ul class="footer-links">
               <li><a href="#">Computers</a></li>
               <li><a href="#">Internet</a></li>
@@ -437,7 +456,7 @@
             </ul>
           </div>
           <div class="footer-widget">
-            <h4 class="footer-col-title">Elsewhere</h4>
+            <h2 class="footer-col-title">Elsewhere</h2>
             <div class="profile-links">
               <a href="#">X</a><a href="#">FB</a><a href="#">IG</a>
             </div>

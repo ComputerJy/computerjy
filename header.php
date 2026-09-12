@@ -76,17 +76,18 @@
 
         <div class="header-actions">
             <button class="search-trigger-btn" type="button" aria-label="<?php esc_attr_e( 'Search', 'computerjy2' ); ?>">
+                <svg class="search-trigger-icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
                 <span><?php esc_html_e( 'SEARCH', 'computerjy2' ); ?></span>
-                <kbd class="search-kbd-shortcut">&#8984;K</kbd>
+                <kbd class="search-kbd-shortcut" aria-hidden="true">&#8984;K</kbd>
             </button>
             <button class="theme-toggle-btn" type="button" aria-label="<?php esc_attr_e( 'Toggle light and dark mode', 'computerjy2' ); ?>" aria-pressed="false">&#9689;</button>
-            <button class="mobile-menu-btn" type="button" aria-label="<?php esc_attr_e( 'Open menu', 'computerjy2' ); ?>">&#9776;</button>
+            <button class="mobile-menu-btn" type="button" aria-label="<?php esc_attr_e( 'Open menu', 'computerjy2' ); ?>" aria-expanded="false" aria-controls="cjy-mobile-drawer">&#9776;</button>
         </div>
     </div>
 </header>
 
 <div class="mobile-drawer-backdrop">
-    <aside class="mobile-drawer" aria-label="<?php esc_attr_e( 'Mobile menu', 'computerjy2' ); ?>">
+    <aside class="mobile-drawer" id="cjy-mobile-drawer" aria-label="<?php esc_attr_e( 'Mobile menu', 'computerjy2' ); ?>">
         <div class="mobile-drawer-header">
             <span class="brand-word"><?php echo wp_kses_post( computerjy2_brand_mark() ); ?></span>
             <button class="search-close-btn" type="button" aria-label="<?php esc_attr_e( 'Close menu', 'computerjy2' ); ?>">ESC</button>
