@@ -16,9 +16,12 @@ describe('deploy/lightsail-apache.conf serves WordPress', () => {
     expect(vhost).toContain('RewriteRule ^/rss\\.xml$ /feed [R=301,L]');
   });
 
-  it('redirects both Astro sitemap URLs to one WordPress sitemap', () => {
-    expect(vhost).toMatch(
-      /RewriteRule \^\/sitemap\(-index\)\?\\\.xml\$ \/\S+ \[R=301,L\]/
+  it('redirects both Astro sitemap URLs to the Yoast sitemap index', () => {
+    // Yoast SEO owns sitemaps on this install. Swapping the SEO plugin means
+    // changing this target (core's is /wp-sitemap.xml), SITEMAP in
+    // scripts/check-urls.sh, and this assertion together.
+    expect(vhost).toContain(
+      'RewriteRule ^/sitemap(-index)?\\.xml$ /sitemap_index.xml [R=301,L]'
     );
   });
 
@@ -54,6 +57,19 @@ describe('deploy/lightsail-apache.conf serves WordPress', () => {
     );
   });
 
+  it('scopes every ExpiresDefault to a <FilesMatch> so generated HTML is never stamped', () => {
+    // A bare ExpiresDefault at <Directory> level would apply to every
+    // response, HTML and /wp-json included, and the ExpiresByType check
+    // above would not notice.
+    let depth = 0;
+    for (const line of vhost.split('\n')) {
+      if (/^\s*<FilesMatch\b/.test(line)) depth++;
+      if (/^\s*<\/FilesMatch>/.test(line)) depth--;
+      if (/^\s*ExpiresDefault\b/.test(line))
+        expect(depth, line.trim()).toBeGreaterThan(0);
+    }
+  });
+
   it('does not fall back to a static 404 page', () => {
     expect(vhost).not.toContain('ErrorDocument 404');
   });
@@ -63,10 +79,12 @@ describe('legacy /YYYY/MM/<slug> redirect (moved from the Worker)', () => {
   const match = vhost.match(
     /RewriteRule (\^\/\\d\{4\}\S+) \/posts\/\$1 \[R=301,L\]/
   );
-  const pattern = new RegExp(match?.[1] ?? '$^');
+  // No '$^' fallback: when the rule is missing, `pattern` is null and every
+  // case below fails on the assertion instead of passing vacuously.
+  const pattern = match ? new RegExp(match[1]) : null;
 
   it('exists', () => {
-    expect(match).not.toBeNull();
+    expect(pattern).not.toBeNull();
   });
 
   it.each([
@@ -75,7 +93,8 @@ describe('legacy /YYYY/MM/<slug> redirect (moved from the Worker)', () => {
     ['/2008/01/15/1goal', '1goal'],
     ['/2010/12/some-long-slug-with-numbers-2', 'some-long-slug-with-numbers-2'],
   ])('%s → /posts/%s', (path, slug) => {
-    const m = pattern.exec(path);
+    expect(pattern).not.toBeNull();
+    const m = pattern!.exec(path);
     expect(m?.[1]).toBe(slug);
   });
 
@@ -85,7 +104,12 @@ describe('legacy /YYYY/MM/<slug> redirect (moved from the Worker)', () => {
     '/2008/1/x',
     '/2008/01',
     '/category/2008/01/x',
+    // Bare day archives: the last segment is the day, not a slug, so they
+    // must not become /posts/15 (a guaranteed 404). WordPress answers them.
+    '/2008/01/15/',
+    '/2008/01/15',
   ])('leaves %s alone', (path) => {
-    expect(pattern.test(path)).toBe(false);
+    expect(pattern).not.toBeNull();
+    expect(pattern!.test(path)).toBe(false);
   });
 });
