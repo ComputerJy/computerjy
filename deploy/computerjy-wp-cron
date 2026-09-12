@@ -1,0 +1,13 @@
+# Drive WordPress scheduled events.
+#
+# WP-Cron loopback spawning is disabled in wp-config.php (DISABLE_WP_CRON=true)
+# to save PHP-FPM workers from processing loopback requests on page loads.
+# This cron job is the authoritative driver for WordPress scheduled events.
+#
+# stderr is kept (not sent to /dev/null) so a broken run reaches the log
+# instead of failing invisibly.
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+HOME=/var/www
+
+*/5 * * * * www-data /usr/local/bin/wp --path=/var/www/wordpress cron event run --due-now --quiet >> /var/log/wp-cron.log 2>&1
