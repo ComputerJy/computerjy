@@ -91,11 +91,12 @@ Keep them in sync when you change markup structure.
   (`'publish' === $status`), spaces inside parentheses, text domain
   `computerjy2` (prefix `computerjy` is allowed only for the standalone
   plugins).
-- Transients use the `cjy2_` prefix; `computerjy2_flush_caches()` in
-  `inc/related.php` sweeps `_transient_cjy2_*` on `save_post` /
-  `wp_insert_comment` / `switch_theme`. That sweep is raw SQL, so anything
-  that must also invalidate under a persistent object cache calls
-  `delete_transient()` itself (see `inc/search-index.php`).
+- Transients use the `cjy2_` prefix. `inc/related.php` stamps its keys with a
+  generation number (`computerjy2_cache_key()`); `computerjy2_flush_caches()`
+  bumps it on `save_post` / `wp_insert_comment` / `switch_theme`, which
+  invalidates through any object cache (the origin runs APCu). Use
+  `computerjy2_cache_key()` for new cached queries, or `delete_transient()`
+  explicitly as `inc/search-index.php` does.
 
 ## Extension points
 

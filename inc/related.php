@@ -3,7 +3,10 @@
  * Related posts, trending list, and the transient caching behind both.
  *
  * Both queries are cached in transients so a page cache plugin (or a cold cache)
- * never pays for them twice; publishing or commenting clears the relevant key.
+ * never pays for them twice. Every key carries a generation number stored in an
+ * option; publishing or commenting bumps the generation, which invalidates every
+ * key at once — through the transient API, so it works whether transients live
+ * in wp_options or in a persistent object cache (the origin runs APCu).
  *
  * @package ComputerJy2
  */
@@ -11,11 +14,30 @@
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 /**
+ * Current cache generation.
+ *
+ * @return int
+ */
+function computerjy2_cache_generation() {
+    return (int) get_option( 'cjy2_cache_generation', 1 );
+}
+
+/**
+ * Transient key for the current generation.
+ *
+ * @param string $suffix Key-specific part, e.g. "related_12_3".
+ * @return string
+ */
+function computerjy2_cache_key( $suffix ) {
+    return 'cjy2_' . computerjy2_cache_generation() . '_' . $suffix;
+}
+
+/**
  * Related posts by shared category/tag, newest first.
  */
 function computerjy2_related_posts( $post_id = null, $count = 3 ) {
     $post_id = $post_id ? $post_id : get_the_ID();
-    $key     = 'cjy2_related_' . $post_id . '_' . $count;
+    $key     = computerjy2_cache_key( 'related_' . $post_id . '_' . $count );
     $cached  = get_transient( $key );
     if ( false !== $cached ) {
         return new WP_Query( array( 'post__in' => $cached ? $cached : array( 0 ), 'orderby' => 'post__in', 'ignore_sticky_posts' => true, 'posts_per_page' => $count ) );
@@ -44,7 +66,7 @@ function computerjy2_related_posts( $post_id = null, $count = 3 ) {
  * Trending: most-commented in the last 90 days, falling back to recent posts.
  */
 function computerjy2_trending_posts( $count = 5 ) {
-    $key    = 'cjy2_trending_' . $count;
+    $key    = computerjy2_cache_key( 'trending_' . $count );
     $cached = get_transient( $key );
     if ( false !== $cached && ! empty( $cached ) ) {
         return new WP_Query( array( 'post__in' => $cached, 'orderby' => 'post__in', 'posts_per_page' => $count, 'ignore_sticky_posts' => true ) );
@@ -69,9 +91,14 @@ function computerjy2_trending_posts( $count = 5 ) {
 
 /**
  * Flush caches on publish / comment.
+ *
+ * Bumping the generation is the invalidation; the DELETE only prunes the
+ * previous generation's rows when transients are stored in wp_options (they
+ * would otherwise sit there until their timeout).
  */
 function computerjy2_flush_caches( $post_id = 0 ) {
     global $wpdb;
+    update_option( 'cjy2_cache_generation', computerjy2_cache_generation() + 1 );
     $wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_cjy2_%' OR option_name LIKE '_transient_timeout_cjy2_%'" ); // phpcs:ignore
 }
 add_action( 'save_post', 'computerjy2_flush_caches' );
