@@ -23,6 +23,6 @@ describe.each(['preview-home.html', 'preview-single.html'])('%s', (file) => {
 
   it('shows the recent-posts fallback dates as d/m/Y like the JSON results', () => {
     expect(header).toContain("get_the_date( 'd/m/Y' )");
-    expect(html).toMatch(/search-result-snippet">\d{2}\/\d{2}\/\d{4}/);
+    expect(html).toMatch(/search-result-snippet">\s*\d{2}\/\d{2}\/\d{4}/);
   });
 });
