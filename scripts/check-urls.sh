@@ -20,7 +20,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BASE="${1:-https://www.computerjy.com}"
 case "$BASE" in --print-urls) PRINT_ONLY=1; BASE="https://www.computerjy.com";; *) PRINT_ONLY=0;; esac
 MODE="${MODE:-wordpress}"
-SITEMAP="${SITEMAP:-/wp-sitemap.xml}"
+SITEMAP="${SITEMAP:-/sitemap_index.xml}"
 CANON="https://www.computerjy.com"
 
 CURL_BASE="-s --max-time 30 -A computerjy-cutover-check"
