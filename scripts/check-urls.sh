@@ -58,6 +58,16 @@ check_header() {
 }
 export -f check_header
 
+# check_no_header PATH HEADER_NAME SUBSTRING — no header of that name may contain SUBSTRING
+check_no_header() {
+    local path="$1" name="$2" sub="$3" hits
+    # shellcheck disable=SC2086
+    hits=$(curl $CURL_OPTS -D - "$BASE$path" | tr -d '\r' | awk -v n="$name" 'tolower($1)==tolower(n":")' | grep -c -- "$sub" || true)
+    if [ "$hits" -gt 0 ]; then echo "FAIL $path header $name contains '$sub'"; return 1; fi
+    echo "ok   $path no $name '$sub'"
+}
+export -f check_no_header
+
 # check_markdown PATH — Accept: text/markdown must yield markdown with the token header
 check_markdown() {
     local path="$1" hdr body
@@ -196,6 +206,10 @@ echo "== headers =="
 check_header / Link 'rel="api-catalog"' || fails=$((fails + 1))
 check_header / Link '</search-index.json>; rel="describedby"' || fails=$((fails + 1))
 check_header /.well-known/api-catalog Access-Control-Allow-Origin '*' || fails=$((fails + 1))
+# W3TC's retired HTTP/2 push left a `Link: …cache/minify/…; rel=preload` in
+# page_enhanced/.htaccess once (GitHub #91): a preload of a file that 404s.
+check_no_header / Link 'cache/minify' || fails=$((fails + 1))
+check_no_header /posts/1goal Link 'cache/minify' || fails=$((fails + 1))
 
 echo "== markdown negotiation =="
 check_markdown / || fails=$((fails + 1))

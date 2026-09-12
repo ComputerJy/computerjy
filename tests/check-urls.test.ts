@@ -116,3 +116,11 @@ describe('scripts/check-urls.sh EDGE=1 (Cloudflare cache matrix)', () => {
     }
   });
 });
+
+describe('scripts/check-urls.sh minify-preload guard (#91)', () => {
+  it('asserts no Link header references cache/minify on HTML pages', () => {
+    const src = readFileSync(script, 'utf8');
+    expect(src).toMatch(/check_no_header \/ Link 'cache\/minify'/);
+    expect(src).toMatch(/check_no_header \/posts\/1goal Link 'cache\/minify'/);
+  });
+});
