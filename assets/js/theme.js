@@ -70,13 +70,20 @@
     if (!searchIndexPromise) {
       searchIndexPromise = fetch('/search-index.json', { credentials: 'omit' })
         .then(function (r) {
-          return r.ok ? r.json() : [];
+          if (!r.ok) {
+            throw new Error('HTTP ' + r.status);
+          }
+          return r.json();
         })
         .then(function (data) {
           searchIndex = Array.isArray(data) ? data : [];
           return searchIndex;
         })
-        .catch(function () {
+        .catch(function (err) {
+          /* Enter still submits ?s=; this only makes a broken endpoint visible */
+          if (window.console && console.warn) {
+            console.warn('search-index.json unavailable, falling back to ?s=', err);
+          }
           searchIndex = [];
           return searchIndex;
         });
