@@ -12,7 +12,7 @@
                 <?php if ( is_active_sidebar( 'footer-1' ) ) : ?>
                     <?php dynamic_sidebar( 'footer-1' ); ?>
                 <?php else : ?>
-                    <h4 class="footer-col-title is-cyan"><?php esc_html_e( 'Newsletter', 'computerjy2' ); ?></h4>
+                    <h2 class="footer-col-title is-cyan"><?php esc_html_e( 'Newsletter', 'computerjy2' ); ?></h2>
                     <p><?php esc_html_e( 'One email when something worth reading goes up.', 'computerjy2' ); ?></p>
                     <?php $cjy_action = get_theme_mod( 'computerjy2_newsletter_action' ); ?>
                     <?php if ( $cjy_action ) : ?>
@@ -29,7 +29,7 @@
                 <?php if ( is_active_sidebar( 'footer-2' ) ) : ?>
                     <?php dynamic_sidebar( 'footer-2' ); ?>
                 <?php else : ?>
-                    <h4 class="footer-col-title"><?php esc_html_e( 'Categories', 'computerjy2' ); ?></h4>
+                    <h2 class="footer-col-title"><?php esc_html_e( 'Categories', 'computerjy2' ); ?></h2>
                     <ul class="footer-links">
                         <?php wp_list_categories( array( 'title_li' => '', 'number' => 6, 'show_count' => false ) ); ?>
                     </ul>

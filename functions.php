@@ -91,8 +91,8 @@ function computerjy2_widgets_init() {
             'id'            => 'footer-' . $i,
             'before_widget' => '<div id="%1$s" class="footer-widget %2$s">',
             'after_widget'  => '</div>',
-            'before_title'  => '<h4 class="footer-col-title">',
-            'after_title'   => '</h4>',
+            'before_title'  => '<h2 class="footer-col-title">',
+            'after_title'   => '</h2>',
         ) );
     }
 }

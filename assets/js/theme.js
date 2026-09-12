@@ -141,8 +141,41 @@
         })
         .join('');
   }
+  /* Focus management shared by the modal and the drawer: remember what was
+     focused before opening, keep Tab inside the overlay, and give focus back
+     on close (WCAG 2.4.3 / 2.1.2). */
+  var FOCUSABLE =
+    'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])';
+  var lastFocus = null;
+  function rememberFocus() {
+    lastFocus = document.activeElement;
+  }
+  function restoreFocus() {
+    if (lastFocus && typeof lastFocus.focus === 'function') {
+      lastFocus.focus();
+    }
+    lastFocus = null;
+  }
+  function trapTab(container, e) {
+    var items = container.querySelectorAll(FOCUSABLE);
+    if (!items.length) return;
+    var first = items[0];
+    var last = items[items.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    } else if (!container.contains(document.activeElement)) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
+
   function openModal() {
-    if (!modal) return;
+    if (!modal || modal.classList.contains('is-open')) return;
+    rememberFocus();
     modal.classList.add('is-open');
     loadSearchIndex();
     var i = modal.querySelector('.search-modal-input');
@@ -151,8 +184,9 @@
     }
   }
   function closeModal() {
-    if (modal) {
+    if (modal && modal.classList.contains('is-open')) {
       modal.classList.remove('is-open');
+      restoreFocus();
     }
   }
   if (modal) {
@@ -186,21 +220,45 @@
       closeModal();
       closeDrawer();
     }
+    if (e.key === 'Tab') {
+      if (modal && modal.classList.contains('is-open')) {
+        trapTab(modal, e);
+      } else if (drawer && drawer.classList.contains('is-open')) {
+        trapTab(drawer, e);
+      }
+    }
   });
 
   /* ---- Mobile drawer ---- */
   var drawer = document.querySelector('.mobile-drawer-backdrop');
+  var menuBtn = document.querySelector('.mobile-menu-btn');
+  function openDrawer() {
+    if (!drawer || drawer.classList.contains('is-open')) return;
+    rememberFocus();
+    drawer.classList.add('is-open');
+    if (menuBtn) {
+      menuBtn.setAttribute('aria-expanded', 'true');
+    }
+    var first =
+      drawer.querySelector('.search-close-btn') ||
+      drawer.querySelector(FOCUSABLE);
+    if (first) {
+      first.focus();
+    }
+  }
   function closeDrawer() {
-    if (drawer) {
+    if (drawer && drawer.classList.contains('is-open')) {
       drawer.classList.remove('is-open');
+      if (menuBtn) {
+        menuBtn.setAttribute('aria-expanded', 'false');
+      }
+      restoreFocus();
     }
   }
   document.addEventListener('click', function (e) {
     if (e.target.closest('.mobile-menu-btn')) {
       e.preventDefault();
-      if (drawer) {
-        drawer.classList.add('is-open');
-      }
+      openDrawer();
     } else if (drawer && e.target === drawer) {
       closeDrawer();
     }
