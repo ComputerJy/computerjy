@@ -57,10 +57,10 @@ Keep them in sync when you change markup structure.
   W3TC's `flush all` / `fix_environment` can take minutes — wrap in `timeout`.
 - Cloudflare caches anonymous HTML for 1 h from the vhost's `s-maxage`. The
   Cache Rule **must** keep the `wordpress_logged_in_` / `wp-postpass_` /
-  `comment_author_` cookie bypasses and `not any(http.request.headers["accept"][*]
-  contains "text/markdown")` — Cloudflare ignores `Vary`, so without the latter
-  agents receive cached HTML. Manual purge:
-  `wp eval 'computerjy_edge_cache_purge();'`.
+  `comment_author_` cookie bypasses and the `Accept: text/markdown` bypass
+  (`not any(http.request.headers["accept"][*] contains "text/markdown")`) —
+  Cloudflare ignores `Vary`, so without it agents receive cached HTML. Manual
+  purge: `wp eval 'computerjy_edge_cache_purge();'`.
 - W3TC: page cache Disk:Enhanced, object cache APCu. Keep **off**: Browser
   Cache → HTML and "Other" `Cache-Control`/`Expires` (the latter put a 1-year
   `max-age` on REST JSON), `minify.*.http2push` (emits a `103` preload for a
