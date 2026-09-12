@@ -18,7 +18,8 @@ The repo also carries the deploy tooling, tests and (until the cutover
 finishes, see `MIGRATION.md`) the retired Cloudflare Worker. Deploy with
 `deploy/deploy-theme.sh` — it stages the theme from an allowlist and copies
 `public/` (agent-discovery files, `markdown.php`) into the WordPress
-DocumentRoot. `STAGE_ONLY=1` builds the tree without SSH.
+DocumentRoot, then flushes the W3TC page cache and purges Cloudflare so the
+new asset versions reach visitors. `STAGE_ONLY=1` builds the tree without SSH.
 
 `inc/computerjy-*.php` are standalone single-file plugins (currently the
 edge-cache purge), hand-installed into `wp-content/plugins`, never required by

@@ -92,6 +92,13 @@ sudo rsync -a --delete --chown=www-data:www-data '${REMOTE_TMP}/theme/' '${THEME
 sudo rsync -a --chown=www-data:www-data '${REMOTE_TMP}/webroot/' '${WP_ROOT}/'
 sudo find '${THEME_DIR}' -type d -exec chmod 755 {} + -o -type f -exec chmod 644 {} +
 rm -rf '${REMOTE_TMP}'
-sudo -u www-data wp --path='${WP_ROOT}' theme status '${THEME_SLUG}'"
+sudo -u www-data wp --path='${WP_ROOT}' theme status '${THEME_SLUG}'
+# Cached HTML still points at the previous asset versions: drop the W3TC page
+# cache (when the plugin is active) and purge Cloudflare (when the edge-cache
+# plugin is active). Both are best-effort; a failure here is not a failed deploy.
+if sudo -u www-data wp --path='${WP_ROOT}' plugin is-active w3-total-cache 2>/dev/null; then
+    sudo -u www-data wp --path='${WP_ROOT}' w3-total-cache flush posts || echo '⚠️  W3TC flush failed'
+fi
+sudo -u www-data wp --path='${WP_ROOT}' eval 'echo function_exists(\"computerjy_edge_cache_purge\") && computerjy_edge_cache_purge() ? \"edge purged\" : \"edge purge skipped\", PHP_EOL;' || echo '⚠️  edge purge failed'"
 
-echo "🎉 Theme deployed. Activate with: sudo -u www-data wp --path=${WP_ROOT} theme activate ${THEME_SLUG}"
+echo "🎉 Theme deployed. First time? Activate with: sudo -u www-data wp --path=${WP_ROOT} theme activate ${THEME_SLUG}"
