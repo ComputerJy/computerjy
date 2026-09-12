@@ -25,15 +25,64 @@ function computerjy_html_to_markdown( $html ) {
     // Embedded scripts and styles are not prose; drop them before the tag pass.
     $html = preg_replace( '/<(script|style)\b[^>]*>.*?<\/\1>/si', '', $html );
 
-    $md = preg_replace( '/<h1[^>]*>(.*?)<\/h1>/si', "\n# $1\n\n", $html );
-    $md = preg_replace( '/<h2[^>]*>(.*?)<\/h2>/si', "\n## $1\n\n", $md );
-    $md = preg_replace( '/<h3[^>]*>(.*?)<\/h3>/si', "\n### $1\n\n", $md );
-    $md = preg_replace( '/<h4[^>]*>(.*?)<\/h4>/si', "\n#### $1\n\n", $md );
+    // Code is stashed first, fully decoded, so the tag pass below never sees
+    // it and the entity pass at the end cannot touch it: `<div>` inside a code
+    // span is literal, but "&lt;div&gt;" in prose must stay an entity (valid
+    // Markdown that still reads as text) rather than become a live tag.
+    $stash = array();
+    $keep  = function ( $text ) use ( &$stash ) {
+        $key           = "\x1eCJY" . count( $stash ) . "\x1e";
+        $stash[ $key ] = $text;
+        return $key;
+    };
+    $code_text = function ( $inner ) {
+        return html_entity_decode( strip_tags( $inner ), ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+    };
+
+    $md = preg_replace_callback(
+        '/<pre[^>]*>\s*(?:<code[^>]*>)?(.*?)(?:<\/code>)?\s*<\/pre>/si',
+        function ( $m ) use ( $keep, $code_text ) {
+            return "\n" . $keep( "```\n" . trim( $code_text( $m[1] ), "\r\n" ) . "\n```" ) . "\n\n";
+        },
+        $html
+    );
+    $md = preg_replace_callback(
+        '/<code[^>]*>(.*?)<\/code>/si',
+        function ( $m ) use ( $keep, $code_text ) {
+            return $keep( '`' . $code_text( $m[1] ) . '`' );
+        },
+        $md
+    );
+
+    // Emphasis markers must hug the text, so inner whitespace moves outside.
+    // \b keeps <br>, <blockquote>, <img>, <iframe> out of the <b> / <i> match.
+    $wrap = function ( $mark ) {
+        return function ( $m ) use ( $mark ) {
+            if ( '' === trim( $m[2] ) ) {
+                return $m[2];
+            }
+            preg_match( '/^(\s*)(.*?)(\s*)$/s', $m[2], $p );
+            return $p[1] . $mark . $p[2] . $mark . $p[3];
+        };
+    };
+    $md   = preg_replace_callback( '/<(strong|b)\b[^>]*>(.*?)<\/\1>/si', $wrap( '**' ), $md );
+    $md   = preg_replace_callback( '/<(em|i)\b[^>]*>(.*?)<\/\1>/si', $wrap( '_' ), $md );
+
+    // A heading is already strong; the block editor's <h2><strong>…</strong></h2>
+    // habit would otherwise come out as "## **…**".
+    $md = preg_replace_callback(
+        '/<h([1-4])[^>]*>(.*?)<\/h\1>/si',
+        function ( $m ) {
+            $text = trim( $m[2] );
+            if ( preg_match( '/^\*\*(.+)\*\*$/s', $text, $b ) ) {
+                $text = $b[1];
+            }
+            return "\n" . str_repeat( '#', (int) $m[1] ) . ' ' . $text . "\n\n";
+        },
+        $md
+    );
 
     $md = preg_replace( '/<a\s+[^>]*href=["\']([^"\']+)["\'][^>]*>(.*?)<\/a>/si', '[$2]($1)', $md );
-
-    $md = preg_replace( '/<pre[^>]*><code[^>]*>(.*?)<\/code><\/pre>/si', "\n```\n$1\n```\n\n", $md );
-    $md = preg_replace( '/<code[^>]*>(.*?)<\/code>/si', '`$1`', $md );
 
     $md = preg_replace( '/<blockquote[^>]*>(.*?)<\/blockquote>/si', "\n> $1\n\n", $md );
 
@@ -43,7 +92,19 @@ function computerjy_html_to_markdown( $html ) {
     $md = preg_replace( '/<hr\s*\/?>/si', "\n---\n\n", $md );
 
     $md = strip_tags( $md );
+
+    // Decode prose entities except the angle brackets (numeric forms first).
+    $md = preg_replace( '/&#(?:60|x3c);/i', '&lt;', $md );
+    $md = preg_replace( '/&#(?:62|x3e);/i', '&gt;', $md );
+    $md = str_replace( array( '&lt;', '&gt;' ), array( "\x1eLT\x1e", "\x1eGT\x1e" ), $md );
     $md = html_entity_decode( $md, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+    $md = str_replace( array( "\x1eLT\x1e", "\x1eGT\x1e" ), array( '&lt;', '&gt;' ), $md );
+
+    // Source indentation (the block editor nests <p> inside wrappers) would
+    // read as an indented code block; code itself is still stashed here.
+    $md = preg_replace( '/^[ \t]+/m', '', $md );
+
+    $md = strtr( $md, $stash );
     $md = preg_replace( "/\n{3,}/", "\n\n", $md );
 
     return trim( $md );
@@ -130,10 +191,11 @@ if ( preg_match( '#^/posts/([^/]+)$#', $uri, $m ) ) {
     ) );
     $post = $found ? $found[0] : null;
 
-    // Password-protected posts must not have their content rendered here;
-    // post_password_required() needs the global $post, which setup_postdata()
-    // below provides for the_content filters too (e.g. shortcodes reading
-    // $post->ID).
+    // Password-protected posts must not have their content rendered here.
+    // The row's post_password is checked directly: post_password_required()
+    // needs the global $post, which is only set up below (setup_postdata(),
+    // also needed by the_content filters that read $post->ID) once the post
+    // is known to be public.
     if ( $post && empty( $post->post_password ) ) {
         $GLOBALS['post'] = $post; // phpcs:ignore WordPress.WP.GlobalVariablesOverride
         setup_postdata( $post );
