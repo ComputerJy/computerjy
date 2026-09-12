@@ -159,14 +159,35 @@ function computerjy2_byline_links( $position = 'top' ) {
 }
 
 /**
- * Featured image with the terminal tint, or a neutral placeholder block.
+ * Fallback image for posts without a featured image: the Customizer upload
+ * if one is set, else the branded placeholder shipped with the theme.
+ *
+ * @param string $size Registered image size for the uploaded fallback.
+ * @return string URL.
+ */
+function computerjy2_fallback_image_url( $size = 'computerjy2-card' ) {
+    $id = absint( get_theme_mod( 'computerjy2_fallback_image', 0 ) );
+    if ( $id ) {
+        $url = wp_get_attachment_image_url( $id, $size );
+        if ( $url ) {
+            return $url;
+        }
+    }
+    return get_template_directory_uri() . '/assets/images/post-placeholder.svg';
+}
+
+/**
+ * Featured image, or the fallback image for posts that have none.
  */
 function computerjy2_thumb( $size = 'computerjy2-card', $chip = false ) {
     echo '<div class="post-thumb">';
     if ( has_post_thumbnail() ) {
         the_post_thumbnail( $size, array( 'loading' => 'lazy', 'alt' => the_title_attribute( array( 'echo' => false ) ) ) );
     } else {
-        echo '<div class="post-thumb-empty" aria-hidden="true"></div>';
+        printf(
+            '<img class="post-thumb-fallback" src="%s" alt="" loading="lazy" decoding="async">',
+            esc_url( computerjy2_fallback_image_url( $size ) )
+        );
     }
     if ( $chip ) {
         echo '<span class="thumb-chip">' . wp_kses_post( computerjy2_category_chip() ) . '</span>';

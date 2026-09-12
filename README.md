@@ -4,7 +4,7 @@ A hybrid classic WordPress theme for computerjy.com: PHP templates plus a full
 `theme.json` so the block editor matches the front end.
 
 Direction: **Terminal** — hard-edged tiles separated by hairline grid gaps,
-featured images tinted toward brand cyan, solid color category chips, monospace
+featured images that zoom on hover, solid color category chips, monospace
 furniture around humanist body copy.
 
 ## Install

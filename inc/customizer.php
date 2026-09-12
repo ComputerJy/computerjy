@@ -68,6 +68,14 @@ function computerjy2_customize_register( $wp_customize ) {
         'type'        => 'checkbox',
     ) );
 
+    $wp_customize->add_setting( 'computerjy2_fallback_image', array( 'default' => 0, 'sanitize_callback' => 'absint' ) );
+    $wp_customize->add_control( new WP_Customize_Media_Control( $wp_customize, 'computerjy2_fallback_image', array(
+        'label'       => __( 'Default post image', 'computerjy2' ),
+        'description' => __( 'Shown on listings for posts without a featured image. Leave empty for the built-in placeholder.', 'computerjy2' ),
+        'section'     => 'computerjy2_layout',
+        'mime_type'   => 'image',
+    ) ) );
+
     $wp_customize->add_setting( 'computerjy2_newsletter_action', array( 'default' => '', 'sanitize_callback' => 'esc_url_raw' ) );
     $wp_customize->add_control( 'computerjy2_newsletter_action', array(
         'label'       => __( 'Newsletter form action URL', 'computerjy2' ),

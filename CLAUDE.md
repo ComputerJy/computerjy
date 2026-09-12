@@ -79,8 +79,9 @@ Keep them in sync when you change markup structure.
 - `inc/template-tags.php` — `computerjy2_reading_time()`,
   `computerjy2_category_chip()`, `computerjy2_breadcrumbs()`,
   `computerjy2_pagination()`, `computerjy2_eyebrow_strip()`,
-  `computerjy2_byline_links()`, `computerjy2_thumb()`,
-  `computerjy2_brand_mark()`.
+  `computerjy2_byline_links()`, `computerjy2_thumb()` (falls back to
+  `computerjy2_fallback_image_url()`: the Customizer "Default post image" or
+  `assets/images/post-placeholder.svg`), `computerjy2_brand_mark()`.
 - `inc/slots.php` — `computerjy2_slot( $id )` renders a height-reserved sponsor
   container. Slot ids: `leaderboard`, `infeed`, `inarticle`, `sidebar`. The
   in-article slot is injected by a `the_content` filter, not by a template.
@@ -140,5 +141,3 @@ add_action( 'computerjy2_slot_sidebar', 'my_sponsor_render' );
 - No `languages/*.pot` — run `wp i18n make-pot . languages/computerjy2.pot`.
 - No RTL stylesheet (`rtl.css`).
 - Trending is comment-count based; swap in real analytics if you have them.
-- Featured images are tinted with a CSS `filter` at rest and un-tinted on hover.
-  Verify this reads well against the real photo library before shipping.
