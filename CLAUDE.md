@@ -103,6 +103,9 @@ Keep them in sync when you change markup structure.
 ## Conventions
 
 - **Styling lives in `assets/css/theme.css`**, organised in numbered sections.
+  Fonts are self-hosted: `assets/css/fonts.css` holds the `@font-face` rules for
+  the variable woff2 files in `assets/fonts/` (OFL); `functions.php` enqueues it
+  on the front end and in the block editor and preloads the two latin files.
   Colors come from the token block in §1 — never hardcode a hex in a component
   rule; add or reuse a `var(--*)`.
 - **Dark is the default token set.** `[data-theme="light"]` overrides it. Any new
