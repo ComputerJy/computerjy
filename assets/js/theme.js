@@ -82,7 +82,10 @@
         .catch(function (err) {
           /* Enter still submits ?s=; this only makes a broken endpoint visible */
           if (window.console && console.warn) {
-            console.warn('search-index.json unavailable, falling back to ?s=', err);
+            console.warn(
+              'search-index.json unavailable, falling back to ?s=',
+              err
+            );
           }
           searchIndex = [];
           return searchIndex;
