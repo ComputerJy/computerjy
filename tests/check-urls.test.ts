@@ -71,3 +71,48 @@ describe('scripts/check-urls.sh live slug paging', () => {
     expect(slugFails).toHaveLength(new Set(slugs).size);
   });
 });
+
+describe('scripts/check-urls.sh EDGE=1 (Cloudflare cache matrix)', () => {
+  const run = (env: Record<string, string>) =>
+    spawnSync('bash', [script, 'http://127.0.0.1:1'], {
+      encoding: 'utf8',
+      env: { ...process.env, LIVE_SLUGS: '0', ...env },
+    });
+
+  it('is skipped under CONNECT_TO, which bypasses Cloudflare', () => {
+    const out = run({
+      EDGE: '1',
+      CONNECT_TO: 'www.computerjy.com:443:127.0.0.1:1',
+    }).stdout;
+    expect(out).toContain('== edge cache: skipped');
+    expect(out).not.toMatch(/^FAIL edge/m);
+  });
+
+  it('is off unless EDGE=1', () => {
+    expect(run({ EDGE: '', CONNECT_TO: '' }).stdout).not.toContain(
+      '== edge cache'
+    );
+  });
+
+  it('asserts every row of the matrix and counts each miss as a FAIL', () => {
+    const out = run({ EDGE: '1', CONNECT_TO: '' }).stdout;
+    const section = out.split('== edge cache (Cloudflare) ==')[1] ?? '';
+    const rows = section.split('\n').filter((l) => l.startsWith('FAIL edge'));
+    for (const label of [
+      'anonymous HTML, 1st',
+      'anonymous HTML, 2nd',
+      'wordpress_logged_in_ cookie',
+      'wp-postpass_ cookie',
+      'comment_author_ cookie',
+      'Accept: text/markdown',
+      'REST',
+      'theme CSS',
+      'search index',
+    ]) {
+      expect(
+        rows.some((r) => r.includes(label)),
+        label
+      ).toBe(true);
+    }
+  });
+});

@@ -10,6 +10,7 @@
 #   MODE=astro scripts/check-urls.sh                        # baseline before cutover
 #   CONNECT_TO=www.computerjy.com:443:127.0.0.1:8443 scripts/check-urls.sh
 #   LIVE_SLUGS=1 scripts/check-urls.sh                      # + every slug from REST
+#   EDGE=1 scripts/check-urls.sh                            # + Cloudflare cache matrix
 #   scripts/check-urls.sh --print-urls                      # list checks, no network
 #
 # Exit 0 when every check passes.
@@ -70,6 +71,27 @@ check_markdown() {
     echo "ok   $path markdown"
 }
 export -f check_markdown
+
+# check_edge LABEL PATH WANT_CF_STATUS_REGEX WANT_SMAXAGE(yes|no|-) WANT_CT_PREFIX(or -) [curl args…]
+# One row of the Cloudflare cache matrix: cf-cache-status says whether the
+# edge served/stored it, the origin's s-maxage says whether it was allowed to.
+check_edge() {
+    local label="$1" path="$2" want_cf="$3" want_sm="$4" want_ct="$5"
+    shift 5
+    local hdr cf cc ct
+    # shellcheck disable=SC2086
+    hdr=$(curl $CURL_BASE -o /dev/null -D - "$@" "$BASE$path" | tr -d '\r')
+    cf=$(awk 'tolower($1)=="cf-cache-status:" {print $2; exit}' <<< "$hdr")
+    cc=$(awk 'tolower($1)=="cache-control:" {sub(/^[^:]*: */,""); print; exit}' <<< "$hdr")
+    ct=$(awk 'tolower($1)=="content-type:" {print $2; exit}' <<< "$hdr")
+    if ! [[ "$cf" =~ ^($want_cf)$ ]]; then echo "FAIL edge [$label] $path cf-cache-status '$cf' (want $want_cf)"; return 1; fi
+    case "$want_sm" in
+        yes) [[ "$cc" == *s-maxage=3600* ]] || { echo "FAIL edge [$label] $path cache-control '$cc' lacks s-maxage=3600"; return 1; } ;;
+        no)  [[ "$cc" != *s-maxage* ]] || { echo "FAIL edge [$label] $path cache-control '$cc' must not carry s-maxage"; return 1; } ;;
+    esac
+    if [ "$want_ct" != "-" ] && [[ "$ct" != "$want_ct"* ]]; then echo "FAIL edge [$label] $path content-type '$ct' (want $want_ct)"; return 1; fi
+    echo "ok   edge [$label] $path $cf"
+}
 
 # ---- Fixed URL table: PATH STATUS [LOCATION] [CONTENT-TYPE] ----------------
 fixed() {
@@ -178,6 +200,29 @@ check_header /.well-known/api-catalog Access-Control-Allow-Origin '*' || fails=$
 echo "== markdown negotiation =="
 check_markdown / || fails=$((fails + 1))
 check_markdown /posts/1goal || fails=$((fails + 1))
+
+# The Cache Rule "WordPress anonymous HTML" must keep its cookie and
+# Accept: text/markdown bypasses (Cloudflare ignores Vary); during #55 it went
+# live without them and only a manual curl -I noticed. Live edge only: through
+# CONNECT_TO the origin answers directly and there is no cf-cache-status.
+if [ "${EDGE:-0}" = "1" ]; then
+    if [ -n "${CONNECT_TO:-}" ]; then
+        echo "== edge cache: skipped (CONNECT_TO bypasses Cloudflare) =="
+    else
+        echo "== edge cache (Cloudflare) =="
+        STORED='MISS|HIT|EXPIRED|REVALIDATED'
+        NOT_STORED='DYNAMIC|BYPASS'
+        check_edge 'anonymous HTML, 1st' / "$STORED" yes text/html || fails=$((fails + 1))
+        check_edge 'anonymous HTML, 2nd' / HIT yes text/html || fails=$((fails + 1))
+        check_edge 'wordpress_logged_in_ cookie' / "$NOT_STORED" no text/html -H 'Cookie: wordpress_logged_in_x=1' || fails=$((fails + 1))
+        check_edge 'wp-postpass_ cookie' / "$NOT_STORED" no text/html -H 'Cookie: wp-postpass_x=1' || fails=$((fails + 1))
+        check_edge 'comment_author_ cookie' / "$NOT_STORED" no text/html -H 'Cookie: comment_author_x=1' || fails=$((fails + 1))
+        check_edge 'Accept: text/markdown' /posts/1goal "$NOT_STORED" - text/markdown -H 'Accept: text/markdown' || fails=$((fails + 1))
+        check_edge 'REST' '/wp-json/wp/v2/posts?per_page=1' "$NOT_STORED" no application/json || fails=$((fails + 1))
+        check_edge 'theme CSS' /wp-content/themes/computerjy-2/assets/css/theme.css "$STORED" - text/css || fails=$((fails + 1))
+        check_edge 'search index' /search-index.json "$STORED" yes application/json || fails=$((fails + 1))
+    fi
+fi
 
 echo "== every post slug =="
 # Collected in temp files rather than `tee /dev/stderr`: re-opening /dev/stderr
