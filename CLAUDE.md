@@ -14,8 +14,7 @@ wp theme activate computerjy-2
 # or with wp-env / Local / Studio, symlink the folder into wp-content/themes
 ```
 
-The repo also carries the deploy tooling, tests and, until its deletion, the
-retired Cloudflare Worker (`workers/`, a frozen rollback snapshot). Deploy with
+The repo also carries the deploy tooling and tests. Deploy with
 `deploy/deploy-theme.sh` — it stages the theme from an allowlist and copies
 `public/` (agent-discovery files, `markdown.php`) into the WordPress
 DocumentRoot. `STAGE_ONLY=1` builds the tree without SSH.
@@ -29,16 +28,16 @@ not introduce a bundler without asking.
 
 ## Verification
 
-- `npm test` — vitest over `tests/`: the Worker, `scripts/`, `deploy/`, and
+- `npm test` — vitest over `tests/`: `scripts/`, `deploy/`, the vhost, and
   PHP helpers driven through `php -r` (files that must load from the CLI
   return early on `PHP_SAPI === 'cli'`, e.g. `public/markdown.php`).
 - `composer install && composer lint` — phpcs with WordPress-Extra
   (`phpcs.xml`); `npm run lint:php` is the plain `php -l` sweep.
 - No WordPress runs locally. WP-bound code is verified against the origin
   through an SSH tunnel: `CONNECT_TO=… scripts/check-urls.sh`.
-- `deploy/lightsail-apache.conf` is read by `tests/edge-router.test.ts` and
-  `tests/apache-vhost.test.ts`: the `Link` header, the five security headers,
-  the Jetpack root rewrite and `Alias /wp-cron.php` must stay byte-identical.
+- `deploy/lightsail-apache.conf` is read by `tests/apache-vhost.test.ts`: the
+  `Link` header (the agent-discovery contract), the edge `Cache-Control`
+  expression and the redirect rules it asserts must stay byte-identical.
 
 Two static previews render the real `assets/css/theme.css` and
 `assets/js/theme.js` with no WordPress: `preview-home.html`,
