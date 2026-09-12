@@ -103,10 +103,13 @@ body {
 }
 img,
 svg,
-video,
-iframe {
+video {
   max-width: 100%;
   height: auto;
+  display: block;
+}
+iframe {
+  max-width: 100%;
   display: block;
 }
 h1,
