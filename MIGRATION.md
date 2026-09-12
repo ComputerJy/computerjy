@@ -1,5 +1,13 @@
 # Migrating computerjy.com back to WordPress rendering
 
+> **Status: completed 2026-09-12.** WordPress (theme `computerjy-2`) renders the
+> site through Cloudflare; the edge Worker routes are detached and the Astro
+> source is removed from the repo. Parity was checked with
+> `scripts/check-urls.sh` (465/465 live). The theme deploys with
+> `deploy/deploy-theme.sh`; the edge-cache plugin purges Cloudflare on publish.
+> Remaining cleanup is tracked in issue #55. The notes below are the plan as
+> executed.
+
 Today the public site is a **static Astro build in R2, served by the Cloudflare
 Worker** in `workers/edge-router/`; Apache and WordPress only handle
 `/wp-admin`, `/wp-json`, `*.php` and `Accept: text/markdown` pass-throughs.
