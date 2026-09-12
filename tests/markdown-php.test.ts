@@ -54,9 +54,9 @@ describe.skipIf(!hasPhp)('public/markdown.php converter', () => {
   });
 
   it('converts strong and emphasis', () => {
-    expect(md('<p>Use <strong>bold</strong> and <em>it</em>, <b>b</b> <i>i</i>.</p>')).toBe(
-      'Use **bold** and _it_, **b** _i_.'
-    );
+    expect(
+      md('<p>Use <strong>bold</strong> and <em>it</em>, <b>b</b> <i>i</i>.</p>')
+    ).toBe('Use **bold** and _it_, **b** _i_.');
   });
 
   it('keeps emphasis markers tight against the text', () => {
@@ -68,17 +68,25 @@ describe.skipIf(!hasPhp)('public/markdown.php converter', () => {
   });
 
   it('fences <pre> with and without a nested <code>', () => {
-    expect(md('<pre><code>x = 1\ny = 2</code></pre>')).toBe('```\nx = 1\ny = 2\n```');
+    expect(md('<pre><code>x = 1\ny = 2</code></pre>')).toBe(
+      '```\nx = 1\ny = 2\n```'
+    );
     expect(md('<pre>x = 1\ny = 2</pre>')).toBe('```\nx = 1\ny = 2\n```');
   });
 
   it('strips syntax-highlight spans inside code and decodes its entities', () => {
-    expect(md('<pre><code><span class="k">if</span> a &lt; b:</code></pre>')).toBe('```\nif a < b:\n```');
-    expect(md('<p>Run <code>&lt;div&gt;</code> here</p>')).toBe('Run `<div>` here');
+    expect(
+      md('<pre><code><span class="k">if</span> a &lt; b:</code></pre>')
+    ).toBe('```\nif a < b:\n```');
+    expect(md('<p>Run <code>&lt;div&gt;</code> here</p>')).toBe(
+      'Run `<div>` here'
+    );
   });
 
   it('keeps tag-like text in prose as entities instead of re-exposing it as HTML', () => {
-    expect(md('<p>Wrap it in &lt;div&gt; tags &amp; go</p>')).toBe('Wrap it in &lt;div&gt; tags & go');
+    expect(md('<p>Wrap it in &lt;div&gt; tags &amp; go</p>')).toBe(
+      'Wrap it in &lt;div&gt; tags & go'
+    );
     expect(md('<p>Numeric &#60;b&#x3E; too</p>')).toBe('Numeric &lt;b&gt; too');
   });
 
@@ -88,12 +96,18 @@ describe.skipIf(!hasPhp)('public/markdown.php converter', () => {
   });
 
   it('drops source indentation so paragraphs do not become code blocks', () => {
-    expect(md('<div>\n    <p>one</p>\n\n    <p>two</p>\n</div>')).toBe('one\n\ntwo');
-    expect(md('<pre><code>    indented\n  code</code></pre>')).toBe('```\n    indented\n  code\n```');
+    expect(md('<div>\n    <p>one</p>\n\n    <p>two</p>\n</div>')).toBe(
+      'one\n\ntwo'
+    );
+    expect(md('<pre><code>    indented\n  code</code></pre>')).toBe(
+      '```\n    indented\n  code\n```'
+    );
   });
 
   it('keeps code inside links and headings', () => {
-    expect(md('<h2>The <code>ls</code> command</h2>')).toBe('## The `ls` command');
+    expect(md('<h2>The <code>ls</code> command</h2>')).toBe(
+      '## The `ls` command'
+    );
     expect(md('<p><a href="/x"><code>ls</code></a></p>')).toBe('[`ls`](/x)');
   });
 
