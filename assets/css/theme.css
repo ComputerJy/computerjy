@@ -1741,22 +1741,36 @@ button.submit {
 
 /* Fix Jetpack Infinite Scroll button */
 #infinite-handle {
-  text-align: center;
-  margin: 40px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#infinite-handle span {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+#infinite-handle span:hover {
+  background: transparent !important;
 }
 #infinite-handle span button,
-#infinite-handle span button:focus {
-  background: var(--brand-cyan);
-  color: var(--chip-fg);
-  border: 0;
-  cursor: pointer;
-  font: 800 0.8125rem/1 var(--font-mono);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  padding: 14px 24px;
-  transition: opacity 0.2s;
-  outline: none;
+#infinite-handle span button:focus,
+#infinite-handle span button:hover {
+  background: var(--brand-cyan) !important;
+  color: var(--chip-fg) !important;
+  border: 0 !important;
+  cursor: pointer !important;
+  font: 800 0.8125rem/1 var(--font-mono) !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  padding: 14px 24px !important;
+  transition: opacity 0.2s !important;
+  outline: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  display: inline-block !important;
 }
 #infinite-handle span button:hover {
-  opacity: 0.9;
+  opacity: 0.9 !important;
 }
