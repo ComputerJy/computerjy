@@ -125,10 +125,18 @@ EOF
 slugs() {
     node -e 'JSON.parse(require("fs").readFileSync(process.argv[1],"utf8")).forEach(s=>console.log(s))' "$ROOT_DIR/scripts/known-slugs.json"
     if [ "${LIVE_SLUGS:-0}" = "1" ]; then
-        local page=1 out
+        local page=1 out rc url
         while :; do
+            url="/wp-json/wp/v2/posts?per_page=100&page=$page&_fields=slug"
+            # A curl failure is reported as a FAIL line (picked out of the slug
+            # list by the caller) instead of aborting the run under `set -e`.
+            rc=0
             # shellcheck disable=SC2086
-            out=$(curl $CURL_BASE "$BASE/wp-json/wp/v2/posts?per_page=100&page=$page&_fields=slug")
+            out=$(curl $CURL_BASE "$BASE$url") || rc=$?
+            if [ "$rc" -ne 0 ]; then
+                echo "FAIL $url curl exit $rc while paging live slugs"
+                break
+            fi
             # An empty page ("[]") means we're done; past the last page the REST
             # API answers with a 400 error object instead, so stop on anything
             # that isn't a JSON array too (otherwise this loops forever).
@@ -172,14 +180,19 @@ check_markdown / || fails=$((fails + 1))
 check_markdown /posts/1goal || fails=$((fails + 1))
 
 echo "== every post slug =="
-# Collected in a temp file rather than `tee /dev/stderr`: re-opening /dev/stderr
+# Collected in temp files rather than `tee /dev/stderr`: re-opening /dev/stderr
 # truncates a log the caller redirected 2>&1 into, wiping the sections above.
+# slugs() reports a REST paging failure as a "FAIL …" line among the slugs
+# (slugs never contain a space), so it is split out and counted here.
+slug_list=$(mktemp)
 slug_out=$(mktemp)
-slugs | sort -u | sed 's#^#/posts/#' \
-    | xargs -P 8 -I{} bash -c 'check "$1" 200 "" text/html' _ {} > "$slug_out" || true
+slugs > "$slug_list"
+grep '^FAIL ' "$slug_list" || true
+grep -v '^FAIL ' "$slug_list" | sort -u | sed 's#^#/posts/#' | tr '\n' '\0' \
+    | xargs -0 -P 8 -I{} bash -c 'check "$1" 200 "" text/html' _ {} > "$slug_out" || true
 cat "$slug_out"
-slug_fails=$(grep -c '^FAIL' "$slug_out" || true)
-rm -f "$slug_out"
+slug_fails=$(cat "$slug_list" "$slug_out" | grep -c '^FAIL ' || true)
+rm -f "$slug_list" "$slug_out"
 fails=$((fails + slug_fails))
 
 echo
