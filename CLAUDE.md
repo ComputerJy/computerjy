@@ -40,7 +40,9 @@ not introduce a bundler without asking.
   `CONNECT_TO=www.computerjy.com:443:127.0.0.1:8443 MODE=wordpress LIVE_SLUGS=1 scripts/check-urls.sh`
   (or `curl --connect-to …`). On the server itself:
   `curl -sk --resolve www.computerjy.com:443:127.0.0.1 https://www.computerjy.com/…`.
-  Run the same check without `CONNECT_TO` against the live edge after a deploy.
+  Run the same check without `CONNECT_TO` against the live edge after a deploy,
+  with `EDGE=1` to assert the Cloudflare cache matrix (`cf-cache-status` per
+  cookie / `Accept: text/markdown` / REST / static row, and the `s-maxage`).
 - `deploy/lightsail-apache.conf` is read by `tests/apache-vhost.test.ts`: the
   `Link` header (the agent-discovery contract), the edge `Cache-Control`
   expression and the redirect rules it asserts must stay byte-identical.
