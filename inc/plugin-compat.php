@@ -38,6 +38,7 @@ function computerjy2_jetpack_setup() {
         'render'    => 'computerjy2_infinite_scroll_render',
         'footer'    => false,
         'type'      => 'click',
+        'wrapper'   => false,
     ) );
 
     add_theme_support( 'jetpack-responsive-videos' );
