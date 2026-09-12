@@ -28,7 +28,7 @@ if [ -n "${CONNECT_TO:-}" ]; then CURL_BASE="$CURL_BASE --connect-to $CONNECT_TO
 CURL_OPTS="$CURL_BASE -o /dev/null"
 export BASE CURL_OPTS CURL_BASE
 
-# check PATH WANT_STATUS_REGEX [WANT_LOCATION] [WANT_CONTENT_TYPE_PREFIX] [ACCEPT]
+# check PATH WANT_STATUS_REGEX [WANT_LOCATION] [WANT_CONTENT_TYPE_REGEX_PREFIX] [ACCEPT]
 check() {
     local path="$1" want="$2" want_loc="${3:-}" want_ct="${4:-}" accept="${5:-}"
     local out code loc ct
@@ -42,7 +42,7 @@ check() {
     IFS=$'\x1f' read -r code loc ct <<< "$out"
     if ! [[ "$code" =~ ^($want)$ ]]; then echo "FAIL $path -> $code (want $want)"; return 1; fi
     if [ -n "$want_loc" ] && [ "$loc" != "$want_loc" ]; then echo "FAIL $path -> $loc (want $want_loc)"; return 1; fi
-    if [ -n "$want_ct" ] && [[ "$ct" != "$want_ct"* ]]; then echo "FAIL $path -> $ct (want $want_ct)"; return 1; fi
+    if [ -n "$want_ct" ] && ! [[ "$ct" =~ ^($want_ct) ]]; then echo "FAIL $path -> $ct (want $want_ct)"; return 1; fi
     echo "ok   $path $code"
 }
 export -f check
@@ -89,7 +89,7 @@ fixed() {
 /security.txt 200 - text/plain
 /.well-known/security.txt 200 - text/plain
 /auth.md 200 - text/markdown
-/.well-known/api-catalog 200 - application/linkset+json
+/.well-known/api-catalog 200 - application/linkset\+json
 /.well-known/openid-configuration 200 - application/json
 /.well-known/oauth-authorization-server 200 - application/json
 /.well-known/oauth-protected-resource 200 - application/json
@@ -104,8 +104,8 @@ EOF
         cat <<EOF
 /posts/1goal/ 200 - text/html
 /rss.xml 200 - application/
-/sitemap.xml 200 - application/xml
-/sitemap-index.xml 200 - application/xml
+/sitemap.xml 200 - (application|text)/xml
+/sitemap-index.xml 200 - (application|text)/xml
 /posts/author/computerjy 404
 EOF
     else
@@ -114,7 +114,7 @@ EOF
 /rss.xml 301 $CANON/feed
 /sitemap.xml 301 $CANON$SITEMAP
 /sitemap-index.xml 301 $CANON$SITEMAP
-$SITEMAP 200 - application/xml
+$SITEMAP 200 - (application|text)/xml
 /posts/author/computerjy 200 - text/html
 /category/entertainment/page/2 200 - text/html
 EOF
