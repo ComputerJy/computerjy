@@ -1730,8 +1730,11 @@ button.submit {
   outline: none !important;
 }
 
-.sharedaddy img, .sharedaddy svg, .sharedaddy iframe,
-.comment-likes-widget img, .comment-likes-widget svg, .comment-likes-widget iframe {
+.sharedaddy img,
+.sharedaddy svg,
+.sharedaddy iframe,
+.comment-likes-widget img,
+.comment-likes-widget svg,
+.comment-likes-widget iframe {
   display: inline-block !important;
-  height: initial !important;
 }
