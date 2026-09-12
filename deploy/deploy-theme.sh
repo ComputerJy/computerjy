@@ -32,7 +32,11 @@ KEY_PATH="${KEY_PATH/\$\{HOME\}/$HOME}"
 KEY_PATH="${KEY_PATH/\$HOME/$HOME}"
 WP_ROOT="${WP_ROOT:-/var/www/wordpress}"
 THEME_SLUG="${THEME_SLUG:-computerjy-2}"
-STAGE_DIR="${STAGE_DIR:-$(mktemp -d)}"
+STAGE_CREATED=0
+if [ -z "${STAGE_DIR:-}" ]; then
+    STAGE_DIR="$(mktemp -d)"
+    STAGE_CREATED=1
+fi
 THEME_STAGE="${STAGE_DIR}/theme"
 ROOT_STAGE="${STAGE_DIR}/webroot"
 
@@ -71,6 +75,12 @@ fi
 if [ "${STAGE_ONLY:-0}" = "1" ]; then
     echo "✅ Staged only (STAGE_ONLY=1): ${STAGE_DIR}"
     exit 0
+fi
+
+# A staging tree we created ourselves is scratch once the upload starts; one
+# the caller passed in (tests, STAGE_ONLY inspection) is theirs to keep.
+if [ "${STAGE_CREATED}" = "1" ]; then
+    trap 'rm -rf "${STAGE_DIR}"' EXIT
 fi
 
 if [ -z "${SERVER_HOST}" ]; then
