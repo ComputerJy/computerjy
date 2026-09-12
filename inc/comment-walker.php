@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 function computerjy2_comment( $comment, $args, $depth ) {
     ?>
     <li id="comment-<?php comment_ID(); ?>" <?php comment_class( 'comment-item' ); ?>>
-        <div class="comment-row">
+        <div class="comment-row" id="div-comment-<?php comment_ID(); ?>">
             <span class="comment-avatar"><?php echo get_avatar( $comment, 30 ); ?></span>
             <div class="comment-bubble">
                 <div class="comment-header">

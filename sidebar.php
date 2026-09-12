@@ -71,9 +71,9 @@ endif;
 
 <div class="is-sticky-slot">
     <?php computerjy2_slot( 'sidebar', __( 'Sidebar unit', 'computerjy2' ) ); ?>
+    <?php
+    if ( is_active_sidebar( 'sidebar-1' ) ) {
+        dynamic_sidebar( 'sidebar-1' );
+    }
+    ?>
 </div>
-
-<?php
-if ( is_active_sidebar( 'sidebar-1' ) ) {
-    dynamic_sidebar( 'sidebar-1' );
-}
