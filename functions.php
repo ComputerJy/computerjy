@@ -102,12 +102,7 @@ add_action( 'widgets_init', 'computerjy2_widgets_init' );
  * Front-end assets.
  */
 function computerjy2_scripts() {
-    wp_enqueue_style(
-        'computerjy2-fonts',
-        'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap',
-        array(),
-        null
-    );
+    computerjy2_enqueue_fonts();
 
     $css_ver = computerjy2_asset_version( 'assets/css/theme.css' );
     $js_ver  = computerjy2_asset_version( 'assets/js/theme.js' );
@@ -141,17 +136,47 @@ function computerjy2_asset_version( $rel ) {
 }
 
 /**
+ * Self-hosted Inter, Plus Jakarta Sans and JetBrains Mono (assets/css/fonts.css,
+ * files in assets/fonts). The only third-party render-blocking request used to
+ * be Google Fonts; now the vhost serves the woff2 with a 1-year Expires.
+ */
+function computerjy2_enqueue_fonts() {
+    wp_enqueue_style(
+        'computerjy2-fonts',
+        get_template_directory_uri() . '/assets/css/fonts.css',
+        array(),
+        computerjy2_asset_version( 'assets/css/fonts.css' )
+    );
+}
+
+/**
  * Block editor assets (fonts, so the editor matches the front end).
  */
 function computerjy2_editor_assets() {
-    wp_enqueue_style(
-        'computerjy2-editor-fonts',
-        'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap',
-        array(),
-        null
-    );
+    computerjy2_enqueue_fonts();
 }
 add_action( 'enqueue_block_editor_assets', 'computerjy2_editor_assets' );
+
+/**
+ * Preload the two latin files every page needs (body and heading faces) so
+ * they are fetched with the HTML instead of after fonts.css is parsed.
+ * unicode-range keeps latin-ext and the mono face on demand.
+ *
+ * @param array $resources Preload entries.
+ * @return array
+ */
+function computerjy2_preload_fonts( $resources ) {
+    foreach ( array( 'inter-latin', 'plus-jakarta-sans-latin' ) as $file ) {
+        $resources[] = array(
+            'href'        => get_template_directory_uri() . '/assets/fonts/' . $file . '.woff2',
+            'as'          => 'font',
+            'type'        => 'font/woff2',
+            'crossorigin' => 'anonymous',
+        );
+    }
+    return $resources;
+}
+add_filter( 'wp_preload_resources', 'computerjy2_preload_fonts' );
 
 /**
  * Google Analytics 4, when a measurement ID is configured.
