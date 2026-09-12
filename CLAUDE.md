@@ -14,8 +14,8 @@ wp theme activate computerjy-2
 # or with wp-env / Local / Studio, symlink the folder into wp-content/themes
 ```
 
-The repo also carries the deploy tooling, tests and (until the cutover
-finishes, see `MIGRATION.md`) the retired Cloudflare Worker. Deploy with
+The repo also carries the deploy tooling, tests and, until its deletion, the
+retired Cloudflare Worker (`workers/`, a frozen rollback snapshot). Deploy with
 `deploy/deploy-theme.sh` — it stages the theme from an allowlist and copies
 `public/` (agent-discovery files, `markdown.php`) into the WordPress
 DocumentRoot. `STAGE_ONLY=1` builds the tree without SSH.

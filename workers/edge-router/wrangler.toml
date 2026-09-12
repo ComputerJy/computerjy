@@ -24,17 +24,18 @@ binding = "ASSETS"
 bucket_name = "computerjy-bucket"
 
 # ------------------------------------------------------------------------------
-# ROUTES — live. See deploy/cloudflare-r2.md for rollback.
+# ROUTES — DETACHED 2026-09-12. WordPress renders the site (MIGRATION.md).
 # ------------------------------------------------------------------------------
-# These routes put the Worker in front of production traffic. Rolling back is
-# deleting them again and redeploying (or `wrangler delete`); Lightsail keeps
-# receiving the same build over rsync throughout, so the origin can serve the
-# site unaided the moment the routes are gone.
+# The routes were removed in the dashboard at the cutover; this file matches
+# production. Re-attaching them and redeploying puts the R2 copy of the LAST
+# Astro build back in front of the site — a frozen snapshot, not something
+# that can be rebuilt (the Astro source is gone from the repo). Delete this
+# Worker, its tests and deploy/cloudflare-r2.md once the cutover has held.
 
-[[routes]]
-pattern = "www.computerjy.com/*"
-zone_name = "computerjy.com"
+# [[routes]]
+# pattern = "www.computerjy.com/*"
+# zone_name = "computerjy.com"
 
-[[routes]]
-pattern = "computerjy.com/*"
-zone_name = "computerjy.com"
+# [[routes]]
+# pattern = "computerjy.com/*"
+# zone_name = "computerjy.com"
