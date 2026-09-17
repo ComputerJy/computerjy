@@ -120,12 +120,10 @@ function computerjy2_search_index_serve( $wp ) {
 add_action( 'parse_request', 'computerjy2_search_index_serve' );
 
 /**
- * Drop the cached index whenever computerjy2_flush_caches() would — but through
- * the transient API, so it also works when transients live in an object cache.
+ * Drop the cached index whenever computerjy2_flush_caches() runs — through the
+ * transient API, so it also works when transients live in an object cache.
  */
 function computerjy2_search_index_flush() {
     delete_transient( 'cjy2_search_index' );
 }
-add_action( 'save_post', 'computerjy2_search_index_flush' );
-add_action( 'wp_insert_comment', 'computerjy2_search_index_flush' );
-add_action( 'switch_theme', 'computerjy2_search_index_flush' );
+add_action( 'computerjy2_flush_caches', 'computerjy2_search_index_flush' );

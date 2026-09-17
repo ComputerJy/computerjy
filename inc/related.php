@@ -90,17 +90,53 @@ function computerjy2_trending_posts( $count = 5 ) {
 }
 
 /**
- * Flush caches on publish / comment.
+ * Flush caches on publish / approved comment / theme switch.
  *
  * Bumping the generation is the invalidation; the DELETE only prunes the
  * previous generation's rows when transients are stored in wp_options (they
- * would otherwise sit there until their timeout).
+ * would otherwise sit there until their timeout). Fires the
+ * `computerjy2_flush_caches` action so other caches (search index) share one
+ * invalidation policy.
  */
-function computerjy2_flush_caches( $post_id = 0 ) {
+function computerjy2_flush_caches() {
     global $wpdb;
     update_option( 'cjy2_cache_generation', computerjy2_cache_generation() + 1 );
-    $wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_cjy2_%' OR option_name LIKE '_transient_timeout_cjy2_%'" ); // phpcs:ignore
+    $wpdb->query(
+        $wpdb->prepare(
+            "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s",
+            $wpdb->esc_like( '_transient_cjy2_' ) . '%',
+            $wpdb->esc_like( '_transient_timeout_cjy2_' ) . '%'
+        )
+    );
+    do_action( 'computerjy2_flush_caches' );
 }
-add_action( 'save_post', 'computerjy2_flush_caches' );
-add_action( 'wp_insert_comment', 'computerjy2_flush_caches' );
+
+/**
+ * Autosaves, revisions and auto-drafts never change what visitors see.
+ *
+ * @param int     $post_id Post ID.
+ * @param WP_Post $post    Post.
+ */
+function computerjy2_flush_on_save( $post_id, $post ) {
+    if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) || 'auto-draft' === $post->post_status ) {
+        return;
+    }
+    computerjy2_flush_caches();
+}
+add_action( 'save_post', 'computerjy2_flush_on_save', 10, 2 );
+
+/**
+ * Only approved comments affect trending counts; pending/spam go through
+ * transition_comment_status when moderated.
+ *
+ * @param int        $id      Comment ID.
+ * @param WP_Comment $comment Comment.
+ */
+function computerjy2_flush_on_comment( $id, $comment ) {
+    if ( '1' === (string) $comment->comment_approved ) {
+        computerjy2_flush_caches();
+    }
+}
+add_action( 'wp_insert_comment', 'computerjy2_flush_on_comment', 10, 2 );
+add_action( 'transition_comment_status', 'computerjy2_flush_caches' );
 add_action( 'switch_theme', 'computerjy2_flush_caches' );
