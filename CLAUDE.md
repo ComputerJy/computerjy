@@ -128,10 +128,12 @@ Keep them in sync when you change markup structure.
   plugins).
 - Transients use the `cjy2_` prefix. `inc/related.php` stamps its keys with a
   generation number (`computerjy2_cache_key()`); `computerjy2_flush_caches()`
-  bumps it on `save_post` / `wp_insert_comment` / `switch_theme`, which
-  invalidates through any object cache (the origin runs APCu). Use
-  `computerjy2_cache_key()` for new cached queries, or `delete_transient()`
-  explicitly as `inc/search-index.php` does.
+  bumps it on real saves (not autosaves/revisions), approved comments and
+  `switch_theme`, which invalidates through any object cache (the origin runs
+  APCu), then fires the `computerjy2_flush_caches` action. Use
+  `computerjy2_cache_key()` for new cached queries, or hook
+  `computerjy2_flush_caches` and `delete_transient()` as
+  `inc/search-index.php` does.
 
 ## Extension points
 
