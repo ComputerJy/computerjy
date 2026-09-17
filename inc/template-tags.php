@@ -190,11 +190,18 @@ function computerjy2_fallback_image_url( $size = 'computerjy2-card' ) {
 
 /**
  * Featured image, or the fallback image for posts that have none.
+ *
+ * Core picks loading / fetchpriority / decoding and the media-library alt;
+ * pass $attr to override (the lead card sets fetchpriority=high).
+ *
+ * @param string $size Image size.
+ * @param bool   $chip Render the category chip.
+ * @param array  $attr Extra <img> attributes.
  */
-function computerjy2_thumb( $size = 'computerjy2-card', $chip = false ) {
+function computerjy2_thumb( $size = 'computerjy2-card', $chip = false, $attr = array() ) {
     echo '<div class="post-thumb">';
     if ( has_post_thumbnail() ) {
-        the_post_thumbnail( $size, array( 'loading' => 'lazy', 'alt' => the_title_attribute( array( 'echo' => false ) ) ) );
+        the_post_thumbnail( $size, $attr );
     } else {
         printf(
             '<img class="post-thumb-fallback" src="%s" alt="" loading="lazy" decoding="async">',
