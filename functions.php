@@ -183,12 +183,13 @@ add_filter( 'wp_preload_resources', 'computerjy2_preload_fonts' );
  * Not printed for logged-in editors, and skipped on AMP requests.
  */
 function computerjy2_analytics() {
-    $id = trim( (string) get_theme_mod( 'computerjy2_ga4_id', '' ) );
+    // Re-validated at render: theme mods can be set outside the Customizer.
+    $id = computerjy2_sanitize_ga4_id( get_theme_mod( 'computerjy2_ga4_id', '' ) );
     if ( '' === $id || is_user_logged_in() ) {
         return;
     }
     ?>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo esc_attr( $id ); ?>"></script>
+    <script async src="<?php echo esc_url( 'https://www.googletagmanager.com/gtag/js?id=' . $id ); ?>"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
