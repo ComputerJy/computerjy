@@ -49,9 +49,9 @@ describe('no Google Fonts requests remain', () => {
     'preview-single.html',
     'assets/css/theme.css',
   ])('%s', (file) => {
-    expect(readFileSync(file, 'utf8')).not.toMatch(
-      /fonts\.(googleapis|gstatic)\.com/
-    );
+    const src = readFileSync(file, 'utf8');
+    expect(src).not.toContain('fonts.googleapis.com');
+    expect(src).not.toContain('fonts.gstatic.com');
   });
 });
 
