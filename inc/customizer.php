@@ -115,7 +115,11 @@ function computerjy2_customize_register( $wp_customize ) {
             'label' => $label, 'section' => 'computerjy2_slots', 'type' => 'checkbox',
         ) );
 
-        $wp_customize->add_setting( 'computerjy2_slot_' . $id . '_code', array( 'default' => '', 'sanitize_callback' => 'computerjy2_sanitize_slot_code' ) );
+        $wp_customize->add_setting( 'computerjy2_slot_' . $id . '_code', array(
+            'default'           => '',
+            'sanitize_callback' => 'computerjy2_sanitize_slot_code',
+            'validate_callback' => 'computerjy2_validate_slot_code',
+        ) );
         $wp_customize->add_control( 'computerjy2_slot_' . $id . '_code', array(
             /* translators: %s: slot label */
             'label'   => sprintf( __( '%s code', 'computerjy2' ), $label ),
@@ -144,6 +148,21 @@ function computerjy2_customize_register( $wp_customize ) {
     ) );
 }
 add_action( 'customize_register', 'computerjy2_customize_register' );
+
+/**
+ * Tell the user when kses would strip their snippet, instead of silently
+ * saving a slot that never fills.
+ *
+ * @param WP_Error $validity Validity.
+ * @param string   $value    Submitted value.
+ * @return WP_Error
+ */
+function computerjy2_validate_slot_code( $validity, $value ) {
+    if ( ! current_user_can( 'unfiltered_html' ) && $value !== wp_kses_post( $value ) ) {
+        $validity->add( 'kses', __( 'Script tags require the unfiltered_html capability; this snippet would be stripped.', 'computerjy2' ) );
+    }
+    return $validity;
+}
 
 /**
  * Slot markup is admin-entered script/HTML; only unfiltered_html users may save it.
