@@ -135,6 +135,18 @@ function computerjy_markdown_emit( $output ) {
     exit;
 }
 
+/**
+ * Transient key stamped with the theme's cache generation, so a publish or
+ * approved comment invalidates it for free; plain key if the theme is not
+ * active.
+ *
+ * @param string $suffix Key-specific part.
+ * @return string
+ */
+function computerjy_markdown_cache_key( $suffix ) {
+    return function_exists( 'computerjy2_cache_key' ) ? computerjy2_cache_key( $suffix ) : 'cjy2_' . $suffix;
+}
+
 // The converter is unit-tested from the CLI; nothing below runs there.
 if ( PHP_SAPI === 'cli' ) {
     return;
@@ -197,6 +209,12 @@ if ( preg_match( '#^/posts/([^/]+)$#', $uri, $m ) ) {
     // also needed by the_content filters that read $post->ID) once the post
     // is known to be public.
     if ( $post && empty( $post->post_password ) ) {
+        $key    = computerjy_markdown_cache_key( 'md_post_' . $post->ID . '_' . strtotime( $post->post_modified_gmt ) );
+        $cached = get_transient( $key );
+        if ( false !== $cached ) {
+            computerjy_markdown_emit( $cached );
+        }
+
         $GLOBALS['post'] = $post; // phpcs:ignore WordPress.WP.GlobalVariablesOverride
         setup_postdata( $post );
 
@@ -217,11 +235,19 @@ if ( preg_match( '#^/posts/([^/]+)$#', $uri, $m ) ) {
 
         wp_reset_postdata();
 
+        set_transient( $key, $output, 12 * HOUR_IN_SECONDS );
         computerjy_markdown_emit( $output );
     }
 }
 
-// 2. Everything else: the site summary with the latest articles.
+// 2. Everything else: the site summary with the latest articles. Rendering
+// 30 excerpts runs the_content 30 times, so the built document is cached.
+$key    = computerjy_markdown_cache_key( 'md_summary' );
+$cached = get_transient( $key );
+if ( false !== $cached ) {
+    computerjy_markdown_emit( $cached );
+}
+
 $output  = "# {$site_name}\n\n";
 $output .= '> ' . get_bloginfo( 'description' ) . "\n\n";
 $output .= "Website: {$home}\n";
@@ -254,4 +280,5 @@ foreach ( $recent as $p ) {
 $output .= "\n---\n";
 $output .= "*For the full search index of every article, see: {$home}search-index.json*\n";
 
+set_transient( $key, $output, 6 * HOUR_IN_SECONDS );
 computerjy_markdown_emit( $output );
