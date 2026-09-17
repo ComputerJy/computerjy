@@ -8,11 +8,23 @@
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 /**
+ * Word count that sees Arabic and other non-Latin text — str_word_count()
+ * only counts Latin letters.
+ *
+ * @param string $text HTML or plain text.
+ * @return int
+ */
+function computerjy2_word_count( $text ) {
+    $n = preg_match_all( '/\S+/u', wp_strip_all_tags( $text ) );
+    return false === $n ? 0 : $n;
+}
+
+/**
  * Reading time string.
  */
 function computerjy2_reading_time( $post_id = null ) {
     $post_id = $post_id ? $post_id : get_the_ID();
-    $words   = str_word_count( wp_strip_all_tags( get_post_field( 'post_content', $post_id ) ) );
+    $words   = computerjy2_word_count( get_post_field( 'post_content', $post_id ) );
     $minutes = max( 1, (int) ceil( $words / 200 ) );
     /* translators: %d: minutes */
     return sprintf( _n( '%d MIN', '%d MIN', $minutes, 'computerjy2' ), $minutes );
