@@ -7,6 +7,10 @@
  * renders the matching Customizer code block; when neither produces output the
  * slot stays as a labelled reserve in the admin preview only.
  *
+ * The code blocks live in theme_mods_*, so anything that can write options
+ * gets site-wide stored HTML. Inherent to the feature and acceptable for a
+ * single-admin site, but it is the theme's one privileged sink.
+ *
  * @package ComputerJy2
  */
 
