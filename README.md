@@ -29,14 +29,12 @@ Upload in **Appearance → Themes → Add New → Upload Theme**, then:
 | File                                               | Covers                                                   |
 | -------------------------------------------------- | -------------------------------------------------------- |
 | `index.php`                                        | Home / blog feed: lead block + Latest grid               |
-| `front-page.php`                                   | Static front page, else the feed                         |
 | `single.php` + `template-parts/content-single.php` | Single post                                              |
-| `page.php`                                         | Page (narrow reading shell)                              |
+| `page.php`                                         | Page (narrow reading shell; wide + leaderboard on front) |
 | `page-templates/full-width.php`                    | Full-width page template                                 |
 | `page-templates/landing.php`                       | Edge-to-edge landing page template                       |
 | `archive.php`                                      | Generic archive                                          |
 | `category.php`                                     | Category archive with hero band                          |
-| `tag.php`, `date.php`                              | Delegate to `archive.php`                                |
 | `author.php`                                       | Author profile page                                      |
 | `search.php`, `searchform.php`                     | Search results and form                                  |
 | `404.php`                                          | Not found + latest posts                                 |
