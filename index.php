@@ -21,10 +21,8 @@ get_header();
     <?php if ( have_posts() ) : ?>
 
         <?php
-        global $wp_query;
-        $cjy_index    = 0;
-        $cjy_interval = computerjy2_infeed_interval();
-        $cjy_lead     = ( is_home() && ! is_paged() );
+        $cjy_index = 0;
+        $cjy_lead  = ( is_home() && ! is_paged() );
 
         // The lead block only exists on page 1: one lead card plus three side cards.
         if ( $cjy_lead ) :
@@ -57,25 +55,7 @@ get_header();
             <span class="section-count"><?php echo esc_html( get_query_var( 'posts_per_page' ) ); ?> / <?php esc_html_e( 'page', 'computerjy2' ); ?></span>
         </div>
 
-        <div class="tile-grid grid-3" id="primary-feed">
-            <?php
-            $cjy_in_grid = 0;
-            while ( have_posts() ) :
-                the_post();
-                $cjy_in_grid++;
-                get_template_part( 'template-parts/content', 'card' );
-
-                // A filled slot spans the full grid row so the tile rhythm survives.
-                if ( 0 === $cjy_in_grid % $cjy_interval && $cjy_in_grid < $wp_query->post_count ) {
-                    echo '<div class="feed-slot-row">';
-                    computerjy2_slot( 'infeed', __( 'In-feed unit', 'computerjy2' ) );
-                    echo '</div>';
-                }
-            endwhile;
-            ?>
-        </div>
-
-        <?php computerjy2_pagination(); ?>
+        <?php get_template_part( 'template-parts/feed', 'grid' ); ?>
 
     <?php else : ?>
         <?php get_template_part( 'template-parts/content', 'none' ); ?>

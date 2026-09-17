@@ -45,25 +45,7 @@ get_header();
             <div class="section-rule"></div>
         </div>
 
-        <div class="tile-grid grid-3" id="primary-feed">
-            <?php
-            global $wp_query;
-            $cjy_in_grid  = 0;
-            $cjy_interval = computerjy2_infeed_interval();
-            while ( have_posts() ) :
-                the_post();
-                $cjy_in_grid++;
-                get_template_part( 'template-parts/content', 'card' );
-                if ( 0 === $cjy_in_grid % $cjy_interval && $cjy_in_grid < $wp_query->post_count ) {
-                    echo '<div class="feed-slot-row">';
-                    computerjy2_slot( 'infeed', __( 'In-feed unit', 'computerjy2' ) );
-                    echo '</div>';
-                }
-            endwhile;
-            ?>
-        </div>
-
-        <?php computerjy2_pagination(); ?>
+        <?php get_template_part( 'template-parts/feed', 'grid' ); ?>
     <?php else : ?>
         <?php get_template_part( 'template-parts/content', 'none' ); ?>
     <?php endif; ?>
