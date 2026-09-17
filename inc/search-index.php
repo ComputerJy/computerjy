@@ -56,7 +56,10 @@ add_action( 'after_switch_theme', 'computerjy2_search_index_activate' );
 function computerjy2_search_index_entry( WP_Post $post ) {
     $categories = get_the_category( $post->ID );
     $category   = empty( $categories ) ? 'Tech' : $categories[0]->name;
-    $excerpt    = wp_strip_all_tags( get_the_excerpt( $post ) );
+    // The index only needs 120 chars; skip the_content filter chain (shortcodes,
+    // autoembed with its per-post _oembed meta lookups, block rendering).
+    $raw        = $post->post_excerpt ? $post->post_excerpt : excerpt_remove_blocks( strip_shortcodes( $post->post_content ) );
+    $excerpt    = wp_trim_words( wp_strip_all_tags( $raw ), 30, '' );
 
     return array(
         'id'       => (int) $post->ID,
