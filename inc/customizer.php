@@ -7,6 +7,17 @@
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
+/**
+ * A GA4 measurement ID is G- plus 4-20 alphanumerics; anything else is dropped.
+ *
+ * @param string $value Raw input.
+ * @return string
+ */
+function computerjy2_sanitize_ga4_id( $value ) {
+    $value = strtoupper( trim( (string) $value ) );
+    return preg_match( '/^G-[A-Z0-9]{4,20}$/', $value ) ? $value : '';
+}
+
 function computerjy2_customize_register( $wp_customize ) {
 
     /* ---- Brand & social ---- */
@@ -38,7 +49,7 @@ function computerjy2_customize_register( $wp_customize ) {
 
     $wp_customize->add_setting( 'computerjy2_ga4_id', array(
         'default'           => '',
-        'sanitize_callback' => 'sanitize_text_field',
+        'sanitize_callback' => 'computerjy2_sanitize_ga4_id',
     ) );
     $wp_customize->add_control( 'computerjy2_ga4_id', array(
         'label'       => __( 'Google Analytics 4 measurement ID', 'computerjy2' ),
