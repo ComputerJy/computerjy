@@ -121,7 +121,10 @@ function computerjy2_customize_register( $wp_customize ) {
         'input_attrs' => array( 'min' => 2, 'max' => 20, 'step' => 1 ),
     ) );
 
-    $wp_customize->add_setting( 'computerjy2_inarticle_paragraph', array( 'default' => 3, 'sanitize_callback' => 'absint' ) );
+    $wp_customize->add_setting( 'computerjy2_inarticle_paragraph', array(
+        'default'           => 3,
+        'sanitize_callback' => function ( $v ) { return max( 1, absint( $v ) ); },
+    ) );
     $wp_customize->add_control( 'computerjy2_inarticle_paragraph', array(
         'label'       => __( 'In-article unit after paragraph', 'computerjy2' ),
         'section'     => 'computerjy2_slots',

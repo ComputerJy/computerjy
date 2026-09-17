@@ -57,6 +57,30 @@ function computerjy2_slot( $id, $label = '' ) {
 }
 
 /**
+ * Insert $slot after the Nth closing </p> in $content, leaving everything
+ * else byte-for-byte intact. Pure so it can be tested from the CLI.
+ *
+ * @param string $content HTML.
+ * @param int    $after   1-based paragraph index.
+ * @param string $slot    Markup to insert.
+ * @return string
+ */
+function computerjy2_insert_after_paragraph( $content, $after, $slot ) {
+    $after = max( 1, (int) $after );
+    if ( substr_count( strtolower( $content ), '</p>' ) <= $after ) {
+        return $content;
+    }
+    $n = 0;
+    return preg_replace_callback(
+        '#</p>#i',
+        function ( $m ) use ( &$n, $after, $slot ) {
+            return ( ++$n === $after ) ? $m[0] . $slot : $m[0];
+        },
+        $content
+    );
+}
+
+/**
  * Insert the in-article slot after paragraph N of post content.
  */
 function computerjy2_inject_inarticle_slot( $content ) {
@@ -68,9 +92,7 @@ function computerjy2_inject_inarticle_slot( $content ) {
     }
 
     $after = (int) apply_filters( 'computerjy2_inarticle_after_paragraph', get_theme_mod( 'computerjy2_inarticle_paragraph', 3 ) );
-    $paras = explode( '</p>', $content );
-
-    if ( count( $paras ) <= $after ) {
+    if ( substr_count( strtolower( $content ), '</p>' ) <= $after ) {
         return $content;
     }
 
@@ -78,15 +100,7 @@ function computerjy2_inject_inarticle_slot( $content ) {
     computerjy2_slot( 'inarticle', __( 'In-article unit', 'computerjy2' ) );
     $slot = ob_get_clean();
 
-    $out = '';
-    foreach ( $paras as $i => $para ) {
-        if ( '' === trim( $para ) ) { continue; }
-        $out .= $para . '</p>';
-        if ( ( $i + 1 ) === $after ) {
-            $out .= $slot;
-        }
-    }
-    return $out;
+    return computerjy2_insert_after_paragraph( $content, $after, $slot );
 }
 add_filter( 'the_content', 'computerjy2_inject_inarticle_slot', 20 );
 
