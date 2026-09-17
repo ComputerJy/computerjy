@@ -133,7 +133,7 @@
         <div class="search-results-list">
             <div class="search-hint"><?php esc_html_e( 'Recent posts', 'computerjy2' ); ?></div>
             <?php
-            $cjy_recent = new WP_Query( array( 'posts_per_page' => 4, 'ignore_sticky_posts' => true, 'no_found_rows' => true ) );
+            $cjy_recent = computerjy2_recent_posts( 4 );
             while ( $cjy_recent->have_posts() ) :
                 $cjy_recent->the_post();
                 ?>

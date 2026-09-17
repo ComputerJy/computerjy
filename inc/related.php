@@ -40,7 +40,7 @@ function computerjy2_related_posts( $post_id = null, $count = 3 ) {
     $key     = computerjy2_cache_key( 'related_' . $post_id . '_' . $count );
     $cached  = get_transient( $key );
     if ( false !== $cached ) {
-        return new WP_Query( array( 'post__in' => $cached ? $cached : array( 0 ), 'orderby' => 'post__in', 'ignore_sticky_posts' => true, 'posts_per_page' => $count ) );
+        return new WP_Query( array( 'post__in' => $cached ? $cached : array( 0 ), 'orderby' => 'post__in', 'ignore_sticky_posts' => true, 'posts_per_page' => $count, 'no_found_rows' => true ) );
     }
 
     $tags = wp_get_post_terms( $post_id, 'post_tag', array( 'fields' => 'ids' ) );
@@ -69,7 +69,7 @@ function computerjy2_trending_posts( $count = 5 ) {
     $key    = computerjy2_cache_key( 'trending_' . $count );
     $cached = get_transient( $key );
     if ( false !== $cached && ! empty( $cached ) ) {
-        return new WP_Query( array( 'post__in' => $cached, 'orderby' => 'post__in', 'posts_per_page' => $count, 'ignore_sticky_posts' => true ) );
+        return new WP_Query( array( 'post__in' => $cached, 'orderby' => 'post__in', 'posts_per_page' => $count, 'ignore_sticky_posts' => true, 'no_found_rows' => true ) );
     }
 
     $query = new WP_Query( array(
@@ -90,7 +90,22 @@ function computerjy2_trending_posts( $count = 5 ) {
 }
 
 /**
- * Flush caches on publish / approved comment / theme switch.
+ * Recent posts for the search modal, rendered on every page.
+ */
+function computerjy2_recent_posts( $count = 4 ) {
+    $key    = computerjy2_cache_key( 'recent_' . $count );
+    $cached = get_transient( $key );
+    if ( false !== $cached && ! empty( $cached ) ) {
+        return new WP_Query( array( 'post__in' => $cached, 'orderby' => 'post__in', 'posts_per_page' => $count, 'ignore_sticky_posts' => true, 'no_found_rows' => true ) );
+    }
+
+    $query = new WP_Query( array( 'posts_per_page' => $count, 'ignore_sticky_posts' => true, 'no_found_rows' => true ) );
+    set_transient( $key, wp_list_pluck( $query->posts, 'ID' ), 12 * HOUR_IN_SECONDS );
+    return $query;
+}
+
+/**
+ * Flush caches on publish / comment.
  *
  * Bumping the generation is the invalidation; the DELETE only prunes the
  * previous generation's rows when transients are stored in wp_options (they
