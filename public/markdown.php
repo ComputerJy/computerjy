@@ -186,58 +186,47 @@ remove_filter( 'the_content', 'computerjy2_inject_inarticle_slot', 20 );
 $site_name = get_bloginfo( 'name' );
 $home      = home_url( '/' );
 
-// 1. Single post: /posts/<slug>
-if ( preg_match( '#^/posts/([^/]+)$#', $uri, $m ) ) {
-    // get_page_by_path() with a single post type silently adds 'attachment'
-    // and resolves by iterating post IDs, so an older attachment sharing the
-    // slug can win over the actual post. get_posts() with an explicit
-    // post_status also lets us require 'publish' in the query itself, rather
-    // than fetching a post of unknown status and checking it after the fact.
-    $found = get_posts( array(
-        'name'                   => urldecode( $m[1] ),
-        'post_type'              => 'post',
-        'post_status'            => 'publish',
-        'numberposts'            => 1,
-        'no_found_rows'          => true,
-        'update_post_meta_cache' => false,
-    ) );
-    $post = $found ? $found[0] : null;
-
-    // Password-protected posts must not have their content rendered here.
-    // The row's post_password is checked directly: post_password_required()
-    // needs the global $post, which is only set up below (setup_postdata(),
-    // also needed by the_content filters that read $post->ID) once the post
-    // is known to be public.
-    if ( $post && empty( $post->post_password ) ) {
-        $key    = computerjy_markdown_cache_key( 'md_post_' . $post->ID . '_' . strtotime( $post->post_modified_gmt ) );
-        $cached = get_transient( $key );
-        if ( false !== $cached ) {
-            computerjy_markdown_emit( $cached );
-        }
-
-        $GLOBALS['post'] = $post; // phpcs:ignore WordPress.WP.GlobalVariablesOverride
-        setup_postdata( $post );
-
-        $title      = html_entity_decode( wp_strip_all_tags( get_the_title( $post ) ), ENT_QUOTES, 'UTF-8' );
-        $date       = get_the_date( 'F j, Y', $post );
-        $categories = get_the_category( $post->ID );
-        $category   = empty( $categories ) ? 'Tech' : $categories[0]->name;
-        $author     = get_the_author_meta( 'display_name', $post->post_author );
-        $content    = computerjy_html_to_markdown( apply_filters( 'the_content', $post->post_content ) );
-
-        $output  = "# {$title}\n\n";
-        $output .= "*Published: {$date} | Category: {$category} | Author: {$author}*\n";
-        $output .= '*URL: ' . get_permalink( $post ) . "*\n\n";
-        $output .= "---\n\n";
-        $output .= $content . "\n\n";
-        $output .= "---\n";
-        $output .= "*{$site_name} — {$home}*\n";
-
-        wp_reset_postdata();
-
-        set_transient( $key, $output, 12 * HOUR_IN_SECONDS );
-        computerjy_markdown_emit( $output );
+// 1. Single post, resolved through the rewrite rules so a permalink change
+// cannot leave this handler matching a structure the site no longer uses.
+// url_to_postid() takes the URL as a string, so the REQUEST_URI re-key
+// above does not affect it.
+//
+// Password-protected posts must not have their content rendered here. The
+// row's post_password is checked directly: post_password_required() needs
+// the global $post, which is only set up below (setup_postdata(), also
+// needed by the_content filters that read $post->ID) once the post is known
+// to be public.
+$post_id = '/' === $uri ? 0 : url_to_postid( home_url( $uri ) );
+$post    = $post_id ? get_post( $post_id ) : null;
+if ( $post && 'post' === $post->post_type && 'publish' === $post->post_status && empty( $post->post_password ) ) {
+    $key    = computerjy_markdown_cache_key( 'md_post_' . $post->ID . '_' . strtotime( $post->post_modified_gmt ) );
+    $cached = get_transient( $key );
+    if ( false !== $cached ) {
+        computerjy_markdown_emit( $cached );
     }
+
+    $GLOBALS['post'] = $post; // phpcs:ignore WordPress.WP.GlobalVariablesOverride
+    setup_postdata( $post );
+
+    $title      = html_entity_decode( wp_strip_all_tags( get_the_title( $post ) ), ENT_QUOTES, 'UTF-8' );
+    $date       = get_the_date( 'F j, Y', $post );
+    $categories = get_the_category( $post->ID );
+    $category   = empty( $categories ) ? 'Tech' : $categories[0]->name;
+    $author     = get_the_author_meta( 'display_name', $post->post_author );
+    $content    = computerjy_html_to_markdown( apply_filters( 'the_content', $post->post_content ) );
+
+    $output  = "# {$title}\n\n";
+    $output .= "*Published: {$date} | Category: {$category} | Author: {$author}*\n";
+    $output .= '*URL: ' . get_permalink( $post ) . "*\n\n";
+    $output .= "---\n\n";
+    $output .= $content . "\n\n";
+    $output .= "---\n";
+    $output .= "*{$site_name} — {$home}*\n";
+
+    wp_reset_postdata();
+
+    set_transient( $key, $output, 12 * HOUR_IN_SECONDS );
+    computerjy_markdown_emit( $output );
 }
 
 // 2. Everything else: the site summary with the latest articles. Rendering
