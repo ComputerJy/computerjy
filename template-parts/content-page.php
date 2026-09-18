@@ -6,12 +6,12 @@
  */
 ?>
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
-    <header style="padding-bottom:16px;border-bottom:1px solid var(--border-color);margin-bottom:22px">
-        <h1 class="entry-title" style="font-size:clamp(28px,4vw,40px);margin:0"><?php the_title(); ?></h1>
+    <header class="page-header">
+        <h1 class="entry-title"><?php the_title(); ?></h1>
     </header>
 
     <?php if ( has_post_thumbnail() && ! is_front_page() ) : ?>
-        <div class="post-thumb" style="margin-bottom:22px"><?php the_post_thumbnail( 'computerjy2-lead' ); ?></div>
+        <div class="post-thumb page-thumb"><?php the_post_thumbnail( 'computerjy2-lead' ); ?></div>
     <?php endif; ?>
 
     <div class="entry-content">
@@ -22,7 +22,7 @@
     </div>
 
     <?php if ( get_edit_post_link() ) : ?>
-        <footer style="margin-top:18px">
+        <footer class="page-footer">
             <?php edit_post_link( esc_html__( 'Edit', 'computerjy2' ), '<span class="entry-meta-mono">', '</span>' ); ?>
         </footer>
     <?php endif; ?>

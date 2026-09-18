@@ -15,7 +15,7 @@ get_header();
         <div class="state-code">404</div>
         <h1 class="state-title"><?php esc_html_e( 'Page not found', 'computerjy2' ); ?></h1>
         <p class="state-text"><?php esc_html_e( 'That address does not resolve. Try a search, or pick something from the latest posts below.', 'computerjy2' ); ?></p>
-        <div style="max-width:380px;margin:0 auto"><?php get_search_form(); ?></div>
+        <div class="state-search"><?php get_search_form(); ?></div>
     </div>
 
     <div class="section-header-bar">
