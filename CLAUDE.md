@@ -32,8 +32,11 @@ not introduce a bundler without asking.
 - `npm test` — vitest over `tests/`: `scripts/`, `deploy/`, the vhost, and
   PHP helpers driven through `php -r` (files that must load from the CLI
   return early on `PHP_SAPI === 'cli'`, e.g. `public/markdown.php`).
-- `composer install && composer lint` — phpcs with WordPress-Extra
-  (`phpcs.xml`); `npm run lint:php` is the plain `php -l` sweep.
+- `composer install && composer lint` — phpcs with the security / i18n /
+  prefix rules in `phpcs.xml`; `npm run lint:php` is the plain `php -l` sweep.
+- CI (`.github/workflows/ci.yml`) is one job running exactly those commands
+  plus `npm run format:check`, `npm test` and actionlint; `ci` and `CodeQL`
+  are the required checks on `main`.
 - No WordPress runs locally. WP-bound code is verified against the origin
   through an SSH tunnel (creds in `.env`):
   `ssh -i $KEY_PATH -f -N -L 8443:127.0.0.1:443 $SERVER_USER@$SERVER_HOST`, then
@@ -122,10 +125,11 @@ Keep them in sync when you change markup structure.
   furniture (`--font-mono`) and humanist for body copy (`--font-body`).
 - Escape on output (`esc_html`, `esc_url`, `esc_attr`, `wp_kses_post`). The one
   deliberate exception is admin-entered sponsor markup in `inc/slots.php`.
-- `phpcs.xml` applies WordPress-Extra: 4-space indent, Yoda conditions
-  (`'publish' === $status`), spaces inside parentheses, text domain
-  `computerjy2` (prefix `computerjy` is allowed only for the standalone
-  plugins).
+- `phpcs.xml` enforces `WordPress.Security`, `WordPress.DB`, deprecated-API
+  checks, the `computerjy2` text domain and global prefixing (prefix
+  `computerjy` is allowed only for the standalone plugins). WordPress style —
+  4-space indent, Yoda conditions (`'publish' === $status`), spaces inside
+  parentheses — is convention here, not lint-enforced.
 - Transients use the `cjy2_` prefix. `inc/related.php` stamps its keys with a
   generation number (`computerjy2_cache_key()`); `computerjy2_flush_caches()`
   bumps it on real saves (not autosaves/revisions), approved comments and
