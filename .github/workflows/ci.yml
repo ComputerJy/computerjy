@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  # One job on purpose: each step is seconds of work, so separate runners
+  # spent more time on checkout than on checks. The job id `ci` is the
+  # required status check in the "Protect main" ruleset.
+  ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - run: npm ci
+
+      # The runner image ships PHP and Composer; composer.json pins WPCS.
+      - run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: PHP syntax
+        run: npm run lint:php
+
+      - name: phpcs (security, i18n, prefixing)
+        run: composer lint
+
+      - name: Prettier
+        run: npm run format:check
+
+      - name: Tests
+        run: npm test
+
+      - name: actionlint
+        uses: reviewdog/action-actionlint@ab7138020abfe6cd20b742c82e5b7a9749fb5884 # v1.75.0
+        with:
+          fail_level: error
