@@ -169,15 +169,15 @@ function computerjy2_editor_assets() {
 add_action( 'enqueue_block_editor_assets', 'computerjy2_editor_assets' );
 
 /**
- * Preload the two latin files every page needs (body and heading faces) so
- * they are fetched with the HTML instead of after fonts.css is parsed.
- * unicode-range keeps latin-ext and the mono face on demand.
+ * Preload the three latin files every page needs (body, heading and the mono
+ * furniture face) so they are fetched with the HTML instead of after the
+ * CSS is parsed. unicode-range keeps latin-ext on demand.
  *
  * @param array $resources Preload entries.
  * @return array
  */
 function computerjy2_preload_fonts( $resources ) {
-    foreach ( array( 'inter-latin', 'plus-jakarta-sans-latin' ) as $file ) {
+    foreach ( array( 'inter-latin', 'plus-jakarta-sans-latin', 'jetbrains-mono-latin' ) as $file ) {
         $resources[] = array(
             'href'        => get_template_directory_uri() . '/assets/fonts/' . $file . '.woff2',
             'as'          => 'font',
