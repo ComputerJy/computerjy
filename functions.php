@@ -84,9 +84,10 @@ function computerjy2_widgets_init() {
         'after_title'   => '</h3>',
     ) );
 
-    foreach ( array( 1 => 'Footer Column 1', 2 => 'Footer Column 2', 3 => 'Footer Column 3' ) as $i => $label ) {
+    for ( $i = 1; $i <= 3; $i++ ) {
         register_sidebar( array(
-            'name'          => $label,
+            /* translators: %d: footer column number */
+            'name'          => sprintf( __( 'Footer Column %d', 'computerjy2' ), $i ),
             'id'            => 'footer-' . $i,
             'before_widget' => '<div id="%1$s" class="footer-widget %2$s">',
             'after_widget'  => '</div>',
@@ -213,9 +214,16 @@ function computerjy2_body_classes( $classes ) {
 }
 add_filter( 'body_class', 'computerjy2_body_classes' );
 
-/** Excerpt tuning. */
-add_filter( 'excerpt_length', function () { return 28; } );
-add_filter( 'excerpt_more', function () { return '&hellip;'; } );
+/** Excerpt tuning (named so a child theme can remove_filter them). */
+function computerjy2_excerpt_length() {
+    return 28;
+}
+add_filter( 'excerpt_length', 'computerjy2_excerpt_length' );
+
+function computerjy2_excerpt_more() {
+    return '&hellip;';
+}
+add_filter( 'excerpt_more', 'computerjy2_excerpt_more' );
 
 /** Include modules. */
 require_once get_template_directory() . '/inc/template-tags.php';
