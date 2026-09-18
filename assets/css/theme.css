@@ -1810,7 +1810,30 @@ button.submit {
   display: inline-block !important;
 }
 
-/* Fix Jetpack Infinite Scroll button */
+/* Jetpack Infinite Scroll (infinity.css is dequeued; these replace it) */
+.infinite-loader {
+  display: block;
+  height: 28px;
+  text-align: center;
+}
+.infinite-loader .infinite-loader-spinner {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+}
+#infinite-aria {
+  position: absolute;
+  overflow: hidden;
+  clip-path: inset(50%);
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+}
+.infinite-wrap:focus {
+  outline: 0;
+}
 #infinite-handle {
   display: flex;
   justify-content: center;

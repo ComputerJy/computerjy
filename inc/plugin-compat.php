@@ -55,6 +55,15 @@ function computerjy2_jetpack_setup() {
 }
 add_action( 'after_setup_theme', 'computerjy2_jetpack_setup' );
 
+/**
+ * Jetpack's infinity.css is a third-party render-blocking request (#132); the
+ * few rules the click-to-load button needs live in theme.css §Jetpack.
+ */
+function computerjy2_dequeue_infinite_scroll_css() {
+    wp_dequeue_style( 'the-neverending-homepage' );
+}
+add_action( 'wp_enqueue_scripts', 'computerjy2_dequeue_infinite_scroll_css', 99 );
+
 function computerjy2_infinite_scroll_render() {
     while ( have_posts() ) {
         the_post();
