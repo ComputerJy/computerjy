@@ -60,13 +60,12 @@ function computerjy2_content_width() {
 add_action( 'after_setup_theme', 'computerjy2_content_width', 0 );
 
 /**
- * Posts per page default (user-configurable in Settings > Reading).
+ * Posts per page for the feed and archives: Settings > Reading, overridable
+ * with the computerjy2_posts_per_page filter.
  */
 function computerjy2_default_posts_per_page( $query ) {
     if ( ! is_admin() && $query->is_main_query() && ( $query->is_home() || $query->is_archive() ) ) {
-        if ( ! get_option( 'computerjy2_respect_reading_setting' ) ) {
-            $query->set( 'posts_per_page', apply_filters( 'computerjy2_posts_per_page', 15 ) );
-        }
+        $query->set( 'posts_per_page', (int) apply_filters( 'computerjy2_posts_per_page', get_option( 'posts_per_page', 10 ) ) );
     }
 }
 add_action( 'pre_get_posts', 'computerjy2_default_posts_per_page' );
