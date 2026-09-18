@@ -40,7 +40,7 @@ get_header();
     </header>
 
     <?php if ( have_posts() ) : ?>
-        <div class="section-header-bar" style="padding-top:18px">
+        <div class="section-header-bar section-header-bar--spaced">
             <h2 class="section-heading"><?php esc_html_e( 'Posts', 'computerjy2' ); ?></h2>
             <div class="section-rule"></div>
         </div>

@@ -13,18 +13,18 @@ $cjy_author = get_queried_object();
 
     <div class="container"><?php computerjy2_slot( 'leaderboard', __( 'Leaderboard', 'computerjy2' ) ); ?></div>
 
-    <section class="landing-hero" style="text-align:left">
+    <section class="landing-hero landing-hero--left">
         <div class="container">
             <?php computerjy2_breadcrumbs(); ?>
-            <div style="display:flex;gap:18px;align-items:flex-start;margin-top:14px;flex-wrap:wrap">
-                <?php echo get_avatar( $cjy_author->ID, 96, '', '', array( 'style' => 'flex:none' ) ); ?>
-                <div style="flex:1;min-width:260px">
+            <div class="author-hero">
+                <?php echo get_avatar( $cjy_author->ID, 96, '', '', array( 'class' => 'author-hero-avatar' ) ); ?>
+                <div class="author-hero-body">
                     <span class="archive-kicker"><?php esc_html_e( 'Author', 'computerjy2' ); ?></span>
-                    <h1 style="margin:10px 0 8px;text-align:left"><?php echo esc_html( get_the_author_meta( 'display_name', $cjy_author->ID ) ); ?></h1>
+                    <h1><?php echo esc_html( get_the_author_meta( 'display_name', $cjy_author->ID ) ); ?></h1>
                     <?php if ( get_the_author_meta( 'description', $cjy_author->ID ) ) : ?>
-                        <p style="margin:0;text-align:left;max-width:62ch"><?php echo esc_html( get_the_author_meta( 'description', $cjy_author->ID ) ); ?></p>
+                        <p class="author-hero-bio"><?php echo esc_html( get_the_author_meta( 'description', $cjy_author->ID ) ); ?></p>
                     <?php endif; ?>
-                    <p class="entry-meta-mono" style="margin-top:12px">
+                    <p class="entry-meta-mono">
                         <?php
                         $cjy_count = (int) count_user_posts( $cjy_author->ID, 'post' );
                         /* translators: %d: post count */
@@ -39,7 +39,7 @@ $cjy_author = get_queried_object();
         </div>
     </section>
 
-    <div class="container" style="padding-top:22px">
+    <div class="container archive-feed">
         <?php if ( have_posts() ) : ?>
             <div class="tile-grid grid-3" id="primary-feed">
                 <?php

@@ -124,7 +124,7 @@
 <div class="search-modal-backdrop">
     <div class="search-modal-card" role="dialog" aria-modal="true" aria-label="<?php esc_attr_e( 'Search', 'computerjy2' ); ?>">
         <div class="search-modal-header">
-            <form role="search" method="get" action="<?php echo esc_url( home_url( '/' ) ); ?>" style="flex:1">
+            <form role="search" method="get" class="search-modal-form" action="<?php echo esc_url( home_url( '/' ) ); ?>">
                 <label class="screen-reader-text" for="cjy-search"><?php esc_html_e( 'Search for:', 'computerjy2' ); ?></label>
                 <input type="search" id="cjy-search" class="search-modal-input" name="s" value="<?php echo esc_attr( get_search_query() ); ?>" placeholder="<?php esc_attr_e( 'Type keywords and press Enter…', 'computerjy2' ); ?>" autocomplete="off">
             </form>

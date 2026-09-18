@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
     <?php if ( get_the_author_meta( 'description' ) ) : ?>
         <p><?php echo esc_html( get_the_author_meta( 'description' ) ); ?></p>
     <?php endif; ?>
-    <p style="margin-top:10px">
+    <p class="author-more">
         <a class="entry-meta-mono" href="<?php echo esc_url( get_author_posts_url( get_the_author_meta( 'ID' ) ) ); ?>"><?php esc_html_e( 'ALL POSTS →', 'computerjy2' ); ?></a>
     </p>
 </div>

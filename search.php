@@ -22,11 +22,11 @@ global $wp_query;
             printf( esc_html( _n( '%d RESULT', '%d RESULTS', (int) $wp_query->found_posts, 'computerjy2' ) ), (int) $wp_query->found_posts );
             ?>
         </p>
-        <div style="margin-top:14px;max-width:420px"><?php get_search_form(); ?></div>
+        <div class="archive-search"><?php get_search_form(); ?></div>
     </header>
 
     <?php if ( have_posts() ) : ?>
-        <div class="tile-grid grid-3" id="primary-feed" style="margin-top:22px">
+        <div class="tile-grid grid-3 feed-spaced" id="primary-feed">
             <?php
             while ( have_posts() ) :
                 the_post();

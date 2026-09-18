@@ -17,5 +17,5 @@
         }
         ?>
     </p>
-    <div style="max-width:380px;margin:0 auto"><?php get_search_form(); ?></div>
+    <div class="state-search"><?php get_search_form(); ?></div>
 </section>
