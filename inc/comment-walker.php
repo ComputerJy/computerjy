@@ -15,7 +15,7 @@ function computerjy2_comment( $comment, $args, $depth ) {
             <div class="comment-bubble">
                 <div class="comment-header">
                     <?php echo get_comment_author_link(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-                    <?php if ( user_can( (int) $comment->user_id, 'edit_posts' ) ) : ?>
+                    <?php if ( $comment->user_id && (int) $comment->user_id === (int) get_post( $comment->comment_post_ID )->post_author ) : ?>
                         <span class="comment-date">&middot; <?php esc_html_e( 'AUTHOR', 'computerjy2' ); ?></span>
                     <?php endif; ?>
                     <span class="comment-date">&middot; <?php echo esc_html( human_time_diff( get_comment_time( 'U' ), current_time( 'timestamp' ) ) ); ?></span>
