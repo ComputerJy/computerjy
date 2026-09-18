@@ -13,6 +13,7 @@ get_header();
     <?php computerjy2_slot( 'leaderboard', __( 'Leaderboard', 'computerjy2' ) ); ?>
 
     <?php if ( is_home() && ! is_paged() ) : ?>
+        <h1 class="screen-reader-text"><?php bloginfo( 'name' ); ?> &mdash; <?php bloginfo( 'description' ); ?></h1>
         <?php computerjy2_eyebrow_strip(); ?>
     <?php else : ?>
         <?php computerjy2_breadcrumbs(); ?>

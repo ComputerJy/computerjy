@@ -40,7 +40,7 @@
                 <?php if ( is_active_sidebar( 'footer-3' ) ) : ?>
                     <?php dynamic_sidebar( 'footer-3' ); ?>
                 <?php else : ?>
-                    <h4 class="footer-col-title"><?php esc_html_e( 'Elsewhere', 'computerjy2' ); ?></h4>
+                    <h2 class="footer-col-title"><?php esc_html_e( 'Elsewhere', 'computerjy2' ); ?></h2>
                     <?php computerjy2_profile_links(); ?>
                     <div class="footer-legal">
                         <?php
