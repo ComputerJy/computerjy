@@ -102,13 +102,13 @@ add_action( 'widgets_init', 'computerjy2_widgets_init' );
  * Front-end assets.
  */
 function computerjy2_scripts() {
-    computerjy2_enqueue_fonts();
-
     $css_ver = computerjy2_asset_version( 'assets/css/theme.css' );
     $js_ver  = computerjy2_asset_version( 'assets/js/theme.js' );
 
+    // theme.css is the only render-blocking request: fonts.css ships inline
+    // next to it and style.css carries nothing but the theme header (#132).
     wp_enqueue_style( 'computerjy2-theme', get_template_directory_uri() . '/assets/css/theme.css', array(), $css_ver );
-    wp_enqueue_style( 'computerjy2-style', get_stylesheet_uri(), array( 'computerjy2-theme' ), $css_ver );
+    wp_add_inline_style( 'computerjy2-theme', computerjy2_inline_fonts_css() );
 
     wp_enqueue_script( 'computerjy2-theme', get_template_directory_uri() . '/assets/js/theme.js', array(), $js_ver, array( 'strategy' => 'defer', 'in_footer' => true ) );
 
@@ -137,8 +137,8 @@ function computerjy2_asset_version( $rel ) {
 
 /**
  * Self-hosted Inter, Plus Jakarta Sans and JetBrains Mono (assets/css/fonts.css,
- * files in assets/fonts). The only third-party render-blocking request used to
- * be Google Fonts; now the vhost serves the woff2 with a 1-year Expires.
+ * files in assets/fonts). The block editor loads the file; the front end
+ * inlines it (computerjy2_inline_fonts_css) to save a blocking request.
  */
 function computerjy2_enqueue_fonts() {
     wp_enqueue_style(
@@ -147,6 +147,17 @@ function computerjy2_enqueue_fonts() {
         array(),
         computerjy2_asset_version( 'assets/css/fonts.css' )
     );
+}
+
+/**
+ * fonts.css with its relative `../fonts/` URLs made absolute, so the
+ * @font-face rules can ship inline in the HTML ahead of theme.css.
+ *
+ * @return string
+ */
+function computerjy2_inline_fonts_css() {
+    $css = (string) file_get_contents( get_template_directory() . '/assets/css/fonts.css' );
+    return str_replace( "url('../fonts/", "url('" . get_template_directory_uri() . "/assets/fonts/", $css );
 }
 
 /**
