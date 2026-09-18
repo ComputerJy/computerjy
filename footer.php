@@ -46,8 +46,8 @@
                         <?php
                         if ( has_nav_menu( 'footer' ) ) {
                             wp_nav_menu( array( 'theme_location' => 'footer', 'menu_class' => 'footer-links', 'container' => false, 'depth' => 1 ) );
-                        } else {
-                            echo '<a href="' . esc_url( home_url( '/privacy-policy-2/' ) ) . '">' . esc_html__( 'Privacy Policy', 'computerjy2' ) . '</a>';
+                        } elseif ( get_privacy_policy_url() ) {
+                            echo '<a href="' . esc_url( get_privacy_policy_url() ) . '">' . esc_html__( 'Privacy Policy', 'computerjy2' ) . '</a>';
                         }
                         ?>
                     </div>

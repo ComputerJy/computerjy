@@ -18,7 +18,7 @@ function computerjy2_comment( $comment, $args, $depth ) {
                     <?php if ( $comment->user_id && (int) $comment->user_id === (int) get_post( $comment->comment_post_ID )->post_author ) : ?>
                         <span class="comment-date">&middot; <?php esc_html_e( 'AUTHOR', 'computerjy2' ); ?></span>
                     <?php endif; ?>
-                    <span class="comment-date">&middot; <?php echo esc_html( human_time_diff( get_comment_time( 'U' ), current_time( 'timestamp' ) ) ); ?></span>
+                    <span class="comment-date">&middot; <?php echo esc_html( human_time_diff( get_comment_time( 'U', true ) ) ); ?></span>
                 </div>
 
                 <div class="comment-body">

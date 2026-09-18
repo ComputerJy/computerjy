@@ -71,17 +71,10 @@ function computerjy2_jetpack_related( $options ) {
 }
 add_filter( 'jetpack_relatedposts_filter_options', 'computerjy2_jetpack_related' );
 
-// Sharing buttons: theme renders its own share row, so move Jetpack's out of the content.
-add_filter( 'jetpack_sharing_display_markup', function ( $markup ) { return $markup; } );
-
 /* ---------- SEO plugins ---------- */
 
 // The theme prints its own breadcrumb trail only when neither plugin is active
-// (see computerjy2_breadcrumbs), so nothing to disable here; just make sure the
-// title tag stays with the plugin when one is present.
-function computerjy2_seo_notice() {
-    // Intentionally empty: title-tag support is compatible with both plugins.
-}
+// (see computerjy2_breadcrumbs); title-tag support is compatible with both.
 
 /* ---------- AMP-safe output ---------- */
 

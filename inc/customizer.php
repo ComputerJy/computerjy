@@ -39,8 +39,13 @@ function computerjy2_customize_register( $wp_customize ) {
     ) );
 
     $socials = array(
-        'twitter' => 'X / Twitter URL', 'facebook' => 'Facebook URL', 'instagram' => 'Instagram URL',
-        'linkedin' => 'LinkedIn URL', 'youtube' => 'YouTube URL', 'github' => 'GitHub URL', 'rss' => 'RSS URL',
+        'twitter'   => __( 'X / Twitter URL', 'computerjy2' ),
+        'facebook'  => __( 'Facebook URL', 'computerjy2' ),
+        'instagram' => __( 'Instagram URL', 'computerjy2' ),
+        'linkedin'  => __( 'LinkedIn URL', 'computerjy2' ),
+        'youtube'   => __( 'YouTube URL', 'computerjy2' ),
+        'github'    => __( 'GitHub URL', 'computerjy2' ),
+        'rss'       => __( 'RSS URL', 'computerjy2' ),
     );
     foreach ( $socials as $key => $label ) {
         $wp_customize->add_setting( 'computerjy2_social_' . $key, array( 'default' => '', 'sanitize_callback' => 'esc_url_raw' ) );
