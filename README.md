@@ -21,7 +21,8 @@ Upload in **Appearance → Themes → Add New → Upload Theme**, then:
    and social URLs.
 3. **Appearance → Customize → ComputerJy: Sponsor Slots** — paste AdSense or
    sponsor markup per slot.
-4. **Settings → Reading** — posts per page (the theme defaults to 15).
+4. **Settings → Reading** — posts per page (`computerjy2_posts_per_page`
+   filter overrides it in code).
 5. Copy `logo-icon.svg` into `assets/images/` or set a custom logo.
 
 ## Templates
