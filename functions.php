@@ -40,6 +40,7 @@ function computerjy2_setup() {
     set_post_thumbnail_size( 720, 420, true );
     add_image_size( 'computerjy2-hero', 1600, 900, true );
     add_image_size( 'computerjy2-lead', 1024, 576, true );
+    add_image_size( 'computerjy2-lead-sm', 768, 432, true ); // srcset candidate for phones (362px × 2dpr) (#133)
     add_image_size( 'computerjy2-card', 640, 400, true );
     add_image_size( 'computerjy2-side', 360, 234, true );
 
