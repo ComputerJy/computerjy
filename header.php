@@ -97,7 +97,7 @@
 </header>
 
 <div class="mobile-drawer-backdrop">
-    <aside class="mobile-drawer" id="cjy-mobile-drawer" aria-label="<?php esc_attr_e( 'Mobile menu', 'computerjy2' ); ?>">
+    <aside class="mobile-drawer" id="cjy-mobile-drawer" role="dialog" aria-modal="true" aria-label="<?php esc_attr_e( 'Mobile menu', 'computerjy2' ); ?>">
         <div class="mobile-drawer-header">
             <span class="brand-word"><?php echo wp_kses_post( computerjy2_brand_mark() ); ?></span>
             <button class="search-close-btn" type="button" aria-label="<?php esc_attr_e( 'Close menu', 'computerjy2' ); ?>">ESC</button>

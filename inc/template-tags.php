@@ -163,8 +163,8 @@ function computerjy2_byline_links( $position = 'top' ) {
     $class  = 'bottom' === $position ? 'byline-links post-links-group' : 'byline-links';
     ?>
     <div class="<?php echo esc_attr( $class ); ?>">
-        <a class="<?php echo 'bottom' === $position ? 'link-primary' : ''; ?>" href="<?php echo esc_url( $x_url ); ?>" target="_blank" rel="noopener noreferrer"><?php echo 'bottom' === $position ? esc_html__( 'Share X', 'computerjy2' ) : 'X'; ?></a>
-        <a href="<?php echo esc_url( $fb_url ); ?>" target="_blank" rel="noopener noreferrer">FB</a>
+        <a class="<?php echo 'bottom' === $position ? 'link-primary' : ''; ?>" href="<?php echo esc_url( $x_url ); ?>" target="_blank" rel="noopener noreferrer" aria-label="<?php esc_attr_e( 'Share on X', 'computerjy2' ); ?>"><?php echo 'bottom' === $position ? esc_html__( 'Share X', 'computerjy2' ) : 'X'; ?></a>
+        <a href="<?php echo esc_url( $fb_url ); ?>" target="_blank" rel="noopener noreferrer" aria-label="<?php esc_attr_e( 'Share on Facebook', 'computerjy2' ); ?>">FB</a>
         <button type="button" data-copy-link="<?php echo esc_url( get_permalink() ); ?>"><?php esc_html_e( 'Copy link', 'computerjy2' ); ?></button>
     </div>
     <?php

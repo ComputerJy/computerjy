@@ -89,6 +89,8 @@
       <aside
         class="mobile-drawer"
         id="cjy-mobile-drawer"
+        role="dialog"
+        aria-modal="true"
         aria-label="Mobile menu"
       >
         <div class="mobile-drawer-header">
@@ -218,7 +220,8 @@
                 ></span
               >
               <div class="byline-links">
-                <a href="#">X</a><a href="#">FB</a
+                <a href="#" aria-label="Share on X">X</a
+                ><a href="#" aria-label="Share on Facebook">FB</a
                 ><button type="button" data-copy-link="#">Copy link</button>
               </div>
             </div>
@@ -278,7 +281,8 @@
                 ><a class="tag-chip" href="#">internet</a>
               </div>
               <div class="byline-links post-links-group">
-                <a class="link-primary" href="#">Share X</a
+                <a class="link-primary" href="#" aria-label="Share on X"
+                  >Share X</a
                 ><button type="button" data-copy-link="#">Copy link</button>
               </div>
             </div>
