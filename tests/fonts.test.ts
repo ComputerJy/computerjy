@@ -59,13 +59,9 @@ describe.each(['preview-home.html', 'preview-single.html'])(
   '%s preloads',
   (file) => {
     const html = readFileSync(file, 'utf8');
-    it('loads fonts.css and preloads the body, heading and mono latin files', () => {
+    it('loads fonts.css and preloads the body and heading latin files only', () => {
       expect(html).toContain('href="assets/css/fonts.css"');
-      for (const f of [
-        'inter-latin.woff2',
-        'plus-jakarta-sans-latin.woff2',
-        'jetbrains-mono-latin.woff2',
-      ]) {
+      for (const f of ['inter-latin.woff2', 'plus-jakarta-sans-latin.woff2']) {
         expect(html).toMatch(
           new RegExp(
             `<link[^>]*rel="preload"[^>]*href="assets/fonts/${f}"[^>]*>`
@@ -73,6 +69,8 @@ describe.each(['preview-home.html', 'preview-single.html'])(
         );
         expect(files).toContain(f);
       }
+      // Mono is furniture text, never in the LCP element (#144).
+      expect(html).not.toMatch(/rel="preload"[^>]*jetbrains-mono/);
     });
   }
 );

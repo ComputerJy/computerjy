@@ -103,13 +103,14 @@ add_action( 'widgets_init', 'computerjy2_widgets_init' );
  * Front-end assets.
  */
 function computerjy2_scripts() {
-    $css_ver = computerjy2_asset_version( 'assets/css/theme.css' );
-    $js_ver  = computerjy2_asset_version( 'assets/js/theme.js' );
+    $js_ver = computerjy2_asset_version( 'assets/js/theme.js' );
 
-    // theme.css is the only render-blocking request: fonts.css ships inline
-    // next to it and style.css carries nothing but the theme header (#132).
-    wp_enqueue_style( 'computerjy2-theme', get_template_directory_uri() . '/assets/css/theme.css', array(), $css_ver );
-    wp_add_inline_style( 'computerjy2-theme', computerjy2_inline_fonts_css() );
+    // No render-blocking stylesheet at all: fonts.css and theme.css (~8 KB
+    // gzipped) ship inline in <head> under one src-less handle, which keeps
+    // wp_add_inline_style() working for Jetpack's content options (#144).
+    wp_register_style( 'computerjy2-theme', false, array(), COMPUTERJY2_VERSION );
+    wp_enqueue_style( 'computerjy2-theme' );
+    wp_add_inline_style( 'computerjy2-theme', computerjy2_inline_fonts_css() . computerjy2_inline_theme_css() );
 
     wp_enqueue_script( 'computerjy2-theme', get_template_directory_uri() . '/assets/js/theme.js', array(), $js_ver, array( 'strategy' => 'defer', 'in_footer' => true ) );
 
@@ -162,6 +163,16 @@ function computerjy2_inline_fonts_css() {
 }
 
 /**
+ * theme.css for inlining. Read every render, which is fine: W3TC's page
+ * cache serves anonymous HTML and file_get_contents is microseconds.
+ *
+ * @return string
+ */
+function computerjy2_inline_theme_css() {
+    return (string) file_get_contents( get_template_directory() . '/assets/css/theme.css' );
+}
+
+/**
  * Block editor assets (fonts, so the editor matches the front end).
  */
 function computerjy2_editor_assets() {
@@ -170,15 +181,17 @@ function computerjy2_editor_assets() {
 add_action( 'enqueue_block_editor_assets', 'computerjy2_editor_assets' );
 
 /**
- * Preload the three latin files every page needs (body, heading and the mono
- * furniture face) so they are fetched with the HTML instead of after the
- * CSS is parsed. unicode-range keeps latin-ext on demand.
+ * Preload the body and heading latin files so they are fetched with the HTML
+ * instead of after the CSS is parsed. The mono face is furniture text only,
+ * never in the LCP element, so it loads on demand and stops competing with
+ * the lead image on throttled links (#144). unicode-range keeps latin-ext on
+ * demand.
  *
  * @param array $resources Preload entries.
  * @return array
  */
 function computerjy2_preload_fonts( $resources ) {
-    foreach ( array( 'inter-latin', 'plus-jakarta-sans-latin', 'jetbrains-mono-latin' ) as $file ) {
+    foreach ( array( 'inter-latin', 'plus-jakarta-sans-latin' ) as $file ) {
         $resources[] = array(
             'href'        => get_template_directory_uri() . '/assets/fonts/' . $file . '.woff2',
             'as'          => 'font',
@@ -193,6 +206,11 @@ add_filter( 'wp_preload_resources', 'computerjy2_preload_fonts' );
 /**
  * Google Analytics 4, when a measurement ID is configured.
  * Not printed for logged-in editors, and skipped on AMP requests.
+ *
+ * gtag.js (~185 KB per container through Cloudflare's tag gateway) is the
+ * largest thing on the page, so it is fetched on the first interaction or
+ * once the page has loaded and gone idle, never during the LCP window (#145).
+ * The dataLayer stub queues the pageview until then.
  */
 function computerjy2_analytics() {
     // Re-validated at render: theme mods can be set outside the Customizer.
@@ -201,12 +219,28 @@ function computerjy2_analytics() {
         return;
     }
     ?>
-    <script async src="<?php echo esc_url( 'https://www.googletagmanager.com/gtag/js?id=' . $id ); ?>"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
         gtag('config', <?php echo wp_json_encode( $id ); ?>);
+        (function(){
+            var loaded = false;
+            function load(){
+                if (loaded) return;
+                loaded = true;
+                var s = document.createElement('script');
+                s.async = true;
+                s.src = <?php echo wp_json_encode( 'https://www.googletagmanager.com/gtag/js?id=' . $id ); ?>;
+                document.head.appendChild(s);
+            }
+            ['pointerdown', 'keydown', 'scroll', 'touchstart'].forEach(function(e){
+                addEventListener(e, load, { once: true, passive: true });
+            });
+            addEventListener('load', function(){
+                (window.requestIdleCallback || setTimeout)(load);
+            });
+        })();
     </script>
     <?php
 }
