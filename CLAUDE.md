@@ -32,15 +32,19 @@ leftovers from the Astro era — ignore them.
 edge-cache purge), hand-installed into `wp-content/plugins`, never required by
 `functions.php`; their secrets are `wp-config.php` constants.
 
-There is no build step. CSS and JS are hand-written and enqueued directly; do
-not introduce a bundler without asking.
+There is no build step. CSS and JS are hand-written; do not introduce a bundler
+without asking. `functions.php` inlines `theme.css` + `fonts.css` into `<head>`
+under the src-less `computerjy2-theme` handle (nothing render-blocking), so the
+live HTML has no stylesheet `<link>`; the files still ship for the previews and
+the block editor. `tests/head-assets.test.ts` guards this and the gtag defer.
 
 ## Verification
 
 - `npm test` — vitest over `tests/`: `scripts/`, `deploy/`, the vhost, and
   PHP helpers driven through `php -r` (files that must load from the CLI
   return early on `PHP_SAPI === 'cli'`, e.g. `public/markdown.php`).
-- `composer install && composer lint` — phpcs with the security / i18n /
+- `composer install && composer lint` (or `vendor/bin/phpcs <file>` when
+  `composer` isn't on PATH) — phpcs with the security / i18n /
   prefix rules in `phpcs.xml`; `npm run lint:php` is the plain `php -l` sweep.
 - CI (`.github/workflows/ci.yml`) is one job running exactly those commands
   plus `npm run format:check`, `npm test` and actionlint; `ci` and `CodeQL`
@@ -73,6 +77,13 @@ Keep them in sync when you change markup structure.
   (`not any(http.request.headers["accept"][*] contains "text/markdown")`) —
   Cloudflare ignores `Vary`, so without it agents receive cached HTML. Manual
   purge: `wp eval 'computerjy_edge_cache_purge();'`.
+- Cloudflare's **Google tag gateway must stay off** — it injects its own gtag
+  snippet (`/wow2/`) at the edge, and once carried the dead Astro property
+  `G-0E6WH95Q6Z` (still in `.env`). The only GA4 property is `G-MYP6LK1T99`
+  (theme mod `computerjy2_ga4_id`); the theme loads it after first
+  interaction / idle. Cloudflare Web Analytics (`beacon.min.js`) stays on.
+  Edge injections only appear with a browser UA **and** `Accept: text/html` —
+  plain `curl` gets a clean page, so verify with both headers.
 - W3TC: page cache Disk:Enhanced, object cache Redis (shared with wp-cli via
   `objectcache.enabled_for_wp_cli`, so cron and deploy flushes are real),
   database cache **off**. Keep **off**: Browser Cache → HTML and "Other"
