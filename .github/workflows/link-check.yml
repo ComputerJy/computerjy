@@ -1,0 +1,60 @@
+name: Link check
+
+# Monthly replacement for the broken-link-checker plugin (removed 2026-09-19):
+# it crawled the origin every ten minutes from WP-Cron; this reads the Yoast
+# sitemaps from the edge and checks every link on every public page from a
+# runner instead. A red run is the notification; the job summary lists what
+# broke and where. Nothing here writes to the site.
+#
+# `schedule:` triggers are disabled by GitHub after 60 days without commits;
+# see cert-expiry-monitor.yml for the same caveat.
+
+on:
+  schedule:
+    # First of the month, 06:00 UTC.
+    - cron: '0 6 1 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  SITEMAP: https://www.computerjy.com/sitemap_index.xml
+  # Named so a Cloudflare WAF skip rule can target it if the runner ever gets challenged.
+  USER_AGENT: 'computerjy-linkcheck/1.0 (+https://github.com/eyadsalah/computerjy)'
+
+jobs:
+  lychee:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      # lychee does not crawl: it checks the links found in its inputs. Feeding it
+      # the sitemap would only verify that the sitemap's URLs answer, so expand the
+      # index into the page URLs first and pass those as the inputs.
+      - name: Collect page URLs from the sitemap index
+        run: |
+          set -euo pipefail
+          curl -sSf -A "$USER_AGENT" "$SITEMAP" \
+            | grep -oP '(?<=<loc>)[^<]+' \
+            | xargs -n1 curl -sSf -A "$USER_AGENT" \
+            | grep -oP '(?<=<loc>)[^<]+' \
+            | sort -u > urls.txt
+          echo "$(wc -l < urls.txt) pages"
+          test -s urls.txt
+
+      - name: Check links
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
+        with:
+          lycheeVersion: v0.24.2
+          # 429: rate-limited, not broken. xmlrpc.php: the <link rel="EditURI">
+          # target, blocked at the edge on purpose. The social hosts 403 every bot.
+          args: >-
+            --no-progress
+            --accept 200..=206,429
+            --max-concurrency 8
+            --user-agent "$USER_AGENT"
+            --exclude 'xmlrpc\.php'
+            --exclude 'twitter\.com|x\.com|linkedin\.com|facebook\.com|instagram\.com'
+            $(cat urls.txt)
+          fail: true
