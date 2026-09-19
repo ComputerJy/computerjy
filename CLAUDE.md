@@ -7,8 +7,8 @@ root (`style.css` + `index.php` at top level).
 ## Local development
 
 ```bash
-# from the WordPress install
-cp -r computerjy-2 wp-content/themes/
+# from the WordPress install (this repo folder becomes the theme dir)
+cp -r /path/to/computerjy wp-content/themes/computerjy-2
 wp theme activate computerjy-2
 
 # or with wp-env / Local / Studio, symlink the folder into wp-content/themes
@@ -19,6 +19,14 @@ The repo also carries the deploy tooling and tests. Deploy with
 `public/` (agent-discovery files, `markdown.php`) into the WordPress
 DocumentRoot, then flushes the W3TC page cache and purges Cloudflare so the
 new asset versions reach visitors. `STAGE_ONLY=1` builds the tree without SSH.
+The script sources `.env` and its `SERVER_HOST` wins over the environment, so
+never run it from the repo root without `STAGE_ONLY=1` unless you mean to deploy.
+
+`design-system/`, `ds-bundle/`, `src/`, `workers/` and `docs/` are untracked
+leftovers from the Astro era — ignore them.
+
+`main` is protected ("Protect main" ruleset): branch, open a PR, let `ci` +
+`CodeQL` pass. Never push to `main` directly.
 
 `inc/computerjy-*.php` are standalone single-file plugins (currently the
 edge-cache purge), hand-installed into `wp-content/plugins`, never required by
@@ -80,6 +88,9 @@ Keep them in sync when you change markup structure.
 
 - `functions.php` — setup, image sizes, menus, widget areas, enqueues; requires
   everything in `inc/`.
+- `template-parts/` — `content-{card,lead,side,single,page,none}.php` and
+  `feed-grid.php` (the post loop + in-feed slot); top-level templates only
+  compose these. `page-templates/` — `full-width.php`, `landing.php`.
 - `inc/template-tags.php` — `computerjy2_reading_time()`,
   `computerjy2_category_chip()`, `computerjy2_breadcrumbs()`,
   `computerjy2_pagination()`, `computerjy2_eyebrow_strip()`,
