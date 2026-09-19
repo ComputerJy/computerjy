@@ -1,7 +1,6 @@
-# Content Signals per robots.txt standard
-# Content-Signal: ai-train=yes, search=yes, index=yes
-
+# Content Signals: https://contentsignals.org/
 User-agent: *
+Content-Signal: search=yes, ai-train=yes, ai-input=yes
 Allow: /
 Disallow: /wp-admin/
 Disallow: /wp-includes/
