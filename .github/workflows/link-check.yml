@@ -21,7 +21,7 @@ permissions:
 env:
   SITEMAP: https://www.computerjy.com/sitemap_index.xml
   # Named so a Cloudflare WAF skip rule can target it if the runner ever gets challenged.
-  USER_AGENT: 'computerjy-linkcheck/1.0 (+https://github.com/eyadsalah/computerjy)'
+  USER_AGENT: 'computerjy-linkcheck/1.0 (+https://github.com/ComputerJy/computerjy)'
 
 jobs:
   lychee:
