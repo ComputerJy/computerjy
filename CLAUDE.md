@@ -73,11 +73,19 @@ Keep them in sync when you change markup structure.
   (`not any(http.request.headers["accept"][*] contains "text/markdown")`) —
   Cloudflare ignores `Vary`, so without it agents receive cached HTML. Manual
   purge: `wp eval 'computerjy_edge_cache_purge();'`.
-- W3TC: page cache Disk:Enhanced, object cache APCu. Keep **off**: Browser
-  Cache → HTML and "Other" `Cache-Control`/`Expires` (the latter put a 1-year
-  `max-age` on REST JSON), `minify.*.http2push` (emits a `103` preload for a
-  file that doesn't exist), the duplicate security headers. `search-index.json`
-  and `markdown.php` are in the never-cache list.
+- W3TC: page cache Disk:Enhanced, object cache Redis (shared with wp-cli via
+  `objectcache.enabled_for_wp_cli`, so cron and deploy flushes are real),
+  database cache **off**. Keep **off**: Browser Cache → HTML and "Other"
+  `Cache-Control`/`Expires` (the latter put a 1-year `max-age` on REST JSON),
+  `minify.*.http2push` (emits a `103` preload for a file that doesn't exist),
+  the duplicate security headers. `search-index.json` and `markdown.php` are in
+  the never-cache list.
+- Jetpack is trimmed to what the theme uses (comments, infinite scroll,
+  protect, monitor, subscriptions, publicize). Related posts, sharing, Photon /
+  Site Accelerator, sitemaps, SEO tools and the WAF are off on purpose: the
+  theme renders its own related and share blocks, images must stay same-origin,
+  Yoast owns sitemaps and verification, Cloudflare is the WAF. A monthly
+  `link-check` workflow replaces the broken-link-checker plugin.
 - Yoast SEO owns sitemaps (`/sitemap_index.xml`; the vhost 301s the old URLs
   there). Comments render through Jetpack's hosted form. WP-Cron runs from
   `/etc/cron.d/computerjy-wp-cron`, not page loads.
@@ -145,7 +153,7 @@ Keep them in sync when you change markup structure.
   generation number (`computerjy2_cache_key()`); `computerjy2_flush_caches()`
   bumps it on real saves (not autosaves/revisions), approved comments and
   `switch_theme`, which invalidates through any object cache (the origin runs
-  APCu), then fires the `computerjy2_flush_caches` action. Use
+  Redis), then fires the `computerjy2_flush_caches` action. Use
   `computerjy2_cache_key()` for new cached queries, or hook
   `computerjy2_flush_caches` and `delete_transient()` as
   `inc/search-index.php` does.
