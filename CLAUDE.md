@@ -92,16 +92,23 @@ Keep them in sync when you change markup structure.
   the duplicate security headers. `search-index.json` and `markdown.php` are in
   the never-cache list.
 - Jetpack is trimmed to what the theme uses (comments, infinite scroll,
-  protect, monitor, subscriptions, publicize). Related posts, sharing, Photon /
-  Site Accelerator, sitemaps, SEO tools and the WAF are off on purpose: the
-  theme renders its own related and share blocks, images must stay same-origin,
-  Yoast owns sitemaps and verification, Cloudflare is the WAF. A monthly
-  `link-check` workflow replaces the broken-link-checker plugin.
-- Yoast SEO owns sitemaps (`/sitemap_index.xml`; the vhost 301s the old URLs
-  there). Comments render through Jetpack's hosted form. WP-Cron runs from
+  protect, monitor, subscriptions, publicize, SEO tools, sitemaps). Sharing,
+  Photon / Site Accelerator, Carousel and the WAF are off on purpose: the theme
+  renders its own share block and image lightbox, images must stay
+  same-origin, Cloudflare is the WAF. Jetpack's related posts are suppressed
+  by the theme (Customizer toggle). A monthly `link-check` workflow replaces
+  the broken-link-checker plugin.
+- SEO is Jetpack SEO tools (title, description, canonical, OG/Twitter) plus
+  `inc/seo.php` (JSON-LD, `og:image:alt`, noindex on date/author archives,
+  legacy-URL 301s); Yoast is gone. Jetpack serves `/sitemap.xml`; the vhost
+  301s `/sitemap-index.xml` and `/sitemap_index.xml` there.
+- Permalinks are `/%year%/%monthnum%/%postname%/`. The old `/posts/<slug>`
+  and wrong-date URLs are 301'd by `inc/seo.php` on exact slug match (core's
+  fuzzy 404 guess is off); the vhost must not rewrite them.
+- Comments render through Jetpack's hosted form. WP-Cron runs from
   `/etc/cron.d/computerjy-wp-cron`, not page loads.
 - `public/` files are served straight from the docroot by the vhost's real-file
-  check; Yoast also drops `llms.txt` there.
+  check.
 
 ## Architecture
 
@@ -125,6 +132,7 @@ Keep them in sync when you change markup structure.
   discovery layer advertises) in the shape the Astro build produced; transient
   `cjy2_search_index`, flushed with the related/trending caches.
 - `inc/plugin-compat.php` — CF7, Jetpack, AMP, SEO plugins, cache plugins.
+- `inc/seo.php` — JSON-LD, robots/OG tweaks, legacy `/posts/` redirects.
 - `public/markdown.php` — `Accept: text/markdown` handler for agents, reads
   WordPress via `wp-load.php`. Contract: `.agents/rules/ai-agent-discovery.md`.
 - `scripts/check-urls.sh` — URL parity checker (`MODE=astro|wordpress`,

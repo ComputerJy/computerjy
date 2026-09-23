@@ -21,8 +21,10 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BASE="${1:-https://www.computerjy.com}"
 case "$BASE" in --print-urls) PRINT_ONLY=1; BASE="https://www.computerjy.com";; *) PRINT_ONLY=0;; esac
 MODE="${MODE:-wordpress}"
-SITEMAP="${SITEMAP:-/sitemap_index.xml}"
+SITEMAP="${SITEMAP:-/sitemap.xml}"
 CANON="https://www.computerjy.com"
+# One post at its current permalink; the legacy shapes must 301 here.
+POST="/2010/07/1goal/"
 
 CURL_BASE="-s --max-time 30 -A computerjy-cutover-check"
 if [ -n "${CONNECT_TO:-}" ]; then CURL_BASE="$CURL_BASE --connect-to $CONNECT_TO"; fi
@@ -113,8 +115,6 @@ fixed() {
 /tag/linux 200 - text/html
 /contact-me 200 - text/html
 /privacy-policy 200 - text/html
-/posts/1goal 200 - text/html
-/2008/01/1goal 301 $CANON/posts/1goal
 /feed 200 - application/
 /feed/ 200|301
 /robots.txt 200 - text/plain
@@ -142,12 +142,16 @@ EOF
 EOF
     else
         cat <<EOF
-/posts/1goal/ 301 $CANON/posts/1goal
+$POST 200 - text/html
+/posts/1goal 301 $CANON$POST
+/posts/1goal/ 301 $CANON$POST
+/2008/01/1goal 301 $CANON$POST
+/posts/1go 404
+/posts/author/computerjy 301 $CANON/author/computerjy/
 /rss.xml 301 $CANON/feed
-/sitemap.xml 301 $CANON$SITEMAP
 /sitemap-index.xml 301 $CANON$SITEMAP
+/sitemap_index.xml 301 $CANON$SITEMAP
 $SITEMAP 200 - (application|text)/xml
-/posts/author/computerjy 200 - text/html
 /category/entertainment/page/2 200 - text/html
 EOF
     fi
@@ -209,11 +213,11 @@ check_header /.well-known/api-catalog Access-Control-Allow-Origin '*' || fails=$
 # W3TC's retired HTTP/2 push left a `Link: …cache/minify/…; rel=preload` in
 # page_enhanced/.htaccess once (GitHub #91): a preload of a file that 404s.
 check_no_header / Link 'cache/minify' || fails=$((fails + 1))
-check_no_header /posts/1goal Link 'cache/minify' || fails=$((fails + 1))
+check_no_header "$POST" Link 'cache/minify' || fails=$((fails + 1))
 
 echo "== markdown negotiation =="
 check_markdown / || fails=$((fails + 1))
-check_markdown /posts/1goal || fails=$((fails + 1))
+check_markdown "$POST" || fails=$((fails + 1))
 
 # The Cache Rule "WordPress anonymous HTML" must keep its cookie and
 # Accept: text/markdown bypasses (Cloudflare ignores Vary); during #55 it went
@@ -231,7 +235,7 @@ if [ "${EDGE:-0}" = "1" ]; then
         check_edge 'wordpress_logged_in_ cookie' / "$NOT_STORED" no text/html -H 'Cookie: wordpress_logged_in_x=1' || fails=$((fails + 1))
         check_edge 'wp-postpass_ cookie' / "$NOT_STORED" no text/html -H 'Cookie: wp-postpass_x=1' || fails=$((fails + 1))
         check_edge 'comment_author_ cookie' / "$NOT_STORED" no text/html -H 'Cookie: comment_author_x=1' || fails=$((fails + 1))
-        check_edge 'Accept: text/markdown' /posts/1goal "$NOT_STORED" - text/markdown -H 'Accept: text/markdown' || fails=$((fails + 1))
+        check_edge 'Accept: text/markdown' "$POST" "$NOT_STORED" - text/markdown -H 'Accept: text/markdown' || fails=$((fails + 1))
         check_edge 'REST' '/wp-json/wp/v2/posts?per_page=1' "$NOT_STORED" no application/json || fails=$((fails + 1))
         check_edge 'theme CSS' /wp-content/themes/computerjy-2/assets/css/theme.css "$STORED" - text/css || fails=$((fails + 1))
         check_edge 'search index' /search-index.json "$STORED" yes application/json || fails=$((fails + 1))
@@ -247,8 +251,9 @@ slug_list=$(mktemp)
 slug_out=$(mktemp)
 slugs > "$slug_list"
 grep '^FAIL ' "$slug_list" || true
+# Every slug's legacy /posts/ URL must land (after its 301) on a live post.
 grep -v '^FAIL ' "$slug_list" | sort -u | sed 's#^#/posts/#' | tr '\n' '\0' \
-    | xargs -0 -P 8 -I{} bash -c 'check "$1" 200 "" text/html' _ {} > "$slug_out" || true
+    | CURL_OPTS="$CURL_OPTS -L" xargs -0 -P 8 -I{} bash -c 'check "$1" 200 "" text/html' _ {} > "$slug_out" || true
 cat "$slug_out"
 slug_fails=$(cat "$slug_list" "$slug_out" | grep -c '^FAIL ' || true)
 rm -f "$slug_list" "$slug_out"

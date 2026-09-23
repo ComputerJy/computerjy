@@ -36,7 +36,7 @@ describe('scripts/check-urls.sh', () => {
     expect(wp).toContain('/tag/linux 200');
     expect(wp).toContain('/privacy-policy 200');
     expect(wp).toContain(
-      '/2008/01/1goal 301 https://www.computerjy.com/posts/1goal'
+      '/2008/01/1goal 301 https://www.computerjy.com/2010/07/1goal/'
     );
   });
 });
@@ -121,6 +121,6 @@ describe('scripts/check-urls.sh minify-preload guard (#91)', () => {
   it('asserts no Link header references cache/minify on HTML pages', () => {
     const src = readFileSync(script, 'utf8');
     expect(src).toMatch(/check_no_header \/ Link 'cache\/minify'/);
-    expect(src).toMatch(/check_no_header \/posts\/1goal Link 'cache\/minify'/);
+    expect(src).toMatch(/check_no_header "\$POST" Link 'cache\/minify'/);
   });
 });

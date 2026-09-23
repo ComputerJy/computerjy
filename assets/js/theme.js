@@ -307,6 +307,218 @@
     });
   }
 
+  /* ---- Image lightbox: click an article image to zoom and pan ----
+     Unlinked content images and the single-post hero (through its scrim,
+     which covers it). Zoom: + / − / FIT buttons and keys, ctrl+wheel or
+     trackpad pinch, touch pinch, double-click or double-tap. Pan: drag,
+     scrollbars, wheel. Esc and the native <dialog> handle close and focus. */
+  var ZOOMABLE = '.entry-content img:not(a img):not(.emoji)';
+  var box, stage, pic, cap, want;
+  var zoom = 1;
+  var fitW = 0;
+  var pts = {};
+  var pinch = 0;
+  var drag = null;
+  var lastTap = 0;
+
+  document.querySelectorAll(ZOOMABLE).forEach(function (img) {
+    img.tabIndex = 0;
+    img.setAttribute('role', 'button');
+    img.setAttribute(
+      'aria-label',
+      (img.alt ? img.alt + ' — ' : '') + 'enlarge image'
+    );
+  });
+
+  /* The largest srcset candidate, so zooming in stays sharp. */
+  function fullSrc(img) {
+    var best = img.currentSrc || img.src;
+    var bestW = 0;
+    (img.getAttribute('srcset') || '').split(',').forEach(function (c) {
+      var p = c.trim().split(/\s+/);
+      var w = parseInt(p[1], 10);
+      if (w > bestW) {
+        bestW = w;
+        best = p[0];
+      }
+    });
+    return best;
+  }
+
+  /* z is relative to the fitted size; (px, py) is the stage point that
+     stays put, the stage centre by default. */
+  function setZoom(z, px, py) {
+    z = Math.min(8, Math.max(1, z));
+    if (zoom === 1) {
+      fitW = pic.getBoundingClientRect().width;
+    }
+    if (px == null) {
+      px = stage.clientWidth / 2;
+      py = stage.clientHeight / 2;
+    }
+    var r = z / zoom;
+    var x = (stage.scrollLeft + px) * r - px;
+    var y = (stage.scrollTop + py) * r - py;
+    zoom = z;
+    box.classList.toggle('is-zoomed', z > 1);
+    pic.style.width = z > 1 ? fitW * z + 'px' : '';
+    stage.scrollLeft = x;
+    stage.scrollTop = y;
+  }
+
+  function stagePoint(x, y) {
+    var rect = stage.getBoundingClientRect();
+    return [x - rect.left, y - rect.top];
+  }
+
+  function toggleZoom(x, y) {
+    var p = stagePoint(x, y);
+    setZoom(zoom > 1 ? 1 : 2.5, p[0], p[1]);
+  }
+
+  function buildBox() {
+    box = document.createElement('dialog');
+    box.className = 'lightbox';
+    box.setAttribute('aria-label', 'Image viewer');
+    box.innerHTML =
+      '<div class="lightbox-bar">' +
+      '<button type="button" data-zoom="out" aria-label="Zoom out">&minus;</button>' +
+      '<button type="button" data-zoom="fit" aria-label="Fit to screen">FIT</button>' +
+      '<button type="button" data-zoom="in" aria-label="Zoom in">+</button>' +
+      '<button type="button" data-zoom="close" aria-label="Close">&times;</button>' +
+      '</div>' +
+      '<div class="lightbox-stage"><img alt="" draggable="false"></div>' +
+      '<p class="lightbox-cap"></p>';
+    document.body.appendChild(box);
+    stage = box.querySelector('.lightbox-stage');
+    pic = stage.querySelector('img');
+    cap = box.querySelector('.lightbox-cap');
+
+    function zoomBy(action) {
+      if (action === 'in') setZoom(zoom * 1.5);
+      else if (action === 'out') setZoom(zoom / 1.5);
+      else if (action === 'fit') setZoom(1);
+      else if (action === 'close') box.close();
+    }
+    box.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-zoom]');
+      if (b) {
+        zoomBy(b.getAttribute('data-zoom'));
+      } else if ((e.target === box || e.target === stage) && zoom === 1) {
+        box.close();
+      }
+    });
+    box.addEventListener('keydown', function (e) {
+      var map = { '+': 'in', '=': 'in', '-': 'out', 0: 'fit' };
+      if (map[e.key]) {
+        e.preventDefault();
+        zoomBy(map[e.key]);
+      }
+    });
+    stage.addEventListener(
+      'wheel',
+      function (e) {
+        if (!e.ctrlKey) return; // plain wheel scrolls the zoomed image
+        e.preventDefault();
+        var p = stagePoint(e.clientX, e.clientY);
+        setZoom(zoom * Math.exp(-e.deltaY * 0.01), p[0], p[1]);
+      },
+      { passive: false }
+    );
+    stage.addEventListener('dblclick', function (e) {
+      if (e.timeStamp - lastTap < 500) return; // a double-tap, handled below
+      toggleZoom(e.clientX, e.clientY);
+    });
+
+    /* touch-action: none on the stage, so pan and pinch are ours. */
+    stage.addEventListener('pointerdown', function (e) {
+      pts[e.pointerId] = e;
+      // Only while zoomed: capture retargets the click, and at fit a click
+      // on the stage closes the viewer.
+      if (zoom > 1) stage.setPointerCapture(e.pointerId);
+      drag = {
+        x: e.clientX,
+        y: e.clientY,
+        l: stage.scrollLeft,
+        t: stage.scrollTop,
+      };
+    });
+    stage.addEventListener('pointermove', function (e) {
+      if (!pts[e.pointerId]) return;
+      pts[e.pointerId] = e;
+      var ids = Object.keys(pts);
+      if (ids.length === 2) {
+        var a = pts[ids[0]];
+        var b = pts[ids[1]];
+        var d = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+        if (pinch) {
+          var p = stagePoint(
+            (a.clientX + b.clientX) / 2,
+            (a.clientY + b.clientY) / 2
+          );
+          setZoom((zoom * d) / pinch, p[0], p[1]);
+        }
+        pinch = d;
+        drag = null;
+      } else if (drag && zoom > 1) {
+        stage.scrollLeft = drag.l - (e.clientX - drag.x);
+        stage.scrollTop = drag.t - (e.clientY - drag.y);
+      }
+    });
+    function lift(e) {
+      delete pts[e.pointerId];
+      pinch = 0;
+      drag = null;
+    }
+    stage.addEventListener('pointerup', function (e) {
+      if (e.pointerType === 'touch' && !pinch) {
+        if (e.timeStamp - lastTap < 300) {
+          toggleZoom(e.clientX, e.clientY);
+        }
+        lastTap = e.timeStamp;
+      }
+      lift(e);
+    });
+    stage.addEventListener('pointercancel', lift);
+  }
+
+  function openBox(img) {
+    if (!box) buildBox();
+    zoom = 1;
+    box.classList.remove('is-zoomed');
+    pic.style.width = '';
+    pic.src = img.currentSrc || img.src; // already loaded: shows at once
+    pic.alt = img.alt;
+    want = fullSrc(img);
+    if (want !== pic.src) {
+      var hi = new Image();
+      var url = want;
+      hi.onload = function () {
+        if (want === url) pic.src = url;
+      };
+      hi.src = url;
+    }
+    var fig = img.closest('figure');
+    var fc = fig && fig.querySelector('figcaption');
+    cap.textContent = fc ? fc.textContent.trim() : '';
+    cap.hidden = !cap.textContent;
+    box.showModal();
+  }
+
+  document.addEventListener('click', function (e) {
+    var img = e.target.closest(ZOOMABLE);
+    if (!img && e.target.closest('.single-hero .hero-scrim')) {
+      img = document.querySelector('.single-hero .hero-img');
+    }
+    if (img) openBox(img);
+  });
+  document.addEventListener('keydown', function (e) {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches(ZOOMABLE)) {
+      e.preventDefault();
+      openBox(e.target);
+    }
+  });
+
   /* ---- Mark reserved slots that a plugin actually filled ---- */
   document.querySelectorAll('.reserved-unit').forEach(function (slot) {
     if (slot.children.length || (slot.textContent || '').trim().length > 40) {

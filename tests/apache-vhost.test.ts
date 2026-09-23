@@ -16,12 +16,11 @@ describe('deploy/lightsail-apache.conf serves WordPress', () => {
     expect(vhost).toContain('RewriteRule ^/rss\\.xml$ /feed [R=301,L]');
   });
 
-  it('redirects both Astro sitemap URLs to the Yoast sitemap index', () => {
-    // Yoast SEO owns sitemaps on this install. Swapping the SEO plugin means
-    // changing this target (core's is /wp-sitemap.xml), SITEMAP in
-    // scripts/check-urls.sh, and this assertion together.
+  it('redirects the Astro and Yoast sitemap indexes to the Jetpack sitemap', () => {
+    // Jetpack SEO owns sitemaps at /sitemap.xml; SITEMAP in
+    // scripts/check-urls.sh names the same URL.
     expect(vhost).toContain(
-      'RewriteRule ^/sitemap(-index)?\\.xml$ /sitemap_index.xml [R=301,L]'
+      'RewriteRule ^/sitemap[-_]index\\.xml$ /sitemap.xml [R=301,L]'
     );
   });
 
@@ -75,41 +74,10 @@ describe('deploy/lightsail-apache.conf serves WordPress', () => {
   });
 });
 
-describe('legacy /YYYY/MM/<slug> redirect (moved from the Worker)', () => {
-  const match = vhost.match(
-    /RewriteRule (\^\/\\d\{4\}\S+) \/posts\/\$1 \[R=301,L\]/
-  );
-  // No '$^' fallback: when the rule is missing, `pattern` is null and every
-  // case below fails on the assertion instead of passing vacuously.
-  const pattern = match ? new RegExp(match[1]) : null;
-
-  it('exists', () => {
-    expect(pattern).not.toBeNull();
-  });
-
-  it.each([
-    ['/2008/01/1goal', '1goal'],
-    ['/2008/01/1goal/', '1goal'],
-    ['/2008/01/15/1goal', '1goal'],
-    ['/2010/12/some-long-slug-with-numbers-2', 'some-long-slug-with-numbers-2'],
-  ])('%s → /posts/%s', (path, slug) => {
-    expect(pattern).not.toBeNull();
-    const m = pattern!.exec(path);
-    expect(m?.[1]).toBe(slug);
-  });
-
-  it.each([
-    '/posts/2008-review',
-    '/20081/01/x',
-    '/2008/1/x',
-    '/2008/01',
-    '/category/2008/01/x',
-    // Bare day archives: the last segment is the day, not a slug, so they
-    // must not become /posts/15 (a guaranteed 404). WordPress answers them.
-    '/2008/01/15/',
-    '/2008/01/15',
-  ])('leaves %s alone', (path) => {
-    expect(pattern).not.toBeNull();
-    expect(pattern!.test(path)).toBe(false);
+describe('legacy permalinks', () => {
+  it('are left to WordPress (inc/seo.php), not rewritten to /posts/', () => {
+    // Permalinks are /YYYY/MM/<slug>/ now; the old /YYYY/MM/<slug> -> /posts/
+    // rule would loop every post.
+    expect(vhost).not.toContain('/posts/$1');
   });
 });
