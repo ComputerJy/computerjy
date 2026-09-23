@@ -192,8 +192,8 @@ function computerjy2_profile_links() {
         $url = get_theme_mod( 'computerjy2_social_' . $key );
         if ( $url ) {
             $out .= sprintf(
-                '<a href="%1$s" target="_blank" rel="noopener noreferrer" aria-label="%2$s"><span aria-hidden="true">%3$s</span></a>',
-                esc_url( $url ), esc_attr( ucfirst( $key ) ), esc_html( $abbr )
+                '<a href="%1$s" target="_blank" rel="noopener noreferrer">%3$s<span class="screen-reader-text"> (%2$s)</span></a>',
+                esc_url( $url ), esc_html( ucfirst( $key ) ), esc_html( $abbr )
             );
         }
     }
