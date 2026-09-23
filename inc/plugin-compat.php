@@ -72,13 +72,12 @@ function computerjy2_infinite_scroll_render() {
 }
 
 // Jetpack's related posts duplicate the theme's own block; keep one of them.
-function computerjy2_jetpack_related( $options ) {
-    if ( get_theme_mod( 'computerjy2_use_theme_related', true ) ) {
-        $options['enabled'] = false;
-    }
-    return $options;
+// Per request, because the module ignores 'enabled' => false on self-hosted
+// sites and still enqueues its render-blocking stylesheet.
+function computerjy2_jetpack_related_for_request( $enabled ) {
+    return get_theme_mod( 'computerjy2_use_theme_related', true ) ? false : $enabled;
 }
-add_filter( 'jetpack_relatedposts_filter_options', 'computerjy2_jetpack_related' );
+add_filter( 'jetpack_relatedposts_filter_enabled_for_request', 'computerjy2_jetpack_related_for_request' );
 
 /* ---------- SEO plugins ---------- */
 
