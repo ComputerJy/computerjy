@@ -109,14 +109,7 @@ check_edge() {
 fixed() {
     cat <<EOF
 / 200 - text/html
-/page/2 200 - text/html
-/category/entertainment 200 - text/html
-/category/g33ky 200 - text/html
-/tag/linux 200 - text/html
-/contact-me 200 - text/html
-/privacy-policy 200 - text/html
-/feed 200 - application/
-/feed/ 200|301
+/feed/ 200 - application/
 /robots.txt 200 - text/plain
 /security.txt 200 - text/plain
 /.well-known/security.txt 200 - text/plain
@@ -142,6 +135,15 @@ EOF
 EOF
     else
         cat <<EOF
+/page/2/ 200 - text/html
+/category/entertainment/ 200 - text/html
+/category/g33ky/ 200 - text/html
+/tag/linux/ 200 - text/html
+/contact-me/ 200 - text/html
+/privacy-policy/ 200 - text/html
+/category/entertainment/page/2/ 200 - text/html
+/category/entertainment 301 $CANON/category/entertainment/
+/feed 301 $CANON/feed/
 $POST 200 - text/html
 /posts/1goal 301 $CANON$POST
 /posts/1goal/ 301 $CANON$POST
@@ -152,7 +154,6 @@ $POST 200 - text/html
 /sitemap-index.xml 301 $CANON$SITEMAP
 /sitemap_index.xml 301 $CANON$SITEMAP
 $SITEMAP 200 - (application|text)/xml
-/category/entertainment/page/2 200 - text/html
 EOF
     fi
 }
