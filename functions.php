@@ -277,6 +277,7 @@ require_once get_template_directory() . '/inc/comment-walker.php';
 require_once get_template_directory() . '/inc/slots.php';
 require_once get_template_directory() . '/inc/related.php';
 require_once get_template_directory() . '/inc/search-index.php';
+require_once get_template_directory() . '/inc/seo.php';
 require_once get_template_directory() . '/inc/plugin-compat.php';
 require_once get_template_directory() . '/inc/customizer.php';
 require_once get_template_directory() . '/inc/block-patterns.php';
