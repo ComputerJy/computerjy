@@ -32,9 +32,9 @@ describe('scripts/check-urls.sh', () => {
     });
     expect(astro).toContain('/rss.xml 200');
     expect(wp).toContain('/rss.xml 301 https://www.computerjy.com/feed');
-    expect(wp).toContain('/category/entertainment 200');
-    expect(wp).toContain('/tag/linux 200');
-    expect(wp).toContain('/privacy-policy 200');
+    expect(wp).toContain('/category/entertainment/ 200');
+    expect(wp).toContain('/tag/linux/ 200');
+    expect(wp).toContain('/privacy-policy/ 200');
     expect(wp).toContain(
       '/2008/01/1goal 301 https://www.computerjy.com/2010/07/1goal/'
     );
