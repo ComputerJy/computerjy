@@ -13,7 +13,7 @@
     "lint": "npm run format:check && npm run lint:php"
   },
   "devDependencies": {
-    "prettier": "^3.9.6",
+    "prettier": "^3.9.8",
     "vitest": "^5.0.1"
   }
 }
