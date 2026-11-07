@@ -11,7 +11,7 @@ $cjy_current = get_the_ID();
 ?>
 
 <div class="author-card">
-    <?php echo get_avatar( get_the_author_meta( 'ID' ), 54 ); ?>
+    <?php echo get_avatar( get_the_author_meta( 'ID' ), 54, '', get_the_author() ); ?>
     <div>
         <div class="author-name"><?php the_author(); ?></div>
         <a class="entry-meta-mono" href="<?php echo esc_url( get_author_posts_url( get_the_author_meta( 'ID' ) ) ); ?>"><?php esc_html_e( 'ALL POSTS →', 'computerjy2' ); ?></a>

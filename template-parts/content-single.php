@@ -9,7 +9,7 @@
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 
     <div class="byline-row">
-        <span class="byline-avatar"><?php echo get_avatar( get_the_author_meta( 'ID' ), 30 ); ?></span>
+        <span class="byline-avatar"><?php echo get_avatar( get_the_author_meta( 'ID' ), 30, '', get_the_author() ); ?></span>
         <span class="byline-name">
             <a href="<?php echo esc_url( get_author_posts_url( get_the_author_meta( 'ID' ) ) ); ?>"><?php the_author(); ?></a><br>
             <span><?php echo esc_html( get_the_date( 'Y-m-d' ) ); ?> &middot; <?php echo esc_html( computerjy2_reading_time() ); ?></span>
