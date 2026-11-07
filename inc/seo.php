@@ -80,6 +80,63 @@ function computerjy2_og_image_alt( $tags ) {
 add_filter( 'jetpack_open_graph_tags', 'computerjy2_og_image_alt' );
 
 /**
+ * A scheduled post edited before it went live has a modified time earlier
+ * than its publish time. Jetpack prints both as UTC 'c' dates, so they compare
+ * as strings.
+ *
+ * @param array $tags Open Graph tags.
+ * @return array
+ */
+function computerjy2_og_modified_time( $tags ) {
+    if ( isset( $tags['article:published_time'], $tags['article:modified_time'] )
+        && $tags['article:modified_time'] < $tags['article:published_time'] ) {
+        $tags['article:modified_time'] = $tags['article:published_time'];
+    }
+    return $tags;
+}
+add_filter( 'jetpack_open_graph_tags', 'computerjy2_og_modified_time' );
+
+/**
+ * Description for image and video posts, which have no text to excerpt.
+ *
+ * @return string
+ */
+function computerjy2_fallback_description() {
+    return sprintf(
+        /* translators: 1: post title, 2: site name. */
+        __( '%1$s: a post from %2$s', 'computerjy2' ),
+        computerjy2_plain( get_the_title() ),
+        computerjy2_plain( get_bloginfo( 'name' ) )
+    );
+}
+
+/**
+ * Replace Jetpack's "Visit the post for more." on posts with no text. Jetpack
+ * then skips twitter:description too, and X reads og:description.
+ *
+ * @param string $description Jetpack's fallback.
+ * @return string
+ */
+function computerjy2_og_fallback_description( $description ) {
+    return is_singular() ? computerjy2_fallback_description() : $description;
+}
+add_filter( 'jetpack_open_graph_fallback_description', 'computerjy2_og_fallback_description' );
+
+/**
+ * Jetpack prints no meta description for a post with no text.
+ *
+ * @param array $meta Meta name and content pairs.
+ * @return array
+ */
+function computerjy2_seo_meta_tags( $meta ) {
+    if ( is_singular() && empty( $meta['description'] ) ) {
+        $meta['description'] = computerjy2_fallback_description();
+    }
+    return $meta;
+}
+add_filter( 'jetpack_seo_meta_tags', 'computerjy2_seo_meta_tags' );
+
+/**
  * Featured images with no media-library alt use the post title, like
  * og:image:alt above. Covers every the_post_thumbnail() caller.
  *
@@ -127,6 +184,39 @@ function computerjy2_schema_org() {
 }
 
 /**
+ * True timestamp of a post date. get_post_timestamp() reads the local column
+ * under today's zone rules, an hour off for dates stored under older ones.
+ * Drafts have no GMT date yet.
+ *
+ * @param WP_Post $post  Post.
+ * @param string  $field 'date' or 'modified'.
+ * @return int
+ */
+function computerjy2_post_timestamp( $post, $field = 'date' ) {
+    $date = get_post_datetime( $post, $field, 'gmt' );
+    return $date ? $date->getTimestamp() : (int) get_post_timestamp( $post, $field );
+}
+
+/**
+ * Featured image, else the body image Jetpack chose for og:image (at least
+ * 200×200), else the fallback image. Jetpack's own last resort is the site
+ * icon, which is the publisher logo and doesn't stand for the post.
+ *
+ * @param WP_Post $post Post.
+ * @return string
+ */
+function computerjy2_schema_image( $post ) {
+    if ( has_post_thumbnail( $post ) ) {
+        return get_the_post_thumbnail_url( $post, 'full' );
+    }
+    $og = function_exists( 'jetpack_og_get_image' ) ? jetpack_og_get_image() : array();
+    if ( ! empty( $og['src'] ) && get_site_icon_url( 512 ) !== $og['src'] ) {
+        return $og['src'];
+    }
+    return computerjy2_fallback_image_url( 'full' );
+}
+
+/**
  * JSON-LD graph for the current page: WebSite + Organization on the front
  * page, BlogPosting + BreadcrumbList on posts.
  *
@@ -159,12 +249,12 @@ function computerjy2_schema_graph() {
     $post  = get_post();
     $url   = get_permalink( $post );
     $title = computerjy2_plain( get_the_title( $post ) );
-    $image = has_post_thumbnail( $post ) ? get_the_post_thumbnail_url( $post, 'full' ) : computerjy2_fallback_image_url( 'full' );
     $term  = computerjy2_primary_category( $post->ID );
     // A scheduled post can be modified before its publish date; Google
     // rejects dateModified earlier than datePublished.
-    $published = get_post_timestamp( $post );
-    $modified  = max( $published, (int) get_post_timestamp( $post, 'modified' ) );
+    $published = computerjy2_post_timestamp( $post );
+    $modified  = max( $published, computerjy2_post_timestamp( $post, 'modified' ) );
+    $excerpt   = computerjy2_plain( get_the_excerpt( $post ) );
 
     $crumbs = array( array( get_bloginfo( 'name' ), home_url( '/' ) ) );
     if ( $term ) {
@@ -178,8 +268,8 @@ function computerjy2_schema_graph() {
             '@id'              => $url . '#article',
             'mainEntityOfPage' => $url,
             'headline'         => $title,
-            'description'      => computerjy2_plain( get_the_excerpt( $post ) ),
-            'image'            => $image,
+            'description'      => $excerpt ? $excerpt : computerjy2_fallback_description(),
+            'image'            => computerjy2_schema_image( $post ),
             'datePublished'    => wp_date( 'c', $published ),
             'dateModified'     => wp_date( 'c', $modified ),
             'author'           => array(
