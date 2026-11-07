@@ -51,7 +51,7 @@ function computerjy2_primary_category( $post_id = null ) {
 /**
  * Category chip markup. $style: 'solid' (default) or 'text'.
  */
-function computerjy2_category_chip( $post_id = null, $style = 'solid' ) {
+function computerjy2_category_chip( $post_id = null ) {
     $term = computerjy2_primary_category( $post_id );
     if ( ! $term ) { return ''; }
 
@@ -63,14 +63,6 @@ function computerjy2_category_chip( $post_id = null, $style = 'solid' ) {
         $modifier = ' badge-education';
     } elseif ( in_array( $slug, array( 'news', 'seo' ), true ) ) {
         $modifier = ' badge-news';
-    }
-
-    if ( 'text' === $style ) {
-        return sprintf(
-            '<a href="%1$s" class="card-cat">%2$s</a>',
-            esc_url( get_category_link( $term->term_id ) ),
-            esc_html( $term->name )
-        );
     }
 
     return sprintf(
@@ -156,18 +148,97 @@ function computerjy2_eyebrow_strip() {
  * Byline links row. $position: 'top' | 'bottom'.
  */
 function computerjy2_byline_links( $position = 'top' ) {
-    $url    = rawurlencode( get_permalink() );
-    $title  = rawurlencode( get_the_title() );
-    $x_url  = 'https://twitter.com/intent/tweet?url=' . $url . '&text=' . $title;
-    $fb_url = 'https://www.facebook.com/sharer/sharer.php?u=' . $url;
-    $class  = 'bottom' === $position ? 'byline-links post-links-group' : 'byline-links';
+    $bottom = 'bottom' === $position;
     ?>
-    <div class="<?php echo esc_attr( $class ); ?>">
-        <a class="<?php echo 'bottom' === $position ? 'link-primary' : ''; ?>" href="<?php echo esc_url( $x_url ); ?>" target="_blank" rel="noopener noreferrer"><?php echo 'bottom' === $position ? esc_html__( 'Share X', 'computerjy2' ) : 'X<span class="screen-reader-text"> ' . esc_html__( '(share on X)', 'computerjy2' ) . '</span>'; ?></a>
-        <a href="<?php echo esc_url( $fb_url ); ?>" target="_blank" rel="noopener noreferrer">FB<span class="screen-reader-text"> <?php esc_html_e( '(share on Facebook)', 'computerjy2' ); ?></span></a>
-        <button type="button" data-copy-link="<?php echo esc_url( get_permalink() ); ?>"><?php esc_html_e( 'Copy link', 'computerjy2' ); ?></button>
+    <div class="<?php echo esc_attr( $bottom ? 'byline-links post-links-group' : 'byline-links' ); ?>">
+        <?php if ( $bottom ) : ?>
+            <span class="post-links-label"><?php esc_html_e( 'Share this article', 'computerjy2' ); ?></span>
+        <?php endif; ?>
+        <?php foreach ( computerjy2_post_link_targets( get_permalink(), get_the_title() ) as $cjy_net => $cjy_target ) : ?>
+            <a class="net-link net-<?php echo esc_attr( $cjy_net ); ?>" href="<?php echo esc_url( $cjy_target['href'] ); ?>" aria-label="<?php echo esc_attr( $cjy_target['label'] ); ?>" title="<?php echo esc_attr( $cjy_target['label'] ); ?>"<?php echo 'email' === $cjy_net ? '' : ' target="_blank" rel="noopener noreferrer"'; ?>>
+                <?php echo computerjy2_icon( $cjy_net ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+            </a>
+        <?php endforeach; ?>
+        <button class="net-link" type="button" data-copy-link="<?php echo esc_url( get_permalink() ); ?>" aria-label="<?php esc_attr_e( 'Copy link', 'computerjy2' ); ?>" title="<?php esc_attr_e( 'Copy link', 'computerjy2' ); ?>">
+            <?php echo computerjy2_icon( 'link' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+        </button>
     </div>
     <?php
+}
+
+/**
+ * Where a reader can send an article, in display order.
+ *
+ * Plain links, not the networks' own widgets: those load third-party scripts
+ * on every article. Labels stay untranslated brand names so this runs from
+ * the CLI tests.
+ *
+ * @param string $permalink Article address.
+ * @param string $title     Article title.
+ * @return array<string, array{label: string, href: string}>
+ */
+function computerjy2_post_link_targets( $permalink, $title ) {
+    $url  = rawurlencode( $permalink );
+    $text = rawurlencode( $title );
+
+    return array(
+        'x'        => array( 'label' => 'Share on X', 'href' => "https://twitter.com/intent/tweet?url={$url}&text={$text}" ),
+        'facebook' => array( 'label' => 'Share on Facebook', 'href' => "https://www.facebook.com/sharer/sharer.php?u={$url}" ),
+        'linkedin' => array( 'label' => 'Share on LinkedIn', 'href' => "https://www.linkedin.com/sharing/share-offsite/?url={$url}" ),
+        'reddit'   => array( 'label' => 'Share on Reddit', 'href' => "https://www.reddit.com/submit?url={$url}&title={$text}" ),
+        'whatsapp' => array( 'label' => 'Share on WhatsApp', 'href' => "https://wa.me/?text={$text}%20{$url}" ),
+        'telegram' => array( 'label' => 'Share on Telegram', 'href' => "https://t.me/share/url?url={$url}&text={$text}" ),
+        'email'    => array( 'label' => 'Share by email', 'href' => "mailto:?subject={$text}&body={$url}" ),
+    );
+}
+
+/**
+ * The tags a card shows: the rarest first, because broad ones like Computers
+ * sit on most posts and say nothing about this one.
+ *
+ * @param array $tags Term objects.
+ * @return array At most three terms.
+ */
+function computerjy2_pick_card_tags( $tags ) {
+    usort( $tags, fn( $a, $b ) => $a->count <=> $b->count );
+    return array_slice( $tags, 0, 3 );
+}
+
+/**
+ * Card tags row. theme.css hides whichever tags don't fit on one line.
+ */
+function computerjy2_card_tags() {
+    $tags = get_the_tags();
+    if ( ! $tags || is_wp_error( $tags ) ) {
+        return;
+    }
+
+    echo '<div class="card-tags">';
+    foreach ( computerjy2_pick_card_tags( $tags ) as $tag ) {
+        printf( '<a href="%1$s">%2$s</a>', esc_url( get_tag_link( $tag ) ), esc_html( $tag->name ) );
+    }
+    echo '</div>';
+}
+
+/**
+ * Publish date under a card title. The archive reaches back to 2008, so an
+ * undated card would pass old advice off as current.
+ */
+function computerjy2_card_date() {
+    printf( '<time class="card-date" datetime="%1$s">%2$s</time>', esc_attr( get_the_date( 'c' ) ), esc_html( get_the_date( 'Y-m-d' ) ) );
+}
+
+/**
+ * Newsletter signup. Empty when Jetpack Subscriptions is off, so callers can
+ * drop the surrounding copy too.
+ *
+ * @return string Markup rendered by Jetpack.
+ */
+function computerjy2_newsletter_form() {
+    if ( ! shortcode_exists( 'jetpack_subscription_form' ) ) {
+        return '';
+    }
+    return do_shortcode( '[jetpack_subscription_form show_only_email_and_button="true" show_subscribers_total="false" submit_button_text="Join" subscribe_placeholder="you@email.com"]' );
 }
 
 /**
@@ -195,10 +266,9 @@ function computerjy2_fallback_image_url( $size = 'computerjy2-card' ) {
  * pass $attr to override (the lead card sets fetchpriority=high).
  *
  * @param string $size Image size.
- * @param bool   $chip Render the category chip.
  * @param array  $attr Extra <img> attributes.
  */
-function computerjy2_thumb( $size = 'computerjy2-card', $chip = false, $attr = array() ) {
+function computerjy2_thumb( $size = 'computerjy2-card', $attr = array() ) {
     echo '<div class="post-thumb">';
     if ( has_post_thumbnail() ) {
         the_post_thumbnail( $size, $attr );
@@ -208,24 +278,23 @@ function computerjy2_thumb( $size = 'computerjy2-card', $chip = false, $attr = a
             esc_url( computerjy2_fallback_image_url( $size ) )
         );
     }
-    if ( $chip ) {
-        echo '<span class="thumb-chip">' . wp_kses_post( computerjy2_category_chip() ) . '</span>';
-    }
     echo '</div>';
 }
 
 /**
- * Site name with the trailing accent syllable in brand cyan ("Computer" + "Jy").
- * The accent length is filterable for other site names.
+ * Site name with the brand accent in cyan ("Computer" + "Jy" + " World").
+ * The accent is filterable for other site names.
  */
 function computerjy2_brand_mark() {
     $name   = get_bloginfo( 'name' );
-    $length = (int) apply_filters( 'computerjy2_brand_accent_length', 2 );
+    $accent = (string) apply_filters( 'computerjy2_brand_accent', 'Jy' );
+    $at     = '' === $accent ? false : mb_strpos( $name, $accent );
 
-    if ( $length < 1 || mb_strlen( $name ) <= $length ) {
+    if ( false === $at ) {
         return esc_html( $name );
     }
 
-    return esc_html( mb_substr( $name, 0, -$length ) )
-        . '<span class="brand-accent">' . esc_html( mb_substr( $name, -$length ) ) . '</span>';
+    return esc_html( mb_substr( $name, 0, $at ) )
+        . '<span class="brand-accent">' . esc_html( $accent ) . '</span>'
+        . esc_html( mb_substr( $name, $at + mb_strlen( $accent ) ) );
 }

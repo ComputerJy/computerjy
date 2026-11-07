@@ -3,9 +3,8 @@
 A hybrid classic WordPress theme for computerjy.com: PHP templates plus a full
 `theme.json` so the block editor matches the front end.
 
-Direction: **Terminal** — hard-edged tiles separated by hairline grid gaps,
-featured images that zoom on hover, solid color category chips, monospace
-furniture around humanist body copy.
+Direction: **Terminal** — square corners, real gaps between cards, featured
+images that zoom on hover, monospace labels around humanist body copy.
 
 ## Install
 
@@ -64,7 +63,7 @@ Filters: `computerjy2_infeed_interval`, `computerjy2_inarticle_after_paragraph`,
   primary-term selection is honoured by the category chip.
 - **Contact Form 7** — themed inputs; CF7's CSS/JS is dequeued on pages with no
   form; `wpcf7_autop` disabled.
-- **Jetpack** — infinite scroll (click-to-load on `#primary-feed`), responsive
+- **Jetpack** — newsletter signup, responsive
   videos, content options, related-posts de-duplication.
 - **AdSense / sponsor plugins** — the reserved slots above.
 - **Caching plugins** — related and trending queries are transient-backed and

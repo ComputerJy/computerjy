@@ -4,7 +4,7 @@
  *
  * Covered: Gutenberg (theme.json + editor styles, see functions.php),
  * Yoast SEO / Rank Math (breadcrumbs + primary term, see template-tags.php),
- * Contact Form 7, Jetpack (related posts, sharing, infinite scroll, subscriptions),
+ * Contact Form 7, Jetpack (related posts, sharing, subscriptions),
  * AdSense and other sponsor plugins (reserved slots, see slots.php),
  * page caching plugins (transient-backed queries, see related.php).
  *
@@ -33,14 +33,6 @@ add_filter( 'wpcf7_autop_or_not', '__return_false' );
 /* ---------- Jetpack ---------- */
 
 function computerjy2_jetpack_setup() {
-    add_theme_support( 'infinite-scroll', array(
-        'container' => 'primary-feed',
-        'render'    => 'computerjy2_infinite_scroll_render',
-        'footer'    => false,
-        'type'      => 'click',
-        'wrapper'   => false,
-    ) );
-
     add_theme_support( 'jetpack-responsive-videos' );
     add_theme_support( 'jetpack-content-options', array(
         'blog-display'       => 'excerpt',
@@ -54,22 +46,6 @@ function computerjy2_jetpack_setup() {
     ) );
 }
 add_action( 'after_setup_theme', 'computerjy2_jetpack_setup' );
-
-/**
- * Jetpack's infinity.css is a third-party render-blocking request (#132); the
- * few rules the click-to-load button needs live in theme.css §Jetpack.
- */
-function computerjy2_dequeue_infinite_scroll_css() {
-    wp_dequeue_style( 'the-neverending-homepage' );
-}
-add_action( 'wp_enqueue_scripts', 'computerjy2_dequeue_infinite_scroll_css', 99 );
-
-function computerjy2_infinite_scroll_render() {
-    while ( have_posts() ) {
-        the_post();
-        get_template_part( 'template-parts/content', 'card' );
-    }
-}
 
 // Jetpack's related posts duplicate the theme's own block; keep one of them.
 // Per request, because the module ignores 'enabled' => false on self-hosted

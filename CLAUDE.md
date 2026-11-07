@@ -91,8 +91,7 @@ Keep them in sync when you change markup structure.
   `minify.*.http2push` (emits a `103` preload for a file that doesn't exist),
   the duplicate security headers. `search-index.json` and `markdown.php` are in
   the never-cache list.
-- Jetpack is trimmed to what the theme uses (comments, infinite scroll,
-  protect, monitor, subscriptions, publicize, SEO tools, sitemaps). Sharing,
+- Jetpack is trimmed to what the theme uses (comments, protect, monitor, subscriptions, publicize, SEO tools, sitemaps). Sharing,
   Photon / Site Accelerator, Carousel and the WAF are off on purpose: the theme
   renders its own share block and image lightbox, images must stay
   same-origin, Cloudflare is the WAF. Jetpack's related posts are suppressed
@@ -114,8 +113,8 @@ Keep them in sync when you change markup structure.
 
 - `functions.php` — setup, image sizes, menus, widget areas, enqueues; requires
   everything in `inc/`.
-- `template-parts/` — `content-{card,lead,side,single,page,none}.php` and
-  `feed-grid.php` (the post loop + in-feed slot); top-level templates only
+- `template-parts/` — `content-{card,lead,side,single,page,none}.php`,
+  `sidebar-list.php` and `feed-grid.php` (the post loop + in-feed slot); top-level templates only
   compose these. `page-templates/` — `full-width.php`, `landing.php`.
 - `inc/template-tags.php` — `computerjy2_reading_time()`,
   `computerjy2_category_chip()`, `computerjy2_breadcrumbs()`,
@@ -124,7 +123,7 @@ Keep them in sync when you change markup structure.
   `computerjy2_fallback_image_url()`: the Customizer "Default post image" or
   `assets/images/post-placeholder.svg`), `computerjy2_brand_mark()`.
 - `inc/slots.php` — `computerjy2_slot( $id )` renders a height-reserved sponsor
-  container. Slot ids: `leaderboard`, `infeed`, `inarticle`, `sidebar`. The
+  container, or nothing when the slot has no sponsor. Slot ids: `leaderboard`, `infeed`, `inarticle`, `sidebar`. The
   in-article slot is injected by a `the_content` filter, not by a template.
 - `inc/related.php` — related + trending queries, transient-cached, purged on
   `save_post`, `wp_insert_comment`, and common cache-plugin flush hooks.
@@ -159,8 +158,11 @@ Keep them in sync when you change markup structure.
   browser filter lists hide them and the element vanishes for real visitors.
   This is why the share rails are `.byline-links` / `.post-links-row` and the
   footer icons are `.profile-links`.
-- Square corners, hairline `1px` grid gaps via `.tile-grid`, monospace for
-  furniture (`--font-mono`) and humanist for body copy (`--font-body`).
+- Square corners, real gaps between cards (`--gutter` via `.tile-grid`),
+  monospace for small labels (`--font-mono`) and humanist for body copy
+  (`--font-body`).
+- Network logos are inline SVGs from `inc/icons.php` on plain links, never the
+  networks' own widgets. `--net-*` tokens must clear 3:1 under `--net-fg`.
 - Escape on output (`esc_html`, `esc_url`, `esc_attr`, `wp_kses_post`). The one
   deliberate exception is admin-entered sponsor markup in `inc/slots.php`.
 - `phpcs.xml` enforces `WordPress.Security`, `WordPress.DB`, deprecated-API
@@ -183,7 +185,7 @@ Keep them in sync when you change markup structure.
 add_filter( 'computerjy2_posts_per_page', fn() => 12 );
 add_filter( 'computerjy2_infeed_interval', fn() => 4 );
 add_filter( 'computerjy2_inarticle_after_paragraph', fn() => 2 );
-add_filter( 'computerjy2_brand_accent_length', fn() => 2 );
+add_filter( 'computerjy2_brand_accent', fn() => 'Jy' );
 add_action( 'computerjy2_slot_sidebar', 'my_sponsor_render' );
 ```
 

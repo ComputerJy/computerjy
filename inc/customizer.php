@@ -92,14 +92,6 @@ function computerjy2_customize_register( $wp_customize ) {
         'mime_type'   => 'image',
     ) ) );
 
-    $wp_customize->add_setting( 'computerjy2_newsletter_action', array( 'default' => '', 'sanitize_callback' => 'esc_url_raw' ) );
-    $wp_customize->add_control( 'computerjy2_newsletter_action', array(
-        'label'       => __( 'Newsletter form action URL', 'computerjy2' ),
-        'description' => __( 'Mailchimp / Buttondown endpoint. Leave blank to hide the footer signup.', 'computerjy2' ),
-        'section'     => 'computerjy2_layout',
-        'type'        => 'url',
-    ) );
-
     /* ---- Reserved slots ---- */
     $wp_customize->add_section( 'computerjy2_slots', array(
         'title'       => __( 'ComputerJy: Sponsor Slots', 'computerjy2' ),
@@ -183,17 +175,23 @@ function computerjy2_sanitize_slot_code( $value ) {
  * Output social links from the Customizer.
  */
 function computerjy2_profile_links() {
+    // Theme mod key => icon key and label.
     $map = array(
-        'twitter' => 'X', 'facebook' => 'FB', 'instagram' => 'IG',
-        'linkedin' => 'IN', 'youtube' => 'YT', 'github' => 'GH', 'rss' => 'RSS',
+        'twitter'   => array( 'x', 'X' ),
+        'facebook'  => array( 'facebook', 'Facebook' ),
+        'instagram' => array( 'instagram', 'Instagram' ),
+        'linkedin'  => array( 'linkedin', 'LinkedIn' ),
+        'youtube'   => array( 'youtube', 'YouTube' ),
+        'github'    => array( 'github', 'GitHub' ),
+        'rss'       => array( 'rss', 'RSS' ),
     );
     $out = '';
-    foreach ( $map as $key => $abbr ) {
+    foreach ( $map as $key => list( $icon, $label ) ) {
         $url = get_theme_mod( 'computerjy2_social_' . $key );
         if ( $url ) {
             $out .= sprintf(
-                '<a href="%1$s" target="_blank" rel="noopener noreferrer">%3$s<span class="screen-reader-text"> (%2$s)</span></a>',
-                esc_url( $url ), esc_html( ucfirst( $key ) ), esc_html( $abbr )
+                '<a class="net-link net-%1$s" href="%2$s" target="_blank" rel="noopener noreferrer" aria-label="%3$s" title="%3$s">%4$s</a>',
+                esc_attr( $icon ), esc_url( $url ), esc_attr( $label ), computerjy2_icon( $icon )
             );
         }
     }

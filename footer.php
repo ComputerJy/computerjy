@@ -12,15 +12,11 @@
                 <?php if ( is_active_sidebar( 'footer-1' ) ) : ?>
                     <?php dynamic_sidebar( 'footer-1' ); ?>
                 <?php else : ?>
-                    <h2 class="footer-col-title is-cyan"><?php esc_html_e( 'Newsletter', 'computerjy2' ); ?></h2>
-                    <p><?php esc_html_e( 'One email when something worth reading goes up.', 'computerjy2' ); ?></p>
-                    <?php $cjy_action = get_theme_mod( 'computerjy2_newsletter_action' ); ?>
-                    <?php if ( $cjy_action ) : ?>
-                        <form class="newsletter-form" action="<?php echo esc_url( $cjy_action ); ?>" method="post" target="_blank">
-                            <label class="screen-reader-text" for="cjy-news"><?php esc_html_e( 'Email address', 'computerjy2' ); ?></label>
-                            <input type="email" id="cjy-news" name="email" required placeholder="you@email.com">
-                            <button type="submit"><?php esc_html_e( 'JOIN', 'computerjy2' ); ?></button>
-                        </form>
+                    <?php $cjy_signup = computerjy2_newsletter_form(); ?>
+                    <?php if ( $cjy_signup ) : ?>
+                        <h2 class="footer-col-title is-cyan"><?php esc_html_e( 'Newsletter', 'computerjy2' ); ?></h2>
+                        <p><?php esc_html_e( 'One email when something worth reading goes up.', 'computerjy2' ); ?></p>
+                        <div class="newsletter-box"><?php echo $cjy_signup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
                     <?php endif; ?>
                 <?php endif; ?>
             </div>

@@ -47,3 +47,39 @@ describe.skipIf(!hasPhp)('computerjy2_insert_after_paragraph', () => {
     expect(insert('<P>a</P><P>b</P>', 1)).toBe('<P>a</P><!--slot--><P>b</P>');
   });
 });
+
+function slot(code: string, preview = false): string {
+  return execFileSync(
+    'php',
+    [
+      '-r',
+      `define("ABSPATH", "/"); function add_filter() {}
+       function get_theme_mod($k, $d = "") { return str_ends_with($k, "_code") ? $GLOBALS["argv"][1] : $d; }
+       function do_action() {}
+       function do_shortcode($s) { return $s; }
+       function esc_attr($s) { return $s; }
+       function esc_html($s) { return $s; }
+       function current_user_can() { return true; }
+       function is_customize_preview() { return ${preview}; }
+       require "inc/slots.php"; computerjy2_slot("sidebar", "Sidebar unit");`,
+      code,
+    ],
+    { encoding: 'utf8' }
+  );
+}
+
+describe.skipIf(!hasPhp)('computerjy2_slot', () => {
+  it('renders nothing without a sponsor', () => {
+    expect(slot('')).toBe('');
+  });
+
+  it('renders sponsor markup in its reserved box', () => {
+    expect(slot('<b>x</b>')).toContain(
+      '<div class="reserved-unit unit-sidebar is-filled" data-slot="sidebar"><b>x</b>'
+    );
+  });
+
+  it('labels an empty slot in the Customizer preview', () => {
+    expect(slot('', true)).toContain('Sidebar unit');
+  });
+});

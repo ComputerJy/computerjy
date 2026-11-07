@@ -1,7 +1,7 @@
 /* ============================================================
    ComputerJy 2.0 - theme.css
-   Direction: "Terminal" - square tiles, hairline grid gaps,
-   zoom-on-hover imagery, solid brand chips, monospace furniture.
+   Direction: "Terminal" - square corners, real gaps between cards,
+   zoom-on-hover imagery, monospace for small labels.
    ============================================================ */
 
 /* ---------- 1. Tokens ---------- */
@@ -46,6 +46,20 @@
   --text-accent-blue: #2b93ff;
   --text-accent-purple: #b07cf0;
   --text-error: #ff006e;
+  /* Network brand colours: the same in both palettes. The logos sit on them
+     in --net-fg, which must clear 3:1 on each. */
+  --net-fg: #ffffff;
+  --net-x: #000000;
+  --net-facebook: #1877f2;
+  --net-linkedin: #0a66c2;
+  --net-reddit: #e03d00;
+  --net-whatsapp: #128c7e;
+  --net-telegram: #1c8cc4;
+  --net-github: #24292f;
+  --net-instagram: #d6295b;
+  --net-youtube: #e60000;
+  --net-rss: #c85a00;
+
   --thumb-ease: 420ms cubic-bezier(0.2, 0.7, 0.2, 1);
 
   --font-heading: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
@@ -79,6 +93,20 @@
   --text-accent-blue: #0062c4;
   --text-accent-purple: #7209b7;
   --text-error: #c4005a;
+
+  /* Network brand colours: the same in both palettes. The logos sit on them
+     in --net-fg, which must clear 3:1 on each. */
+  --net-fg: #ffffff;
+  --net-x: #000000;
+  --net-facebook: #1877f2;
+  --net-linkedin: #0a66c2;
+  --net-reddit: #e03d00;
+  --net-whatsapp: #128c7e;
+  --net-telegram: #1c8cc4;
+  --net-github: #24292f;
+  --net-instagram: #d6295b;
+  --net-youtube: #e60000;
+  --net-rss: #c85a00;
 }
 
 /* ---------- 2. Reset & base ---------- */
@@ -405,15 +433,10 @@ a:focus-visible {
   margin: 0 4px;
 }
 
-/* ---------- 7. Grid system (hairline gaps) ---------- */
+/* ---------- 7. Grid system ---------- */
 .tile-grid {
   display: grid;
-  gap: 1px;
-  background: var(--border-color);
-  border: 1px solid var(--border-color);
-}
-.tile-grid > * {
-  background: var(--bg-base);
+  gap: var(--gutter);
 }
 .grid-3 {
   grid-template-columns: repeat(3, 1fr);
@@ -424,22 +447,13 @@ a:focus-visible {
 .lead-block {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1px;
-  background: var(--border-color);
-  border: 1px solid var(--border-color);
+  gap: var(--gutter);
   margin: 22px 0;
-}
-.lead-block > * {
-  background: var(--bg-base);
 }
 .lead-side {
   display: grid;
-  grid-template-rows: repeat(3, 1fr);
-  gap: 1px;
-  background: var(--border-color);
-}
-.lead-side > * {
-  background: var(--bg-base);
+  grid-template-rows: repeat(2, 1fr);
+  gap: var(--gutter);
 }
 
 /* ---------- 8. Post cards ---------- */
@@ -451,6 +465,7 @@ a:focus-visible {
 .post-thumb img {
   display: block;
   width: 100%;
+  aspect-ratio: 16 / 9;
   object-fit: cover;
   transition: transform var(--thumb-ease);
 }
@@ -458,47 +473,66 @@ a:focus-visible {
 .post-card:focus-within .post-thumb img,
 .lead-card:hover .post-thumb img,
 .lead-card:focus-within .post-thumb img,
-.related-item:hover .post-thumb img,
-.related-item:focus-within .post-thumb img {
+.side-card:hover .post-thumb img,
+.side-card:focus-within .post-thumb img {
   transform: scale(1.06);
 }
-.post-thumb .thumb-chip {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-.post-card {
+.post-card,
+.lead-card {
   display: block;
 }
-.post-card .card-body {
-  padding: 13px;
-}
-.post-card .entry-title {
-  margin: 9px 0 0;
-  font: 700 0.90625rem/1.34 var(--font-heading);
-  letter-spacing: -0.01em;
-}
-.post-card .entry-title a {
-  color: var(--text-primary);
-}
-.post-card:hover .entry-title a {
-  color: var(--brand-cyan);
-}
-.post-card .card-cat {
-  font: 800 0.75rem/1 var(--font-mono);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--brand-cyan);
-}
+.post-card .card-body,
 .lead-card .card-body {
-  padding: 18px 18px 22px;
+  padding-top: 12px;
+}
+/* One line: tags that wrap fall below the clip, so only what fits shows. */
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 8px;
+  height: 1.25rem;
+  overflow: hidden;
+  margin-bottom: 6px;
+  font: 600 0.75rem/1.25rem var(--font-mono);
+}
+.card-tags a {
+  color: var(--brand-cyan);
+}
+.card-tags a:hover {
+  text-decoration: underline;
+}
+.card-tags a:not(:first-child)::before,
+.topic-line a:not(:first-of-type)::before {
+  content: '·';
+  display: inline-block;
+  margin-right: 8px;
+  color: var(--text-subtle);
+}
+.card-date {
+  display: block;
+  margin-top: 8px;
+  font: 600 0.75rem/1 var(--font-mono);
+  color: var(--text-subtle);
+}
+.post-card .entry-title,
+.side-card .entry-title {
+  margin: 0;
+  font: 800 1.125rem/1.3 var(--font-heading);
+  letter-spacing: -0.01em;
 }
 .lead-card .entry-title {
   margin: 0 0 10px;
-  font: 900 1.625rem/1.16 var(--font-heading);
+  font: 900 1.75rem/1.16 var(--font-heading);
 }
+.post-card .entry-title a,
+.side-card .entry-title a,
 .lead-card .entry-title a {
   color: var(--text-primary);
+}
+.post-card:hover .entry-title a,
+.side-card:hover .entry-title a,
+.lead-card:hover .entry-title a {
+  color: var(--brand-cyan);
 }
 .lead-card .entry-excerpt {
   margin: 0;
@@ -507,30 +541,25 @@ a:focus-visible {
   color: var(--text-secondary);
 }
 .side-card {
-  display: flex;
-  gap: 14px;
-  padding: 14px;
+  display: grid;
+  grid-template-columns: 45% 1fr;
+  gap: 16px;
   align-items: center;
 }
+.side-card > a {
+  display: block;
+  align-self: stretch;
+}
+/* The image fills the row instead of setting its height. */
 .side-card .post-thumb {
-  width: 120px;
-  height: 78px;
-  flex: none;
+  height: 100%;
+  min-height: 150px;
 }
 .side-card .post-thumb img {
-  width: 120px;
-  height: 78px;
-}
-.side-card .entry-title {
-  margin: 9px 0 0;
-  font: 700 0.9375rem/1.32 var(--font-heading);
-}
-.side-card .entry-title a {
-  color: var(--text-primary);
-}
-.post-card .post-thumb img {
-  height: 118px;
-  width: 100%;
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  aspect-ratio: auto;
 }
 .entry-meta-mono {
   font: 600 0.75rem/1.6 var(--font-mono);
@@ -644,6 +673,7 @@ a:focus-visible {
 
 .byline-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
   padding-bottom: 16px;
@@ -666,41 +696,97 @@ a:focus-visible {
 /* ---------- 11. Byline links ---------- */
 .byline-links {
   display: flex;
-  gap: 1px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
   margin-left: auto;
 }
-.byline-links a,
-.byline-links button {
+.net-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
   border: 1px solid var(--border-color);
-  background: transparent;
+  background: var(--bg-elevated);
+  color: var(--text-primary);
   cursor: pointer;
-  padding: 6px 10px;
-  min-height: 28px;
+}
+.net-link:hover {
+  filter: brightness(1.2);
+}
+.net-x,
+.net-facebook,
+.net-linkedin,
+.net-reddit,
+.net-whatsapp,
+.net-telegram,
+.net-github,
+.net-instagram,
+.net-youtube,
+.net-rss {
+  color: var(--net-fg);
+}
+.net-x {
+  background: var(--net-x);
+}
+.net-facebook {
+  background: var(--net-facebook);
+}
+.net-linkedin {
+  background: var(--net-linkedin);
+}
+.net-reddit {
+  background: var(--net-reddit);
+}
+.net-whatsapp {
+  background: var(--net-whatsapp);
+}
+.net-telegram {
+  background: var(--net-telegram);
+}
+.net-github {
+  background: var(--net-github);
+}
+.net-instagram {
+  background: var(--net-instagram);
+}
+.net-youtube {
+  background: var(--net-youtube);
+}
+.net-rss {
+  background: var(--net-rss);
+}
+.net-link.is-copied {
+  width: auto;
+  gap: 6px;
+  padding: 0 10px;
+  background: var(--brand-cyan);
+  color: var(--chip-fg);
+}
+.net-link.is-copied::after {
+  content: 'Copied';
   font: 700 0.75rem/1 var(--font-mono);
-  letter-spacing: 0.1em;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-}
-.byline-links a:hover,
-.byline-links button:hover {
-  background: var(--brand-cyan);
-  color: var(--chip-fg);
-  border-color: var(--brand-cyan);
-}
-.post-links-row .link-primary {
-  background: var(--brand-cyan);
-  color: var(--chip-fg);
-  border-color: var(--brand-cyan);
 }
 .post-links-row {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  gap: 14px;
   padding: 16px 0;
   border-top: 1px solid var(--border-color);
   border-bottom: 1px solid var(--border-color);
   margin-bottom: 22px;
-  flex-wrap: wrap;
+}
+.post-links-group {
+  margin-left: 0;
+}
+.post-links-label {
+  margin-right: 6px;
+  font: 800 0.75rem/1.5 var(--font-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
 }
 
 /* ---------- 12. Entry content / block editor ---------- */
@@ -878,26 +964,21 @@ a:focus-visible {
   color: var(--brand-amber);
 }
 
-/* ---------- 13. Tags ---------- */
-.tag-list {
+/* ---------- 13. Topic line ---------- */
+.topic-line {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  align-items: center;
+  align-items: baseline;
+  gap: 4px 8px;
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
 }
-.tag-chip {
-  display: inline-flex;
-  align-items: center;
-  min-height: 28px;
-  background: var(--bg-subtle);
-  border: 1px solid var(--border-color);
-  color: var(--text-secondary);
-  font: 600 0.75rem/1 var(--font-mono);
-  padding: 5px 9px;
+.topic-line a {
+  color: var(--text-accent-blue);
 }
-.tag-chip:hover {
-  border-color: var(--brand-cyan);
-  color: var(--brand-cyan);
+.topic-line a:hover {
+  text-decoration: underline;
 }
 
 /* ---------- 14. Related posts ---------- */
@@ -908,18 +989,11 @@ a:focus-visible {
   color: var(--brand-cyan);
   margin: 26px 0 14px;
 }
-.related-grid .related-item h3 {
-  margin: 0;
-  padding: 11px;
-  font: 700 0.8125rem/1.35 var(--font-heading);
+.related-grid {
+  margin-bottom: 22px;
 }
-.related-grid .related-item h3 a {
-  color: var(--text-primary);
-}
-.related-grid .related-item img {
-  height: 80px;
-  width: 100%;
-  object-fit: cover;
+.related-grid .entry-title {
+  font-size: 0.9375rem;
 }
 
 /* ---------- 15. Sidebar widgets ---------- */
@@ -939,59 +1013,54 @@ a:focus-visible {
 .widget-cyan .widget-title {
   color: var(--brand-cyan);
 }
+.widget-copy {
+  margin: 0 0 10px;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
 .author-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
   border: 1px solid var(--border-color);
-  padding: 16px;
-  text-align: center;
 }
 .author-card img {
   width: 54px;
   height: 54px;
-  margin: 0 auto 10px;
-}
-.author-card .author-more {
-  margin-top: 10px;
 }
 .author-card .author-name {
+  margin-bottom: 6px;
   font: 800 0.875rem/1 var(--font-heading);
   color: var(--text-primary);
 }
-.author-card p {
-  margin: 8px 0 0;
-  font-size: 0.78125rem;
-  line-height: 1.6;
-  color: var(--text-secondary);
-}
-.trending-list {
+.rail-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
-.trending-item {
-  display: flex;
+.rail-item {
+  display: grid;
+  grid-template-columns: 76px 1fr;
   gap: 10px;
 }
-.trending-rank {
-  font: 700 0.75rem/1.4 var(--font-mono);
-  flex: none;
+.rail-item .post-thumb img {
+  aspect-ratio: 4 / 3;
 }
-.trending-item:nth-child(1) .trending-rank {
-  color: var(--brand-cyan);
+.rail-item > div {
+  line-height: 1.4;
 }
-.trending-item:nth-child(2) .trending-rank {
-  color: var(--text-accent-blue);
-}
-.trending-item:nth-child(3) .trending-rank {
-  color: var(--text-accent-purple);
-}
-.trending-item:nth-child(n + 4) .trending-rank {
-  color: var(--text-subtle);
-}
-.trending-item a {
-  font: 600 0.8125rem/1.45 var(--font-body);
+.rail-item div a {
+  font: 600 0.8125rem/1.4 var(--font-body);
   color: var(--text-body);
 }
-.trending-item a:hover {
+.rail-item div a:hover {
+  color: var(--brand-cyan);
+}
+.rail-rank {
+  margin-right: 4px;
+  font: 700 0.75rem/1.4 var(--font-mono);
   color: var(--brand-cyan);
 }
 .sidebar-widget ul {
@@ -1012,6 +1081,9 @@ a:focus-visible {
 .is-sticky-slot {
   position: sticky;
   top: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
 }
 
 /* ---------- 16. Reserved layout slots (sponsor placements) ---------- */
@@ -1051,6 +1123,9 @@ a:focus-visible {
 .feed-slot-row {
   grid-column: 1 / -1;
   padding: 0;
+}
+.feed-slot-row:empty {
+  display: none;
 }
 .feed-slot-row .reserved-unit {
   margin: 0;
@@ -1173,7 +1248,9 @@ input:focus {
   border-color: var(--brand-cyan);
   outline: none;
 }
-.comment-form .form-submit input[type='submit'],
+/* Jetpack mounts the button in span.jetpack-comments__submit, disabled until
+   the comment has text. */
+.comment-form input[type='submit'],
 .btn-primary,
 button.submit {
   background: var(--brand-cyan);
@@ -1185,8 +1262,13 @@ button.submit {
   text-transform: uppercase;
   padding: 12px 18px;
 }
-.comment-form .form-submit input[type='submit']:hover {
+.comment-form input[type='submit']:hover:enabled {
   background: var(--text-primary);
+}
+.comment-form input[type='submit']:disabled {
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  cursor: not-allowed;
 }
 .comment-navigation,
 .comment-respond {
@@ -1223,14 +1305,17 @@ button.submit {
 .post-navigation .nav-links {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1px;
-  background: var(--border-color);
-  border: 1px solid var(--border-color);
+  gap: var(--gutter);
 }
 .post-navigation .nav-previous,
 .post-navigation .nav-next {
-  background: var(--bg-base);
+  border: 1px solid var(--border-color);
   padding: 16px;
+}
+/* The newest and oldest articles have one neighbour; it takes the full row. */
+.post-navigation .nav-previous:only-child,
+.post-navigation .nav-next:only-child {
+  grid-column: 1 / -1;
 }
 .post-navigation .nav-next {
   text-align: right;
@@ -1270,24 +1355,36 @@ button.submit {
   line-height: 1.6;
   color: var(--text-secondary);
 }
-.newsletter-form {
+/* Jetpack's signup markup: form > [div >] p#subscribe-email + p#subscribe-submit */
+.newsletter-box form,
+.newsletter-box form > div {
   display: flex;
-  gap: 1px;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: 100%;
 }
-.newsletter-form input[type='email'] {
-  flex: 1;
-  height: 36px;
-  padding: 0 10px;
+.newsletter-box p {
+  margin: 0;
 }
-.newsletter-form button {
+.newsletter-box #subscribe-email {
+  flex: 1 1 150px;
+}
+.newsletter-box input[type='email'] {
+  width: 100% !important;
+  height: 38px;
+  padding: 0 10px !important;
+}
+.newsletter-box button,
+.newsletter-box input[type='submit'] {
+  height: 38px;
   padding: 0 16px;
-  height: 36px;
   background: var(--brand-cyan);
   color: var(--chip-fg);
   border: 0;
   cursor: pointer;
   font: 800 0.75rem/1 var(--font-mono);
   letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 .footer-links {
   list-style: none;
@@ -1306,20 +1403,8 @@ button.submit {
 }
 .profile-links {
   display: flex;
-  gap: 1px;
-}
-.profile-links a {
-  width: 30px;
-  height: 30px;
-  border: 1px solid var(--border-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-secondary);
-}
-.profile-links a:hover {
-  border-color: var(--brand-cyan);
-  color: var(--brand-cyan);
+  flex-wrap: wrap;
+  gap: 6px;
 }
 .footer-legal {
   margin-top: 14px;
@@ -1622,13 +1707,6 @@ button.submit {
   font-family: var(--font-heading) !important;
   color: var(--text-primary) !important;
 }
-.jetpack_subscription_widget input[type='submit'] {
-  background: var(--brand-cyan);
-  color: var(--chip-fg);
-  border: 0;
-  font-family: var(--font-mono);
-}
-
 /* Core's Calendar block ships its own greys (#40464d text, 2:1 on our dark
    base); repaint it with the tokens and give the day links a real target. */
 .wp-block-calendar table,
@@ -1808,13 +1886,17 @@ body:has(.lightbox[open]) {
     grid-template-columns: 1fr;
   }
   .side-card {
-    flex-direction: column;
-    align-items: flex-start;
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
-  .side-card .post-thumb,
-  .side-card .post-thumb img {
-    width: 100%;
+  .side-card .post-thumb {
     height: auto;
+    min-height: 0;
+  }
+  .side-card .post-thumb img {
+    position: static;
+    height: auto;
+    aspect-ratio: 16 / 9;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -1887,63 +1969,4 @@ body:has(.lightbox[open]) {
 .comment-likes-widget svg,
 .comment-likes-widget iframe {
   display: inline-block !important;
-}
-
-/* Jetpack Infinite Scroll (infinity.css is dequeued; these replace it) */
-.infinite-loader {
-  display: block;
-  height: 28px;
-  text-align: center;
-}
-.infinite-loader .infinite-loader-spinner {
-  display: inline-block;
-  width: 28px;
-  height: 28px;
-}
-#infinite-aria {
-  position: absolute;
-  overflow: hidden;
-  clip-path: inset(50%);
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  border: 0;
-}
-.infinite-wrap:focus {
-  outline: 0;
-}
-#infinite-handle {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-#infinite-handle span {
-  background: transparent !important;
-  border: none !important;
-  padding: 0 !important;
-  box-shadow: none !important;
-}
-#infinite-handle span:hover {
-  background: transparent !important;
-}
-#infinite-handle span button,
-#infinite-handle span button:focus,
-#infinite-handle span button:hover {
-  background: var(--brand-cyan) !important;
-  color: var(--chip-fg) !important;
-  border: 0 !important;
-  cursor: pointer !important;
-  font: 800 0.8125rem/1 var(--font-mono) !important;
-  letter-spacing: 0.12em !important;
-  text-transform: uppercase !important;
-  padding: 14px 24px !important;
-  transition: opacity 0.2s !important;
-  outline: none !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  display: inline-block !important;
-}
-#infinite-handle span button:hover {
-  opacity: 0.9 !important;
 }

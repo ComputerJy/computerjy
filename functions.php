@@ -272,6 +272,7 @@ function computerjy2_excerpt_more() {
 add_filter( 'excerpt_more', 'computerjy2_excerpt_more' );
 
 /** Include modules. */
+require_once get_template_directory() . '/inc/icons.php';
 require_once get_template_directory() . '/inc/template-tags.php';
 require_once get_template_directory() . '/inc/comment-walker.php';
 require_once get_template_directory() . '/inc/slots.php';
