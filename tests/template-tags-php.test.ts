@@ -108,3 +108,30 @@ describe.skipIf(!hasPhp)('computerjy2_post_link_targets', () => {
       expect(href).toContain('https%3A%2F%2Fx.test%2Fa%20b%2F');
   });
 });
+
+describe.skipIf(!hasPhp)('computerjy2_newsletter_form', () => {
+  const form = (block: string, shortcode: boolean) =>
+    execFileSync(
+      'php',
+      [
+        '-r',
+        `define("ABSPATH", "/");
+         function do_blocks($s) { return $GLOBALS["argv"][1]; }
+         function shortcode_exists($s) { return (bool) $GLOBALS["argv"][2]; }
+         function do_shortcode($s) { return "shortcode"; }
+         require "inc/template-tags.php"; echo computerjy2_newsletter_form();`,
+        block,
+        shortcode ? '1' : '',
+      ],
+      { encoding: 'utf8' }
+    );
+
+  it('prefers the block, which does not depend on a cached nonce', () => {
+    expect(form('<form>', true)).toBe('<form>');
+  });
+
+  it('falls back to the shortcode, then to nothing', () => {
+    expect(form('  ', true)).toBe('shortcode');
+    expect(form('', false)).toBe('');
+  });
+});
