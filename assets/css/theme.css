@@ -501,8 +501,7 @@ a:focus-visible {
 .card-tags a:hover {
   text-decoration: underline;
 }
-.card-tags a:not(:first-child)::before,
-.topic-line a:not(:first-of-type)::before {
+.card-tags a:not(:first-child)::before {
   content: '·';
   display: inline-block;
   margin-right: 8px;
@@ -980,6 +979,13 @@ a:focus-visible {
 .topic-line a:hover {
   text-decoration: underline;
 }
+/* After, not before: a wrapped line must not open with a separator. */
+.topic-line a:not(:last-child)::after {
+  content: '·';
+  display: inline-block;
+  margin-left: 8px;
+  color: var(--text-subtle);
+}
 
 /* ---------- 14. Related posts ---------- */
 .block-kicker {
@@ -1372,7 +1378,7 @@ button.submit {
 /* !important: Jetpack's block sets these inline. */
 .newsletter-box input[type='email'] {
   width: 100% !important;
-  height: 38px;
+  height: 38px !important;
   padding: 0 10px !important;
   font-size: 0.875rem !important;
 }
