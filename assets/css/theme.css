@@ -353,7 +353,7 @@ a:focus-visible {
 }
 .badge-news {
   background: var(--brand-pink);
-  color: #fff;
+  color: #080b12;
 }
 .badge-glow {
   background: var(--grad-primary);

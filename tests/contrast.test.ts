@@ -68,6 +68,17 @@ describe.each([
   it('chip text on the cyan chip background is at least 4.5:1', () => {
     expect(ratio(t['chip-fg'], t['brand-cyan'])).toBeGreaterThanOrEqual(4.5);
   });
+
+  it.each(['entertainment', 'education', 'news'])(
+    '.badge-%s label on its fill is at least 4.5:1',
+    (name) => {
+      const rule = css.match(new RegExp(`\\.badge-${name} \\{([^}]*)\\}`))![1];
+      const fill = t[rule.match(/background: var\(--([a-z-]+)\)/)![1]];
+      const label = rule.match(/[^-]color: (#[0-9a-f]+)/)![1];
+      const hex = label === '#fff' ? '#ffffff' : label;
+      expect(ratio(hex, fill)).toBeGreaterThanOrEqual(4.5);
+    }
+  );
 });
 
 describe('brand colours are not used as text', () => {
