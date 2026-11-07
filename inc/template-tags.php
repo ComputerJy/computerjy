@@ -235,6 +235,14 @@ function computerjy2_card_date() {
  * @return string Markup rendered by Jetpack.
  */
 function computerjy2_newsletter_form() {
+    // The block posts to WordPress.com. The shortcode posts back to this site
+    // with a nonce, and Jetpack silently drops the signup once a cached page's
+    // nonce has expired, so it is only the fallback.
+    $form = do_blocks( '<!-- wp:jetpack/subscriptions {"showSubscribersTotal":false,"submitButtonText":"Join","subscribePlaceholder":"you@email.com"} /-->' );
+    if ( '' !== trim( $form ) ) {
+        return $form;
+    }
+
     if ( ! shortcode_exists( 'jetpack_subscription_form' ) ) {
         return '';
     }
