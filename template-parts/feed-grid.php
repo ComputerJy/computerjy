@@ -4,9 +4,6 @@
  * Continues the main loop from wherever the caller left it (index.php has
  * already consumed the lead block on page 1).
  *
- * Jetpack infinite scroll keeps its own loop in inc/plugin-compat.php: it
- * must not emit slots.
- *
  * @package ComputerJy2
  */
 

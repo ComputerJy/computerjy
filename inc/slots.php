@@ -39,6 +39,12 @@ function computerjy2_slot( $id, $label = '' ) {
     $hooked = ob_get_clean();
 
     $has_content = ( '' !== trim( $code ) ) || ( '' !== trim( $hooked ) );
+    $show_label  = ! $has_content && current_user_can( 'edit_theme_options' ) && is_customize_preview();
+
+    // An unsold slot takes no space; the Customizer still shows where it sits.
+    if ( ! $has_content && ! $show_label ) {
+        return;
+    }
 
     printf(
         '<div class="reserved-unit unit-%1$s%2$s" data-slot="%1$s">',
@@ -53,7 +59,7 @@ function computerjy2_slot( $id, $label = '' ) {
     }
     echo $hooked; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
-    if ( ! $has_content && ( current_user_can( 'edit_theme_options' ) && is_customize_preview() ) ) {
+    if ( $show_label ) {
         echo esc_html( $label ? $label : $id );
     }
 

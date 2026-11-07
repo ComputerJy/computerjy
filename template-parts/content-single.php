@@ -29,17 +29,14 @@
 
     <div class="post-links-row">
         <?php if ( has_tag() ) : ?>
-            <div class="tag-list">
+            <p class="topic-line">
+                <span class="post-links-label"><?php esc_html_e( 'Keep reading about:', 'computerjy2' ); ?></span>
                 <?php
                 foreach ( get_the_tags() as $cjy_tag ) {
-                    printf(
-                        '<a class="tag-chip" href="%1$s">%2$s</a>',
-                        esc_url( get_tag_link( $cjy_tag->term_id ) ),
-                        esc_html( $cjy_tag->name )
-                    );
+                    printf( '<a href="%1$s">%2$s</a>', esc_url( get_tag_link( $cjy_tag ) ), esc_html( $cjy_tag->name ) );
                 }
                 ?>
-            </div>
+            </p>
         <?php endif; ?>
         <?php computerjy2_byline_links( 'bottom' ); ?>
     </div>
@@ -62,12 +59,7 @@
                 <?php
                 while ( $cjy_related->have_posts() ) :
                     $cjy_related->the_post();
-                    ?>
-                    <div class="related-item">
-                        <?php computerjy2_thumb( 'computerjy2-side' ); ?>
-                        <h3><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
-                    </div>
-                    <?php
+                    get_template_part( 'template-parts/content', 'card' );
                 endwhile;
                 wp_reset_postdata();
                 ?>

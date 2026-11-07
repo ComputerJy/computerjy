@@ -65,6 +65,13 @@ describe.each([
     }
   );
 
+  it.each(Object.keys(dark).filter((k) => /^net-(?!fg)/.test(k)))(
+    '--net-fg logo on --%s is at least 3:1',
+    (bg) => {
+      expect(ratio(t['net-fg'], t[bg])).toBeGreaterThanOrEqual(3);
+    }
+  );
+
   it('chip text on the cyan chip background is at least 4.5:1', () => {
     expect(ratio(t['chip-fg'], t['brand-cyan'])).toBeGreaterThanOrEqual(4.5);
   });

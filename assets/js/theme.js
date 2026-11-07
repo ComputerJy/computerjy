@@ -271,10 +271,9 @@
     e.preventDefault();
     var url = btn.getAttribute('data-copy-link') || window.location.href;
     var done = function () {
-      var prev = btn.textContent;
-      btn.textContent = 'COPIED';
+      btn.classList.add('is-copied');
       setTimeout(function () {
-        btn.textContent = prev;
+        btn.classList.remove('is-copied');
       }, 1600);
     };
     if (navigator.clipboard) {

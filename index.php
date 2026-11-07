@@ -25,10 +25,11 @@ get_header();
         $cjy_index = 0;
         $cjy_lead  = ( is_home() && ! is_paged() );
 
-        // The lead block only exists on page 1: one lead card plus three side cards.
+        // The lead block only exists on page 1: one lead card plus two side cards,
+        // which leaves nine feed cards: full rows of three.
         if ( $cjy_lead ) :
             $cjy_side = array();
-            while ( have_posts() && count( $cjy_side ) < 3 ) :
+            while ( have_posts() && count( $cjy_side ) < 2 ) :
                 the_post();
                 $cjy_index++;
                 if ( 1 === $cjy_index ) {
