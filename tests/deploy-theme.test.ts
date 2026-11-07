@@ -62,6 +62,7 @@ describe('deploy/deploy-theme.sh staging', () => {
   it.each([
     'webroot/.well-known/api-catalog',
     'webroot/.well-known/openid-configuration',
+    'webroot/.well-known/poppy.json',
     'webroot/api/openapi.json',
     'webroot/robots.txt',
     'webroot/security.txt',
