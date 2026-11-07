@@ -58,6 +58,13 @@ the block editor. `tests/head-assets.test.ts` guards this and the gtag defer.
   Run the same check without `CONNECT_TO` against the live edge after a deploy,
   with `EDGE=1` to assert the Cloudflare cache matrix (`cf-cache-status` per
   cookie / `Accept: text/markdown` / REST / static row, and the `s-maxage`).
+- Without SSH, read public facts from `/wp-json/` and the live HTML.
+- Check the visitor view with the Chrome DevTools MCP in an `isolatedContext`.
+  Claude in Chrome is logged in as admin, and its JavaScript tool failed on
+  article pages here.
+- Jetpack markup can't run locally or in the previews, so check signup and
+  comment changes on the live site after deploy.
+- The owner merges and deploys, so hand over a green PR rather than merging.
 - `deploy/lightsail-apache.conf` is read by `tests/apache-vhost.test.ts`: the
   `Link` header (the agent-discovery contract), the edge `Cache-Control`
   expression and the redirect rules it asserts must stay byte-identical.
@@ -91,8 +98,9 @@ Keep them in sync when you change markup structure.
   `minify.*.http2push` (emits a `103` preload for a file that doesn't exist),
   the duplicate security headers. `search-index.json` and `markdown.php` are in
   the never-cache list.
-- Jetpack is trimmed to what the theme uses (comments, protect, monitor, subscriptions, publicize, SEO tools, sitemaps). Sharing,
-  Photon / Site Accelerator, Carousel and the WAF are off on purpose: the theme
+- Jetpack is trimmed to what the theme uses (comments, protect, monitor,
+  subscriptions, publicize, SEO tools, sitemaps). Sharing, Photon / Site
+  Accelerator, Carousel and the WAF are off on purpose: the theme
   renders its own share block and image lightbox, images must stay
   same-origin, Cloudflare is the WAF. Jetpack's related posts are suppressed
   by the theme (Customizer toggle). A monthly `link-check` workflow replaces
@@ -104,7 +112,16 @@ Keep them in sync when you change markup structure.
 - Permalinks are `/%year%/%monthnum%/%postname%/`. The old `/posts/<slug>`
   and wrong-date URLs are 301'd by `inc/seo.php` on exact slug match (core's
   fuzzy 404 guess is off); the vhost must not rewrite them.
-- Comments render through Jetpack's hosted form. WP-Cron runs from
+- Newsletter signup is Jetpack's block, not the shortcode, which posts back with
+  a nonce and silently drops signups once a cached page's nonce expires. The
+  block sets inline styles, so `.newsletter-box` overrides use `!important`.
+- The site icon must be opaque. WordPress.com emails use it, and a transparent
+  lossy WebP showed black and color blocks there. Uploads are served as WebP.
+- `sidebar-1` widgets are database settings, shown under the theme's sidebar.
+  Check them in the live HTML, because a Tag Cloud has no title.
+- Comments render through Jetpack's hosted form, which mounts the submit button
+  in `span.jetpack-comments__submit` (no `.form-submit`), disabled until there
+  is text. WP-Cron runs from
   `/etc/cron.d/computerjy-wp-cron`, not page loads.
 - `public/` files are served straight from the docroot by the vhost's real-file
   check.
@@ -114,17 +131,22 @@ Keep them in sync when you change markup structure.
 - `functions.php` — setup, image sizes, menus, widget areas, enqueues; requires
   everything in `inc/`.
 - `template-parts/` — `content-{card,lead,side,single,page,none}.php`,
-  `sidebar-list.php` and `feed-grid.php` (the post loop + in-feed slot); top-level templates only
-  compose these. `page-templates/` — `full-width.php`, `landing.php`.
+  `sidebar-list.php` and `feed-grid.php` (the post loop + in-feed slot);
+  top-level templates only compose these. `page-templates/` — `full-width.php`,
+  `landing.php`.
 - `inc/template-tags.php` — `computerjy2_reading_time()`,
   `computerjy2_category_chip()`, `computerjy2_breadcrumbs()`,
   `computerjy2_pagination()`, `computerjy2_eyebrow_strip()`,
-  `computerjy2_byline_links()`, `computerjy2_thumb()` (falls back to
+  `computerjy2_byline_links()`, `computerjy2_card_tags()`,
+  `computerjy2_card_date()`, `computerjy2_newsletter_form()`,
+  `computerjy2_thumb()` (falls back to
   `computerjy2_fallback_image_url()`: the Customizer "Default post image" or
   `assets/images/post-placeholder.svg`), `computerjy2_brand_mark()`.
+- `inc/icons.php` — `computerjy2_icon()`, inline network logos.
 - `inc/slots.php` — `computerjy2_slot( $id )` renders a height-reserved sponsor
-  container, or nothing when the slot has no sponsor. Slot ids: `leaderboard`, `infeed`, `inarticle`, `sidebar`. The
-  in-article slot is injected by a `the_content` filter, not by a template.
+  container, or nothing when the slot has no sponsor. Slot ids: `leaderboard`,
+  `infeed`, `inarticle`, `sidebar`. The in-article slot is injected by a
+  `the_content` filter, not by a template.
 - `inc/related.php` — related + trending queries, transient-cached, purged on
   `save_post`, `wp_insert_comment`, and common cache-plugin flush hooks.
 - `inc/search-index.php` — serves `/search-index.json` (the ⌘K dataset the
@@ -163,6 +185,11 @@ Keep them in sync when you change markup structure.
   (`--font-body`).
 - Network logos are inline SVGs from `inc/icons.php` on plain links, never the
   networks' own widgets. `--net-*` tokens must clear 3:1 under `--net-fg`.
+- Keep `computerjy2_posts_per_page` a multiple of 3. The Lead block takes 3 posts
+  and the Feed has 3 columns, so other values leave a hole in the grid.
+- Use the terms in `GLOSSARY.md` in code comments, PRs and docs.
+- The ComputerJy Design System artifact mirrors `theme.css` and the templates, so
+  update it after a deploy that changes them.
 - Escape on output (`esc_html`, `esc_url`, `esc_attr`, `wp_kses_post`). The one
   deliberate exception is admin-entered sponsor markup in `inc/slots.php`.
 - `phpcs.xml` enforces `WordPress.Security`, `WordPress.DB`, deprecated-API
