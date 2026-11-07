@@ -39,3 +39,33 @@ describe.skipIf(!hasPhp)('computerjy2_legacy_target', () => {
     }
   );
 });
+
+describe.skipIf(!hasPhp)('computerjy2_thumbnail_alt', () => {
+  const thumb = (html: string) =>
+    execFileSync(
+      'php',
+      [
+        '-r',
+        `define("ABSPATH", "/");
+        function add_action() {} function add_filter() {}
+        function get_the_title($id) { return 7 === $id ? "Rust &#038; <em>apps</em>" : "wrong post"; }
+        function wp_strip_all_tags($s) { return strip_tags($s); }
+        function esc_attr($s) { return htmlspecialchars($s, ENT_QUOTES); }
+        require "inc/seo.php";
+        echo computerjy2_thumbnail_alt($argv[1], 7);`,
+        html,
+      ],
+      { encoding: 'utf8' }
+    );
+
+  it('falls back to the post title when the library alt is empty', () => {
+    expect(thumb('<img src="a.webp" alt="" />')).toBe(
+      '<img src="a.webp" alt="Rust &amp; apps" />'
+    );
+  });
+
+  it('keeps a media-library alt', () => {
+    const img = '<img src="a.webp" alt="Two phones" />';
+    expect(thumb(img)).toBe(img);
+  });
+});

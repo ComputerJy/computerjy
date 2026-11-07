@@ -11,7 +11,7 @@ function computerjy2_comment( $comment, $args, $depth ) {
     ?>
     <li id="comment-<?php comment_ID(); ?>" <?php comment_class( 'comment-item' ); ?>>
         <div class="comment-row" id="div-comment-<?php comment_ID(); ?>">
-            <span class="comment-avatar"><?php echo get_avatar( $comment, 30 ); ?></span>
+            <span class="comment-avatar"><?php echo get_avatar( $comment, 30, '', get_comment_author( $comment ) ); ?></span>
             <div class="comment-bubble">
                 <div class="comment-header">
                     <?php echo get_comment_author_link(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>

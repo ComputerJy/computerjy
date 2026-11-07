@@ -80,6 +80,19 @@ function computerjy2_og_image_alt( $tags ) {
 add_filter( 'jetpack_open_graph_tags', 'computerjy2_og_image_alt' );
 
 /**
+ * Featured images with no media-library alt use the post title, like
+ * og:image:alt above. Covers every the_post_thumbnail() caller.
+ *
+ * @param string $html    Thumbnail markup.
+ * @param int    $post_id Post the thumbnail belongs to.
+ * @return string
+ */
+function computerjy2_thumbnail_alt( $html, $post_id ) {
+    return str_replace( ' alt=""', ' alt="' . esc_attr( computerjy2_plain( get_the_title( $post_id ) ) ) . '"', $html );
+}
+add_filter( 'post_thumbnail_html', 'computerjy2_thumbnail_alt', 10, 2 );
+
+/**
  * Title / excerpt text without markup or HTML entities (&#8211; and friends).
  *
  * @param string $html Text.

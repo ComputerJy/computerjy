@@ -17,7 +17,7 @@ $cjy_author = get_queried_object();
         <div class="container">
             <?php computerjy2_breadcrumbs(); ?>
             <div class="author-hero">
-                <?php echo get_avatar( $cjy_author->ID, 96, '', '', array( 'class' => 'author-hero-avatar' ) ); ?>
+                <?php echo get_avatar( $cjy_author->ID, 96, '', get_the_author_meta( 'display_name', $cjy_author->ID ), array( 'class' => 'author-hero-avatar' ) ); ?>
                 <div class="author-hero-body">
                     <span class="archive-kicker"><?php esc_html_e( 'Author', 'computerjy2' ); ?></span>
                     <h1><?php echo esc_html( get_the_author_meta( 'display_name', $cjy_author->ID ) ); ?></h1>
