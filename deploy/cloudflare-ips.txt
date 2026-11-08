@@ -4,7 +4,7 @@
 # This file is the canonical record of what is configured on the Lightsail origin,
 # and the single source for both consumers -- deploy/lightsail-remoteip.conf is
 # generated from it so the two allowlists cannot drift apart.
-# It is compared weekly against Cloudflare's published list by
+# It is compared daily against Cloudflare's published list and the live ufw rules by
 # .github/workflows/cloudflare-ip-monitor.yml -- that job FAILS if they diverge,
 # because a newly-published Cloudflare range that is not allowed here means
 # Cloudflare cannot reach the origin and the site goes down.
