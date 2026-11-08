@@ -25,6 +25,8 @@ permissions:
   contents: read
 
 env:
+  # For messages only: the origin reads this path in deploy/cjy-monitor, the forced
+  # command the monitor key is locked to.
   CERT_PATH: /etc/letsencrypt/live/computerjy.com/cert.pem
   WARN_DAYS: 21
   # Cloudflare connects to the origin as www.computerjy.com. Both names must stay on
@@ -64,8 +66,7 @@ jobs:
         run: |
           set -uo pipefail
           ssh -i ~/.ssh/id_rsa -o ConnectTimeout=20 -o BatchMode=yes \
-            -o StrictHostKeyChecking=yes "$SSH_TARGET" \
-            "sudo openssl x509 -in '${CERT_PATH}' -noout -enddate -ext subjectAltName 2>&1" \
+            -o StrictHostKeyChecking=yes "$SSH_TARGET" cert \
             > /tmp/cert.txt 2>/tmp/ssh-err.txt
           echo "ssh_exit=$?" >> "$GITHUB_ENV"
           echo "--- remote output ---"
