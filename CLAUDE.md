@@ -51,6 +51,10 @@ the block editor. `tests/head-assets.test.ts` guards this and the gtag defer.
 - CI (`.github/workflows/ci.yml`) is one job running exactly those commands
   plus `npm run format:check`, `npm test` and actionlint; `ci` and `CodeQL`
   are the required checks on `main`.
+- Scheduled workflows (cert / Cloudflare monitors) never run on a PR: verify
+  with `gh workflow run <file> --ref <branch>` before the owner merges. actionlint
+  (reviewdog) fails past 10 annotations per step in a touched file; ignores go
+  in `.github/actionlint.yaml`.
 - No WordPress runs locally. WP-bound code is verified against the origin
   through an SSH tunnel (creds in `.env`):
   `ssh -i $KEY_PATH -f -N -L 8443:127.0.0.1:443 $SERVER_USER@$SERVER_HOST`, then
@@ -130,6 +134,10 @@ Keep them in sync when you change markup structure.
   in `span.jetpack-comments__submit` (no `.form-submit`), disabled until there
   is text. WP-Cron runs from
   `/etc/cron.d/computerjy-wp-cron`, not page loads.
+- The monitors SSH in as `cjy-monitor`, whose key is forced to `deploy/cjy-monitor`
+  (`cert` / `ufw` only, backed by `/etc/sudoers.d/cjy-monitor`). A new remote
+  command means updating that script and the sudoers rule on the origin first.
+  The origin host key is pinned in the `LIGHTSAIL_KNOWN_HOSTS` secret.
 - `public/` files are served straight from the docroot by the vhost's real-file
   check.
 
