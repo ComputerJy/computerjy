@@ -140,7 +140,7 @@ jobs:
             | tr -d '\r' | sort -u > /tmp/allowlist.txt
 
           if ! ssh -i ~/.ssh/id_rsa -o ConnectTimeout=20 -o BatchMode=yes \
-            -o StrictHostKeyChecking=yes "$SSH_TARGET" 'sudo ufw status' > /tmp/ufw.txt; then
+            -o StrictHostKeyChecking=yes "$SSH_TARGET" ufw > /tmp/ufw.txt; then
             echo '### Could not read the origin firewall' >> "$GITHUB_STEP_SUMMARY"
             echo "::error::Could not read ufw status from the origin - this check is blind until SSH works."
             exit 1

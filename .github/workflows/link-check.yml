@@ -52,12 +52,15 @@ jobs:
           # 429: rate-limited, not broken. xmlrpc.php: the <link rel="EditURI">
           # target, blocked at the edge on purpose. The social hosts 403 every bot;
           # the host is anchored so e.g. dropbox.com is not caught by x.com.
+          # /cdn-cgi/ is Cloudflare's email obfuscation (decoded by JS, 404 to a bot)
+          # and wp-comments-post.php is the comment form's POST-only action.
           args: >-
             --no-progress
             --accept 200..=206,429
             --max-concurrency 8
             --user-agent "$USER_AGENT"
             --exclude 'xmlrpc\.php'
-            --exclude '^https?://([^/]+\.)?(twitter|x|linkedin|facebook|instagram)\.com([:/?#]|$)'
+            --exclude '^https?://([^/]+\.)?(twitter|x|linkedin|facebook|instagram|reddit)\.com([:/?#]|$)'
+            --exclude '^https://www\.computerjy\.com/(cdn-cgi/|wp-comments-post\.php)'
             $(cat urls.txt)
           fail: true
