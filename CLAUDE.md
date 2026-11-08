@@ -109,8 +109,9 @@ Keep them in sync when you change markup structure.
   Accelerator, Carousel and the WAF are off on purpose: the theme
   renders its own share block and image lightbox, images must stay
   same-origin, Cloudflare is the WAF. Jetpack's related posts are suppressed
-  by the theme (Customizer toggle). A monthly `link-check` workflow replaces
-  the broken-link-checker plugin.
+  by the theme (Customizer toggle). Nothing checks for broken links: the
+  broken-link-checker plugin and its `link-check` workflow replacement are both
+  gone (the workflow took about 8 minutes a run).
 - SEO is Jetpack SEO tools (title, description, canonical, OG/Twitter) plus
   `inc/seo.php` (JSON-LD, `og:image:alt`, noindex on date/author archives,
   legacy-URL 301s); Yoast is gone. Jetpack serves `/sitemap.xml`; the vhost
