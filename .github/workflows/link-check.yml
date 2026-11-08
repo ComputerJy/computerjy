@@ -1,7 +1,7 @@
 name: Link check
 
 # Monthly replacement for the broken-link-checker plugin (removed 2026-09-19):
-# it crawled the origin every ten minutes from WP-Cron; this reads the Yoast
+# it crawled the origin every ten minutes from WP-Cron; this reads Jetpack's
 # sitemaps from the edge and checks every link on every public page from a
 # runner instead. A red run is the notification; the job summary lists what
 # broke and where. Nothing here writes to the site.
@@ -19,7 +19,7 @@ permissions:
   contents: read
 
 env:
-  SITEMAP: https://www.computerjy.com/sitemap_index.xml
+  SITEMAP: https://www.computerjy.com/sitemap.xml
   # Named so a Cloudflare WAF skip rule can target it if the runner ever gets challenged.
   USER_AGENT: 'computerjy-linkcheck/1.0 (+https://github.com/ComputerJy/computerjy)'
 
@@ -31,13 +31,15 @@ jobs:
     steps:
       # lychee does not crawl: it checks the links found in its inputs. Feeding it
       # the sitemap would only verify that the sitemap's URLs answer, so expand the
-      # index into the page URLs first and pass those as the inputs.
+      # index into the page URLs first and pass those as the inputs. -L because the
+      # vhost 301s the legacy sitemap names, and a 301 body is empty: without it the
+      # pipeline silently collects nothing.
       - name: Collect page URLs from the sitemap index
         run: |
           set -euo pipefail
-          curl -sSf -A "$USER_AGENT" "$SITEMAP" \
+          curl -sSfL -A "$USER_AGENT" "$SITEMAP" \
             | grep -oP '(?<=<loc>)[^<]+' \
-            | xargs -n1 curl -sSf -A "$USER_AGENT" \
+            | xargs -n1 curl -sSfL -A "$USER_AGENT" \
             | grep -oP '(?<=<loc>)[^<]+' \
             | sort -u > urls.txt
           echo "$(wc -l < urls.txt) pages"
@@ -48,13 +50,14 @@ jobs:
         with:
           lycheeVersion: v0.24.2
           # 429: rate-limited, not broken. xmlrpc.php: the <link rel="EditURI">
-          # target, blocked at the edge on purpose. The social hosts 403 every bot.
+          # target, blocked at the edge on purpose. The social hosts 403 every bot;
+          # the host is anchored so e.g. dropbox.com is not caught by x.com.
           args: >-
             --no-progress
             --accept 200..=206,429
             --max-concurrency 8
             --user-agent "$USER_AGENT"
             --exclude 'xmlrpc\.php'
-            --exclude 'twitter\.com|x\.com|linkedin\.com|facebook\.com|instagram\.com'
+            --exclude '^https?://([^/]+\.)?(twitter|x|linkedin|facebook|instagram)\.com([:/?#]|$)'
             $(cat urls.txt)
           fail: true

@@ -24,6 +24,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-node@v7
         with:
@@ -32,7 +34,15 @@ jobs:
 
       - run: npm ci
 
-      # The runner image ships PHP and Composer; composer.json pins WPCS.
+      # Match the origin's PHP minor so `php -l` and phpcs see what production runs.
+      # Bump it when the origin's PHP is upgraded.
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: '8.5'
+          tools: composer
+          coverage: none
+
+      # composer.json pins WPCS.
       - run: composer install --no-interaction --no-progress --prefer-dist
 
       - name: PHP syntax

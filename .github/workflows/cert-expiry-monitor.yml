@@ -38,23 +38,33 @@ jobs:
     timeout-minutes: 5
 
     steps:
+      # The host key is pinned from a secret rather than fetched with ssh-keyscan,
+      # which would trust whatever key answered and make a changed host key
+      # undetectable. A mismatch fails the read below, which reports it as "blind".
+      # Refresh after rebuilding the origin, from a machine that already trusts it:
+      #   ssh-keygen -F <host> | grep -v '^#' | gh secret set LIGHTSAIL_KNOWN_HOSTS
       - name: Setup SSH Credentials
+        env:
+          SSH_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.LIGHTSAIL_KNOWN_HOSTS }}
         run: |
           set -euo pipefail
           mkdir -p ~/.ssh
-          echo "${{ secrets.LIGHTSAIL_SSH_KEY }}" > ~/.ssh/id_rsa
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.LIGHTSAIL_HOST }} >> ~/.ssh/known_hosts
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
 
       - name: Read certificate from the origin
         # The remote script always exits 0 and prints a verdict instead. That keeps a
         # transport failure (SSH down, host key changed) distinguishable from a real
         # expiry finding — the next step treats a missing verdict as "the monitor is
         # blind", which is its own alertable condition rather than a silent pass.
+        env:
+          SSH_TARGET: ${{ secrets.LIGHTSAIL_USER }}@${{ secrets.LIGHTSAIL_HOST }}
         run: |
           set -uo pipefail
           ssh -i ~/.ssh/id_rsa -o ConnectTimeout=20 -o BatchMode=yes \
-            ${{ secrets.LIGHTSAIL_USER }}@${{ secrets.LIGHTSAIL_HOST }} \
+            -o StrictHostKeyChecking=yes "$SSH_TARGET" \
             "sudo openssl x509 -in '${CERT_PATH}' -noout -enddate -ext subjectAltName 2>&1" \
             > /tmp/cert.txt 2>/tmp/ssh-err.txt
           echo "ssh_exit=$?" >> "$GITHUB_ENV"

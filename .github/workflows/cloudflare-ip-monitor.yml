@@ -3,7 +3,8 @@ name: Cloudflare IP Range Monitor
 # Cloudflare's published IP ranges are allow-listed in the origin firewall (ufw).
 # If Cloudflare publishes a NEW range that the firewall does not allow, Cloudflare
 # loses access to the origin and the site goes down. This job alerts on divergence;
-# it never edits the firewall.
+# it never edits the firewall. It also reads the live ufw rules over SSH, because
+# deploy/cloudflare-ips.txt is only the record of what the firewall should hold.
 #
 # GitHub disables `schedule:` triggers in a repository with no commits for 60 days,
 # and a monitor that has silently stopped running looks exactly like one reporting
@@ -30,6 +31,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Fetch Cloudflare published ranges
         run: |
@@ -109,4 +112,61 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
           cat /tmp/conf-diff.txt
           echo "::error::deploy/lightsail-remoteip.conf does not match deploy/cloudflare-ips.txt."
+          exit 1
+
+      # Same pinned-host-key setup as cert-expiry-monitor.yml; see the note there.
+      - name: Setup SSH Credentials
+        if: always()
+        env:
+          SSH_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.LIGHTSAIL_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      # The live firewall can drift from the committed record (a manual ufw edit, or
+      # update-cloudflare-firewall.sh run without committing the result), and then the
+      # comparison above checks the wrong list.
+      - name: Check the live origin firewall matches the allowlist
+        if: always()
+        env:
+          SSH_TARGET: ${{ secrets.LIGHTSAIL_USER }}@${{ secrets.LIGHTSAIL_HOST }}
+        run: |
+          set -euo pipefail
+          sed '/^[[:space:]]*#/d; /^[[:space:]]*$/d' deploy/cloudflare-ips.txt \
+            | tr -d '\r' | sort -u > /tmp/allowlist.txt
+
+          if ! ssh -i ~/.ssh/id_rsa -o ConnectTimeout=20 -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes "$SSH_TARGET" 'sudo ufw status' > /tmp/ufw.txt; then
+            echo '### Could not read the origin firewall' >> "$GITHUB_STEP_SUMMARY"
+            echo "::error::Could not read ufw status from the origin - this check is blind until SSH works."
+            exit 1
+          fi
+
+          grep '# cloudflare' /tmp/ufw.txt \
+            | grep -oE '[0-9a-fA-F:.]+/[0-9]{1,3}' | sort -u > /tmp/live.txt || true
+
+          # An empty result with ufw active is a real (and severe) finding, so it is
+          # reported as a diff rather than a read failure.
+          if diff -u /tmp/allowlist.txt /tmp/live.txt > /tmp/live-diff.txt; then
+            echo "Live ufw rules match deploy/cloudflare-ips.txt ($(wc -l < /tmp/live.txt) ranges)."
+            exit 0
+          fi
+          {
+            echo '### Origin firewall drifted from `deploy/cloudflare-ips.txt`'
+            echo ''
+            echo '`+` allowed on the origin but not recorded. `-` recorded but **not allowed on the origin** - Cloudflare cannot reach it from that range.'
+            echo ''
+            echo '```diff'
+            cat /tmp/live-diff.txt
+            echo '```'
+            echo ''
+            echo 'Fix: `sudo bash deploy/update-cloudflare-firewall.sh` on the origin, then commit the'
+            echo 'resulting list to `deploy/cloudflare-ips.txt`.'
+          } >> "$GITHUB_STEP_SUMMARY"
+          cat /tmp/live-diff.txt
+          echo "::error::Live ufw rules diverge from deploy/cloudflare-ips.txt - see job summary."
           exit 1
