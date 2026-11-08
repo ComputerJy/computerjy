@@ -1,0 +1,6 @@
+# Job-summary lines are Markdown, so single-quoted backticks are intentional,
+# not a shell expansion that failed (shellcheck SC2016).
+paths:
+  .github/workflows/**/*.yml:
+    ignore:
+      - 'SC2016:'
