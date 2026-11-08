@@ -31,6 +31,8 @@ leftovers from the Astro era — ignore them.
 `inc/computerjy-*.php` are standalone single-file plugins (currently the
 edge-cache purge), hand-installed into `wp-content/plugins`, never required by
 `functions.php`; their secrets are `wp-config.php` constants.
+`deploy-theme.sh` doesn't ship them, so the origin copy drifts: `diff` it over
+SSH and install with `sudo install -o www-data -g www-data -m 644`.
 
 There is no build step. CSS and JS are hand-written; do not introduce a bundler
 without asking. `functions.php` inlines `theme.css` + `fonts.css` into `<head>`
@@ -98,6 +100,10 @@ Keep them in sync when you change markup structure.
   `minify.*.http2push` (emits a `103` preload for a file that doesn't exist),
   the duplicate security headers. `search-index.json` and `markdown.php` are in
   the never-cache list.
+- W3TC's Cloudflare extension is active with credentials but
+  `cloudflare.pagecache` is off, so it purges only on flush-all; the edge-cache
+  plugin is the only purge on publish/comment/term/menu/Customizer. Keep it
+  (its token is cache-purge-scoped and lives in `wp-config.php`).
 - Jetpack is trimmed to what the theme uses (comments, protect, monitor,
   subscriptions, publicize, SEO tools, sitemaps). Sharing, Photon / Site
   Accelerator, Carousel and the WAF are off on purpose: the theme
