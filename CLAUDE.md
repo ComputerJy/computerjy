@@ -74,6 +74,9 @@ the block editor. `tests/head-assets.test.ts` guards this and the gtag defer.
 - `deploy/lightsail-apache.conf` is read by `tests/apache-vhost.test.ts`: the
   `Link` header (the agent-discovery contract), the edge `Cache-Control`
   expression and the redirect rules it asserts must stay byte-identical.
+- The vhost isn't shipped by `deploy-theme.sh`. On the origin it is
+  `/etc/apache2/sites-available/computerjy-headless.conf`: diff, back up, `install`, then
+  `sudo apache2ctl configtest && sudo systemctl reload apache2`.
 
 Two static previews render the real `assets/css/theme.css` and
 `assets/js/theme.js` with no WordPress: `preview-home.html`,
@@ -97,6 +100,9 @@ Keep them in sync when you change markup structure.
   interaction / idle. Cloudflare Web Analytics (`beacon.min.js`) stays on.
   Edge injections only appear with a browser UA **and** `Accept: text/html` —
   plain `curl` gets a clean page, so verify with both headers.
+- Traffic data lives only in GA4 (property ID `551843372`): Jetpack Stats is off, so
+  WordPress.com stats tools fail. Read the GA4 Data API by impersonating
+  `ga4-reader@computerjy-analytics.iam.gserviceaccount.com` (Viewer); ADC login is blocked.
 - W3TC: page cache Disk:Enhanced, object cache Redis (shared with wp-cli via
   `objectcache.enabled_for_wp_cli`, so cron and deploy flushes are real),
   database cache **off**. Keep **off**: Browser Cache → HTML and "Other"
@@ -116,6 +122,8 @@ Keep them in sync when you change markup structure.
   by the theme (Customizer toggle). Nothing checks for broken links: the
   broken-link-checker plugin and its `link-check` workflow replacement are both
   gone (the workflow took about 8 minutes a run).
+- The WordPress MCP Adapter endpoint is `/wp-json/mcp/mcp-adapter-default-server`. It exposes only
+  core site/user/environment info and Jetpack Forms; use wp-cli for plugins, users and comments.
 - SEO is Jetpack SEO tools (title, description, canonical, OG/Twitter) plus
   `inc/seo.php` (JSON-LD, `og:image:alt`, noindex on date/author archives,
   legacy-URL 301s); Yoast is gone. Jetpack serves `/sitemap.xml`; the vhost
