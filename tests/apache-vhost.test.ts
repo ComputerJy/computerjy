@@ -69,6 +69,19 @@ describe('deploy/lightsail-apache.conf serves WordPress', () => {
     }
   });
 
+  it('denies log files and other sensitive files', () => {
+    // wp-content/debug.log from a 2022 WP_DEBUG run was publicly downloadable.
+    const deny = vhost.match(
+      /<FilesMatch "([^"]+)">\s*Require all denied/
+    )?.[1];
+    expect(deny).toBeDefined();
+    const re = new RegExp(deny as string);
+    for (const name of ['debug.log', 'error.log', '.env', 'wp-config.php'])
+      expect(name, name).toMatch(re);
+    for (const name of ['theme.css', 'blog.html', 'catalog.json'])
+      expect(name, name).not.toMatch(re);
+  });
+
   it('does not fall back to a static 404 page', () => {
     expect(vhost).not.toContain('ErrorDocument 404');
   });
