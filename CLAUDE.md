@@ -100,6 +100,14 @@ Keep them in sync when you change markup structure.
   interaction / idle. Cloudflare Web Analytics (`beacon.min.js`) stays on.
   Edge injections only appear with a browser UA **and** `Accept: text/html` —
   plain `curl` gets a clean page, so verify with both headers.
+- Consent: Google's certified CMP (AdSense → Privacy & messaging, European
+  regulations message with consent mode on for ads + analytics), loaded by the
+  AdSense tag (theme mod `computerjy2_adsense_id`, publisher
+  `pub-4480676073741111`, `public/ads.txt`). `computerjy2_analytics()` sets the
+  Consent Mode v2 defaults first: denied in the EEA/UK/CH, granted elsewhere.
+  The footer's "Privacy and cookie settings" button only appears where GDPR
+  applies. Keep Auto ads off until ads are wanted. The CMP only shows to EU
+  visitors, so check it on the live site from an EU IP.
 - Traffic data lives only in GA4 (property ID `551843372`): Jetpack Stats is off, so
   WordPress.com stats tools fail. Read the GA4 Data API by impersonating
   `ga4-reader@computerjy-analytics.iam.gserviceaccount.com` (Viewer); ADC login is blocked.

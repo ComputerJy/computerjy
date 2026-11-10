@@ -55,6 +55,12 @@
         <?php
         /* translators: %1$s: year, %2$s: site name */
         printf( esc_html__( '© %1$s %2$s', 'computerjy2' ), esc_html( date_i18n( 'Y' ) ), esc_html( strtoupper( get_bloginfo( 'name' ) ) ) );
+        // Reopens Google's consent message; theme.js unhides it where GDPR applies.
+        if ( computerjy2_sanitize_adsense_id( get_theme_mod( 'computerjy2_adsense_id', '' ) ) ) :
+            ?>
+            <button type="button" class="credit-prefs" hidden><?php esc_html_e( 'Privacy and cookie settings', 'computerjy2' ); ?></button>
+            <?php
+        endif;
         ?>
     </div>
 </footer>

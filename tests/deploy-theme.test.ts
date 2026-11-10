@@ -65,6 +65,7 @@ describe('deploy/deploy-theme.sh staging', () => {
     'webroot/.well-known/poppy.json',
     'webroot/api/openapi.json',
     'webroot/robots.txt',
+    'webroot/ads.txt',
     'webroot/security.txt',
     'webroot/auth.md',
     'webroot/markdown.php',

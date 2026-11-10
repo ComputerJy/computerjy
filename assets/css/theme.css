@@ -1429,6 +1429,20 @@ button.submit {
   color: var(--text-subtle);
   letter-spacing: 0.12em;
 }
+.credit-prefs {
+  margin-left: 1em;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.credit-prefs:hover {
+  color: var(--text-primary);
+}
 .back-to-top {
   position: fixed;
   right: 18px;

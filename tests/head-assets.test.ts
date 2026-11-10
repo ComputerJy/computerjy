@@ -24,8 +24,23 @@ describe('functions.php head assets', () => {
   });
 
   it('does not load gtag.js with an async <script src> in <head>', () => {
-    expect(php).not.toMatch(/<script async src=/);
+    expect(php).not.toMatch(
+      /<script async src="https:\/\/www\.googletagmanager/
+    );
     expect(php).toMatch(/document\.createElement\('script'\)/);
     expect(php).toMatch(/addEventListener\('load'/);
+  });
+
+  // Google's CMP (AdSense Privacy & messaging) only updates consent for
+  // visitors it shows a message to, so the defaults must be set first.
+  it('sets Consent Mode defaults before gtag config and the AdSense tag', () => {
+    const consent = php.indexOf("gtag('consent', 'default'");
+    expect(consent).toBeGreaterThan(-1);
+    expect(consent).toBeLessThan(php.indexOf("gtag('config'"));
+    expect(consent).toBeLessThan(php.indexOf('adsbygoogle.js'));
+    const region = php.match(/region: \[([^\]]*)\]/)?.[1] ?? '';
+    for (const cc of ['DE', 'FR', 'NO', 'IS', 'LI', 'GB', 'CH']) {
+      expect(region).toContain(`'${cc}'`);
+    }
   });
 });

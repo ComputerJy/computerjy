@@ -18,6 +18,18 @@ function computerjy2_sanitize_ga4_id( $value ) {
     return preg_match( '/^G-[A-Z0-9]{4,20}$/', $value ) ? $value : '';
 }
 
+/**
+ * An AdSense publisher ID is pub- plus 16 digits; the ca- client prefix is
+ * accepted and stripped. Anything else is dropped.
+ *
+ * @param string $value Raw input.
+ * @return string
+ */
+function computerjy2_sanitize_adsense_id( $value ) {
+    $value = preg_replace( '/^ca-/', '', strtolower( trim( (string) $value ) ) );
+    return preg_match( '/^pub-[0-9]{16}$/', $value ) ? $value : '';
+}
+
 function computerjy2_customize_register( $wp_customize ) {
 
     /* ---- Brand & social ---- */
@@ -59,6 +71,17 @@ function computerjy2_customize_register( $wp_customize ) {
     $wp_customize->add_control( 'computerjy2_ga4_id', array(
         'label'       => __( 'Google Analytics 4 measurement ID', 'computerjy2' ),
         'description' => __( 'e.g. G-XXXXXXXXXX. Leave blank to load no analytics.', 'computerjy2' ),
+        'section'     => 'computerjy2_brand',
+        'type'        => 'text',
+    ) );
+
+    $wp_customize->add_setting( 'computerjy2_adsense_id', array(
+        'default'           => '',
+        'sanitize_callback' => 'computerjy2_sanitize_adsense_id',
+    ) );
+    $wp_customize->add_control( 'computerjy2_adsense_id', array(
+        'label'       => __( 'AdSense publisher ID', 'computerjy2' ),
+        'description' => __( 'e.g. pub-0000000000000000. Loads the AdSense tag, which shows Google\'s consent message in the EEA, UK and Switzerland. Leave blank to load nothing.', 'computerjy2' ),
         'section'     => 'computerjy2_brand',
         'type'        => 'text',
     ) );
