@@ -204,24 +204,39 @@ function computerjy2_preload_fonts( $resources ) {
 add_filter( 'wp_preload_resources', 'computerjy2_preload_fonts' );
 
 /**
- * Google Analytics 4, when a measurement ID is configured.
+ * Google Analytics 4 and the AdSense tag, when their IDs are configured.
  * Not printed for logged-in editors, and skipped on AMP requests.
+ *
+ * Consent Mode v2 defaults come first: denied in the EEA, UK and Switzerland,
+ * granted elsewhere. The AdSense tag loads Google's certified CMP (AdSense
+ * Privacy & messaging, with consent mode on), which asks those visitors and
+ * updates the consent state. Until then GA4 sends only cookieless pings.
  *
  * gtag.js (~185 KB per container through Cloudflare's tag gateway) is the
  * largest thing on the page, so it is fetched on the first interaction or
  * once the page has loaded and gone idle, never during the LCP window (#145).
- * The dataLayer stub queues the pageview until then.
+ * The dataLayer stub queues the pageview until then. The AdSense tag stays a
+ * real async tag: AdSense site verification looks for it in the HTML.
  */
 function computerjy2_analytics() {
     // Re-validated at render: theme mods can be set outside the Customizer.
-    $id = computerjy2_sanitize_ga4_id( get_theme_mod( 'computerjy2_ga4_id', '' ) );
-    if ( '' === $id || is_user_logged_in() ) {
+    $id      = computerjy2_sanitize_ga4_id( get_theme_mod( 'computerjy2_ga4_id', '' ) );
+    $adsense = computerjy2_sanitize_adsense_id( get_theme_mod( 'computerjy2_adsense_id', '' ) );
+    if ( ( '' === $id && '' === $adsense ) || is_user_logged_in() ) {
         return;
     }
     ?>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
+        gtag('consent', 'default', {
+            ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied',
+            region: ['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE','IS','LI','NO','GB','CH']
+        });
+        gtag('consent', 'default', {
+            ad_storage: 'granted', ad_user_data: 'granted', ad_personalization: 'granted', analytics_storage: 'granted'
+        });
+    <?php if ( '' !== $id ) : ?>
         gtag('js', new Date());
         gtag('config', <?php echo wp_json_encode( $id ); ?>);
         (function(){
@@ -241,7 +256,11 @@ function computerjy2_analytics() {
                 (window.requestIdleCallback || setTimeout)(load);
             });
         })();
+    <?php endif; ?>
     </script>
+    <?php if ( '' !== $adsense ) : ?>
+    <script async src="<?php echo esc_url( 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-' . $adsense ); ?>" crossorigin="anonymous"></script>
+    <?php endif; ?>
     <?php
 }
 add_action( 'wp_head', 'computerjy2_analytics', 5 );

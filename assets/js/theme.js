@@ -612,6 +612,25 @@
       }
     });
   }
+  /* ---- Privacy and cookie settings (Google's CMP via the AdSense tag) ---- */
+  var prefs = document.querySelector('.credit-prefs');
+  if (prefs) {
+    window.googlefc = window.googlefc || {};
+    window.googlefc.callbackQueue = window.googlefc.callbackQueue || [];
+    window.googlefc.callbackQueue.push({
+      CONSENT_API_READY: function () {
+        window.__tcfapi('addEventListener', 2, function (data, ok) {
+          if (ok && data.gdprApplies) {
+            prefs.hidden = false;
+          }
+        });
+      },
+    });
+    prefs.addEventListener('click', function () {
+      window.googlefc.showRevocationMessage();
+    });
+  }
+
   if ('requestIdleCallback' in window) {
     requestIdleCallback(registerWebMcp, { timeout: 2500 });
   } else {
