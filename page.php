@@ -6,6 +6,8 @@
  * @package ComputerJy2
  */
 
+if ( ! defined( 'ABSPATH' ) ) { exit; }
+
 $cjy_front = is_front_page();
 
 get_header();

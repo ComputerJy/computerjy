@@ -86,6 +86,8 @@ function computerjy2_search_index_data() {
     $posts = get_posts( array(
         'post_type'              => 'post',
         'post_status'            => 'publish',
+        // Excerpts come from raw post_content; a protected post must not leak it.
+        'has_password'           => false,
         'numberposts'            => -1,
         'orderby'                => 'date',
         'order'                  => 'DESC',

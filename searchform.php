@@ -4,6 +4,9 @@
  *
  * @package ComputerJy2
  */
+
+if ( ! defined( 'ABSPATH' ) ) { exit; }
+
 $cjy_search_id = wp_unique_id( 'cjy-search-' );
 ?>
 <form role="search" method="get" class="search-form" action="<?php echo esc_url( home_url( '/' ) ); ?>">

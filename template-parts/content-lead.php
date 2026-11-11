@@ -4,6 +4,8 @@
  *
  * @package ComputerJy2
  */
+
+if ( ! defined( 'ABSPATH' ) ) { exit; }
 ?>
 <article id="post-<?php the_ID(); ?>" <?php post_class( 'lead-card' ); ?>>
     <a href="<?php the_permalink(); ?>" tabindex="-1" aria-hidden="true">
