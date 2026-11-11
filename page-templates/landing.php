@@ -9,6 +9,8 @@
  * @package ComputerJy2
  */
 
+if ( ! defined( 'ABSPATH' ) ) { exit; }
+
 get_header();
 ?>
 

@@ -4,6 +4,8 @@
  *
  * @package ComputerJy2
  */
+
+if ( ! defined( 'ABSPATH' ) ) { exit; }
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>

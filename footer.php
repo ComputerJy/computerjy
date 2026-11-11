@@ -4,6 +4,8 @@
  *
  * @package ComputerJy2
  */
+
+if ( ! defined( 'ABSPATH' ) ) { exit; }
 ?>
 <footer class="site-footer" role="contentinfo">
     <div class="container">

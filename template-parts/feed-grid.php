@@ -7,6 +7,8 @@
  * @package ComputerJy2
  */
 
+if ( ! defined( 'ABSPATH' ) ) { exit; }
+
 global $wp_query;
 $cjy_in_grid  = 0;
 $cjy_interval = computerjy2_infeed_interval();

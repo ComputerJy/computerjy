@@ -7,6 +7,8 @@
  * @var array $args title, query (WP_Query), ranked (bool), exclude (post ID).
  */
 
+if ( ! defined( 'ABSPATH' ) ) { exit; }
+
 $cjy_list = $args['query'];
 if ( ! $cjy_list->have_posts() ) {
     return;

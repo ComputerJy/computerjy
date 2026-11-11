@@ -4,6 +4,8 @@
  *
  * @package ComputerJy2
  */
+
+if ( ! defined( 'ABSPATH' ) ) { exit; }
 ?>
 <section class="state-block">
     <div class="state-code">000</div>

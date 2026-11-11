@@ -5,6 +5,8 @@
  * @package ComputerJy2
  */
 
+if ( ! defined( 'ABSPATH' ) ) { exit; }
+
 get_header();
 $cjy_term = get_queried_object();
 ?>
