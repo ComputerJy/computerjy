@@ -314,3 +314,18 @@ function computerjy2_schema() {
     }
 }
 add_action( 'wp_head', 'computerjy2_schema' );
+
+/**
+ * Hide the REST users list from visitors who can't list users. It leaked the
+ * Gravatar email hash and every account, not just the authors the bylines name.
+ *
+ * @param array $endpoints REST routes.
+ * @return array
+ */
+function computerjy2_hide_rest_users( $endpoints ) {
+    if ( ! current_user_can( 'list_users' ) ) {
+        unset( $endpoints['/wp/v2/users'], $endpoints['/wp/v2/users/(?P<id>[\d]+)'] );
+    }
+    return $endpoints;
+}
+add_filter( 'rest_endpoints', 'computerjy2_hide_rest_users' );
