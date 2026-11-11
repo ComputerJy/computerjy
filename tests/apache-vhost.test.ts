@@ -76,7 +76,15 @@ describe('deploy/lightsail-apache.conf serves WordPress', () => {
     )?.[1];
     expect(deny).toBeDefined();
     const re = new RegExp(deny as string);
-    for (const name of ['debug.log', 'error.log', '.env', 'wp-config.php'])
+    for (const name of [
+      'debug.log',
+      'error.log',
+      '.env',
+      'wp-config.php',
+      'computerjy-edge-cache.php.bak-2026-11-08',
+      'functions.php.bak',
+      'seo.php~',
+    ])
       expect(name, name).toMatch(re);
     for (const name of ['theme.css', 'blog.html', 'catalog.json'])
       expect(name, name).not.toMatch(re);
