@@ -308,9 +308,10 @@
 
   /* ---- Image lightbox: click an article image to zoom and pan ----
      Unlinked content images and the single-post hero (through its scrim,
-     which covers it). Zoom: + / − / FIT buttons and keys, ctrl+wheel or
-     trackpad pinch, touch pinch, double-click or double-tap. Pan: drag,
-     scrollbars, wheel. Esc and the native <dialog> handle close and focus. */
+     which covers it). Opens over the article column so the sidebar and
+     sponsor slots stay in view; the FULL button (or F) fills the screen.
+     Zoom: + / − / FIT buttons and keys, ctrl+wheel or trackpad pinch,
+     touch pinch, double-click or double-tap. Pan: drag, scrollbars, wheel. Esc and the native <dialog> handle close and focus. */
   var ZOOMABLE = '.entry-content img:not(a img):not(.emoji)';
   var box, stage, pic, cap, want;
   var zoom = 1;
@@ -381,6 +382,7 @@
     box.setAttribute('aria-label', 'Image viewer');
     box.innerHTML =
       '<div class="lightbox-bar">' +
+      '<button type="button" data-zoom="full" aria-label="Full screen" aria-pressed="false">FULL</button>' +
       '<button type="button" data-zoom="out" aria-label="Zoom out">&minus;</button>' +
       '<button type="button" data-zoom="fit" aria-label="Fit to screen">FIT</button>' +
       '<button type="button" data-zoom="in" aria-label="Zoom in">+</button>' +
@@ -397,18 +399,20 @@
       if (action === 'in') setZoom(zoom * 1.5);
       else if (action === 'out') setZoom(zoom / 1.5);
       else if (action === 'fit') setZoom(1);
+      else if (action === 'full') setFull(!box.classList.contains('is-full'));
       else if (action === 'close') box.close();
     }
     box.addEventListener('click', function (e) {
       var b = e.target.closest('[data-zoom]');
       if (b) {
         zoomBy(b.getAttribute('data-zoom'));
-      } else if ((e.target === box || e.target === stage) && zoom === 1) {
+      } else if (e.target === box || (e.target === stage && zoom === 1)) {
+        // e.target === box is the backdrop: the page around the viewer
         box.close();
       }
     });
     box.addEventListener('keydown', function (e) {
-      var map = { '+': 'in', '=': 'in', '-': 'out', 0: 'fit' };
+      var map = { '+': 'in', '=': 'in', '-': 'out', 0: 'fit', f: 'full' };
       if (map[e.key]) {
         e.preventDefault();
         zoomBy(map[e.key]);
@@ -479,13 +483,33 @@
       lift(e);
     });
     stage.addEventListener('pointercancel', lift);
+    window.addEventListener('resize', function () {
+      if (box.open) refit();
+    });
+  }
+
+  /* Pin the viewer to the article column (the whole viewport where there
+     is none, or when .is-full), then refit the image to the new size. */
+  function refit() {
+    var col = document.querySelector('.single-main, .entry-content');
+    var r = col && col.getBoundingClientRect();
+    box.style.setProperty('--lb-left', r ? r.left + 'px' : '0px');
+    box.style.setProperty('--lb-width', r ? r.width + 'px' : '100%');
+    zoom = 1;
+    box.classList.remove('is-zoomed');
+    pic.style.width = '';
+  }
+
+  function setFull(on) {
+    var b = box.querySelector('[data-zoom="full"]');
+    box.classList.toggle('is-full', on);
+    b.setAttribute('aria-pressed', String(on));
+    b.textContent = on ? 'EXIT' : 'FULL';
+    refit();
   }
 
   function openBox(img) {
     if (!box) buildBox();
-    zoom = 1;
-    box.classList.remove('is-zoomed');
-    pic.style.width = '';
     pic.src = img.currentSrc || img.src; // already loaded: shows at once
     pic.alt = img.alt;
     want = fullSrc(img);
@@ -502,6 +526,9 @@
     cap.textContent = fc ? fc.textContent.trim() : '';
     cap.hidden = !cap.textContent;
     box.showModal();
+    // Each open starts at column width. Measured after showModal: the scroll
+    // lock drops the scrollbar and re-centres the page.
+    setFull(false);
   }
 
   document.addEventListener('click', function (e) {
