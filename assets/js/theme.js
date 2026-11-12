@@ -310,12 +310,14 @@
      Unlinked content images and the single-post hero (through its scrim,
      which covers it). Opens over the article column so the sidebar and
      sponsor slots stay in view; the FULL button (or F) fills the screen.
-     Zoom: + / − / FIT buttons and keys, ctrl+wheel or trackpad pinch,
-     touch pinch, double-click or double-tap. Pan: drag, scrollbars, wheel. Esc and the native <dialog> handle close and focus. */
+     Zoom: + / − / FIT buttons and keys, mouse wheel or trackpad pinch,
+     touch pinch, double-click or double-tap. Pan: drag, scrollbars.
+     Esc and the native <dialog> handle close and focus. */
   var ZOOMABLE = '.entry-content img:not(a img):not(.emoji)';
   var box, stage, pic, cap, want;
   var zoom = 1;
   var fitW = 0;
+  var fitH = 0;
   var pts = {};
   var pinch = 0;
   var drag = null;
@@ -351,6 +353,7 @@
     z = Math.min(8, Math.max(1, z));
     if (zoom === 1) {
       fitW = pic.getBoundingClientRect().width;
+      fitH = stage.clientHeight;
     }
     if (px == null) {
       px = stage.clientWidth / 2;
@@ -362,6 +365,8 @@
     zoom = z;
     box.classList.toggle('is-zoomed', z > 1);
     pic.style.width = z > 1 ? fitW * z + 'px' : '';
+    // Keep the frame the fitted size, so zooming happens inside it.
+    stage.style.height = z > 1 ? fitH + 'px' : '';
     stage.scrollLeft = x;
     stage.scrollTop = y;
   }
@@ -421,10 +426,13 @@
     stage.addEventListener(
       'wheel',
       function (e) {
-        if (!e.ctrlKey) return; // plain wheel scrolls the zoomed image
         e.preventDefault();
+        // Pinch arrives as ctrl+wheel in small steps; a mouse notch is
+        // ~100px (3 lines in Firefox) and zooms ~1.2x.
+        var dy = e.deltaMode === 1 ? e.deltaY * 33 : e.deltaY;
+        dy = Math.max(-100, Math.min(100, dy));
         var p = stagePoint(e.clientX, e.clientY);
-        setZoom(zoom * Math.exp(-e.deltaY * 0.01), p[0], p[1]);
+        setZoom(zoom * Math.exp(-dy * (e.ctrlKey ? 0.01 : 0.002)), p[0], p[1]);
       },
       { passive: false }
     );
@@ -498,6 +506,7 @@
     zoom = 1;
     box.classList.remove('is-zoomed');
     pic.style.width = '';
+    stage.style.height = '';
   }
 
   function setFull(on) {
