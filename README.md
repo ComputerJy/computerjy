@@ -43,14 +43,24 @@ Upload in **Appearance → Themes → Add New → Upload Theme**, then:
 
 ## Layout slots
 
-`computerjy2_slot( $id )` renders a height-reserved container so filling it
-never shifts layout. Slots: `leaderboard`, `infeed`, `inarticle`, `sidebar`.
+`computerjy2_slot( $id )` renders a container with a minimum reserved height;
+responsive units can grow taller. Slots: `leaderboard`, `infeed`, `inarticle`,
+`sidebar`. Populated slots allow responsive units to expand beyond the column.
+The sidebar's sticky group returns to normal flow at viewport widths of 900px
+or less, where the sidebar moves below the article.
 
 Fill a slot three ways:
 
 - paste markup in the Customizer,
 - `add_action( 'computerjy2_slot_inarticle', $callback )`,
 - let a plugin inject into the container.
+
+With the AdSense publisher ID configured, the theme loads `adsbygoogle.js` in
+the head. Paste only each unit's `<ins>` element and its initialization script
+into the slot; omit the duplicate external loader included in Google's snippet.
+Keep Cloudflare's Google tag gateway off: its injected loader can read consent
+before the theme sets defaults. Google's consent message is supplied separately
+through AdSense Privacy & messaging.
 
 Filters: `computerjy2_infeed_interval`, `computerjy2_inarticle_after_paragraph`,
 `computerjy2_posts_per_page`, `computerjy2_content_width`.
