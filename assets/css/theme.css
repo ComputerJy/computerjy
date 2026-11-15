@@ -1110,6 +1110,9 @@ a:focus-visible {
   border: 0;
   background: transparent;
   display: block;
+  /* Responsive units may expand beyond the column on mobile. */
+  overflow: visible;
+  contain: none;
 }
 .unit-leaderboard {
   min-height: 90px;
@@ -1894,6 +1897,10 @@ body:has(.lightbox[open]) {
   }
   .single-aside {
     border-top: 1px solid var(--border-color);
+  }
+  .is-sticky-slot {
+    position: static;
+    top: auto;
   }
   .footer-cols {
     grid-template-columns: 1fr 1fr;
