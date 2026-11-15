@@ -1093,6 +1093,11 @@ a:focus-visible {
 }
 
 /* ---------- 16. Reserved layout slots (sponsor placements) ---------- */
+/* Google can collapse an unfilled unit while leaving its iframe host full-size.
+   Remove the empty unit from layout so that host cannot widen the viewport. */
+ins.adsbygoogle[data-ad-status='unfilled'] {
+  display: none !important;
+}
 .reserved-unit {
   border: 1px dashed var(--rule-strong);
   background: rgba(0, 210, 255, 0.04);
