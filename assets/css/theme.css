@@ -664,6 +664,8 @@ a:focus-visible {
   min-width: 0;
 }
 .single-aside {
+  /* Full-width responsive units must not set the grid item's minimum width. */
+  min-width: 0;
   padding: 22px 20px 34px;
   display: flex;
   flex-direction: column;
